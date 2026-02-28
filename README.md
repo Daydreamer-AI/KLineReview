@@ -4,13 +4,9 @@
 
 ## 效果图
 
-
-
 ![功能演示动图](docs/效果图/行情.gif)
 
 ![功能演示动图](docs/效果图/回放.gif)
-
-
 
 ![项目架构图](docs/效果图/行情.jpg)
 
@@ -71,7 +67,21 @@ pip install -r requirements.txt
 ./scripts/run_baostock_data_update.bat
 ```
 
-数据下载完成后，运行主程序
+脚本下载较慢，也可下载以下网盘备份（历史数据）：
+
+百度网盘: https://pan.baidu.com/s/5BlN_z8Ga_Ya_Ew4UUN8-cQ
+
+夸克网盘：https://pan.quark.cn/s/6defc64e2982
+
+
+
+解压得到的stocks文件夹，放入KLineReview/data/database目录：
+
+![项目架构图](docs/其他/网盘下载数据.jpg)
+
+
+
+运行主程序（若未事先下载数据，也可在程序运行后的接口界面按需下载数据）
 
 ```bash
 python ./src/main.py
