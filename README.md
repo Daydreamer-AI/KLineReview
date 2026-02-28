@@ -17,8 +17,8 @@
 ### 克隆代码到本地仓库
 
 ```bash
-git clone ...
-cd ...
+git clone https://github.com/Daydreamer-AI/KLineReview.git
+cd KLineReview
 ```
 
 ### 创建并激活虚拟环境
@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 ## 使用示例
 
-因使用本地数据，首次运行需手动下载数据。
+**因使用本地数据，首次运行需手动下载数据。**
 
 执行数据下载脚本：
 ```bash
@@ -56,10 +56,6 @@ pip install -r requirements.txt
 ```bash
 python ./src/main.py
 ```
-
-## 文档
-
-详细文档请参阅 [docs/](docs/) 目录。
 
 ## 贡献指南
 
