@@ -57,6 +57,10 @@ pip install -r requirements.txt
 python ./src/main.py
 ```
 
+## 文档
+
+详细文档请参阅 [docs/](docs/) 目录。
+
 ## 贡献指南
 
 欢迎提交问题和贡献代码，请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。
