@@ -1,0 +1,40 @@
+/*StrategyHomeWidget*/
+
+
+/*StrategyWaitWidget*/
+/* #StrategyWaitWidget {
+    font-size: 24px;
+} */
+
+/*StrategyWidget*/
+/* #StrategyWidget #frame {
+    border: 1px solid #d8d8d8;
+}
+
+#StrategyWidget #frame QPushButton { 
+    border: 1px solid #d8d8d8;
+
+    font-size: 16px;
+    color: #292929;
+}
+
+#StrategyWidget #frame QPushButton:hover { 
+    border: 1px solid #2982FF;
+    color: #000000;
+}
+
+#StrategyWidget #frame QPushButton:checked { 
+    border: 1px solid #2982FF;
+    color: #000000;
+    background-color: #2982FF;
+} */
+
+#StockCardWidget {border-bottom: 1px solid #000000;}
+#StockCardWidget #label_stock_name {font-size: 20px;}
+#StockCardWidget #label_stock_code {font-size: 18px; }
+#StockCardWidget #label_price[change_status="up"] {font-size: 20px; font-weight: bold; color: rgb(255, 0, 0);}
+#StockCardWidget #label_price[change_status="down"] {font-size: 20px; font-weight: bold; color: rgb(21, 130, 42);}
+#StockCardWidget #label_price[change_status="flat"] {font-size: 20px; font-weight: bold; color: rgb(0, 0, 0);}
+#StockCardWidget #label_change_percent[change_status="up"] {font-size: 18px; color: rgb(255, 0, 0);}
+#StockCardWidget #label_change_percent[change_status="down"] {font-size: 18px; color: rgb(21, 130, 42);}
+#StockCardWidget #label_change_percent[change_status="flat"] {font-size: 18px; color: rgb(0, 0, 0);}

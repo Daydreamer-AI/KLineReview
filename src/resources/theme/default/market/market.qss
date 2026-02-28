@@ -1,0 +1,10 @@
+/*MarketWidget*/
+#MarketHomeWidget #MarketWidget #StockCardWidget {border-bottom: 1px solid #000000;}
+#MarketHomeWidget #MarketWidget #StockCardWidget #label_stock_name {font-size: 20px;}
+#MarketHomeWidget #MarketWidget #StockCardWidget #label_stock_code {font-size: 18px; }
+#MarketHomeWidget #MarketWidget #StockCardWidget #label_price[change_status="up"] {font-size: 20px; font-weight: bold; color: rgb(255, 0, 0);}
+#MarketHomeWidget #MarketWidget #StockCardWidget #label_price[change_status="down"] {font-size: 20px; font-weight: bold; color: rgb(21, 130, 42);}
+#MarketHomeWidget #MarketWidget #StockCardWidget #label_price[change_status="flat"] {font-size: 20px; font-weight: bold; color: rgb(0, 0, 0);}
+#MarketHomeWidget #MarketWidget #StockCardWidget #label_change_percent[change_status="up"] {font-size: 18px; color: rgb(255, 0, 0);}
+#MarketHomeWidget #MarketWidget #StockCardWidget #label_change_percent[change_status="down"] {font-size: 18px; color: rgb(21, 130, 42);}
+#MarketHomeWidget #MarketWidget #StockCardWidget #label_change_percent[change_status="flat"] {font-size: 18px; color: rgb(0, 0, 0);}

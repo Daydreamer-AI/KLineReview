@@ -1,0 +1,68 @@
+/*MainWidget*/
+#MainWidget #frame_tab {border-top: none; border-bottom: 1px solid #000000;}
+#MainWidget #frame_tab QPushButton {color: #292929; font-size: 22px; border: none;}
+#MainWidget #frame_tab QPushButton:hover {color: #000000; border-bottom: 3px solid #2982FF;}
+#MainWidget #frame_tab QPushButton:pressed {color: #000000; border-bottom: 3px solid #0053D9;}
+#MainWidget #frame_tab QPushButton:checked {
+    color: #000000; 
+    font-weight: bold; 
+    border-bottom: 3px solid #0066FF;
+    background: qlineargradient(
+        x1: 0, y1: 0, 
+        x2: 0, y2: 1, 
+        stop: 0 #F0F0F0, 
+        stop: 1 #330066FF
+    );
+}
+#MainWidget #frame_tab QPushButton:disabled {color: #BDBDBD; font-weight: normal; border: none;}
+
+QCheckBox::indicator { width: 16px;height: 16px;}
+QCheckBox::indicator:unchecked {image: url(:/icon/general/not_checked_normal.svg);}
+QCheckBox::indicator:unchecked:hover{image: url(:/icon/general/not_checked_hover.svg);}
+QCheckBox::indicator:unchecked:pressed{image: url(:/icon/general/not_checked_pressed.svg);}
+QCheckBox::indicator:unchecked:disabled{image: url(:/icon/general/not_checked_disabled.svg);}
+
+QCheckBox::indicator:checked{image: url(:/icon/general/checked_with_background_checked.svg);}
+QCheckBox::indicator:checked:hover{image: url(:/icon/general/checked_with_background_hovered.svg);}
+QCheckBox::indicator:checked:pressed{image: url(:/icon/general/checked_with_background_pressed.svg);}
+QCheckBox::indicator:checked:disabled{image: url(:/icon/general/checked_with_background_disabled.svg);}
+
+QCheckBox::indicator:partiallyChecked{image: url(:/icon/general/partially_checked_checked.svg);}
+QCheckBox::indicator:partiallyChecked:hover{image: url(:/icon/general/partially_checked_hovered.svg);}
+QCheckBox::indicator:partiallyChecked:pressed{image: url(:/icon/general/partially_checked_pressed.svg);}
+QCheckBox::indicator:partiallyChecked:disabled{image: url(:/icon/general/partially_checked_disabled.svg);}
+
+/* QRadioButton{font-size:24px;color:rgb(50,50,50);spacing:18px;} */
+QRadioButton::indicator { width: 16px;height: 16px;}
+QRadioButton::indicator:unchecked {image: url(:/icon/general/radio_unchecked_normal.svg);}
+QRadioButton::indicator:unchecked:hover{image: url(:/icon/general/radio_unchecked_hovered.svg);}
+QRadioButton::indicator:unchecked:pressed{image: url(:/icon/general/radio_unchecked_pressed.svg);}
+QRadioButton::indicator:unchecked:disabled{image: url(:/icon/general/radio_unchecked_disabled.svg);}
+
+QRadioButton::indicator:checked{image: url(:/icon/general/radio_checked_checked.svg);}
+QRadioButton::indicator:checked:hover{image: url(:/icon/general/radio_checked_hovered.svg);}
+QRadioButton::indicator:checked:pressed{image: url(:/icon/general/radio_checked_pressed.svg);}
+QRadioButton::indicator:checked:disabled{image: url(:/icon/general/radio_checked_disabled.svg);}
+
+/* #MainWidget #btn_setting{image: url(:/icon/general/setting_normal.svg); border: none;}
+#MainWidget #btn_setting:hover{image: url(:/icon/general/setting_hovered.svg);}
+#MainWidget #btn_setting:pressed{image: url(:/icon/general/setting_pressed.svg);}
+#MainWidget #btn_setting:disabled{image: url(:/icon/general/setting_disabled.svg);} */
+
+#MainWidget #btn_min{image: url(:/icon/general/minimum_normal.svg); border: none;}
+#MainWidget #btn_min:hover{image: url(:/icon/general/minimum_hovered.svg); border: none; background: #D8D8D8;}
+#MainWidget #btn_min:pressed{image: url(:/icon/general/minimum_pressed.svg); border: none; background: #B8B8B8;}
+#MainWidget #btn_min:disabled{image: url(:/icon/general/minimum_disabled.svg); border: none;}
+
+#MainWidget #btn_close{image: url(:/icon/general/close_without_background_normal.svg); border: none;}
+#MainWidget #btn_close:hover{image: url(:/icon/general/close_without_background_hovered.svg);background: #E81123;}
+#MainWidget #btn_close:pressed{image: url(:/icon/general/close_without_background_pressed.svg); background: #EE6E79;}
+#MainWidget #btn_close:disabled{image: url(:/icon/general/close_without_background_disabled.svg);}
+
+
+/*HomeWidget*/
+#HomeWidget #frame_bottom {border: 1px solid #000000; border-radius: 6px;}
+
+/*MinuteLevelSelectDialog*/
+
+/*StockDataFetchWidget*/

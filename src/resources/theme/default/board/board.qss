@@ -1,0 +1,26 @@
+/*BoardHome*/
+#BoardHome #frame_board_type {border-top: none; border-bottom: 1px solid #DBDBDB; background: #F5F5F5;}
+#BoardHome #frame_board_type QPushButton{border: none;}
+#BoardHome #frame_board_type QPushButton:hover {color: #2982FF; background: #D8D8D8;}
+#BoardHome #frame_board_type QPushButton:pressed {color: #0053D9; background: #B8B8B8;}
+#BoardHome #frame_board_type QPushButton:checked {color: #0066FF; background: #F0F0F0;}
+#BoardHome #frame_board_type QPushButton:disabled {color: #7AB4FF; background: #BDBDBD;}
+
+
+/*BoardOverViewWidget*/
+
+/*IndustryBoard*/
+
+/*ConceptBoardWidget*/
+
+
+/*StockCardWidget*/
+#StockCardWidget {border-bottom: 1px solid #000000;}
+#StockCardWidget #label_stock_name {font-size: 20px;}
+#StockCardWidget #label_stock_code {font-size: 18px; }
+#StockCardWidget #label_price[change_status="up"] {font-size: 20px; font-weight: bold; color: rgb(255, 0, 0);}
+#StockCardWidget #label_price[change_status="down"] {font-size: 20px; font-weight: bold; color: rgb(21, 130, 42);}
+#StockCardWidget #label_price[change_status="flat"] {font-size: 20px; font-weight: bold; color: rgb(0, 0, 0);}
+#StockCardWidget #label_change_percent[change_status="up"] {font-size: 18px; color: rgb(255, 0, 0);}
+#StockCardWidget #label_change_percent[change_status="down"] {font-size: 18px; color: rgb(21, 130, 42);}
+#StockCardWidget #label_change_percent[change_status="flat"] {font-size: 18px; color: rgb(0, 0, 0);}

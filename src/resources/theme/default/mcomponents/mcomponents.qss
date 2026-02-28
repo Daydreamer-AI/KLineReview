@@ -1,0 +1,53 @@
+/*IndicatorsViewWidget*/
+#IndicatorsViewWidget #btn_review {}
+#IndicatorsViewWidget #btn_review:hover {color: #2982FF;}
+#IndicatorsViewWidget #btn_review:pressed {color: #0053D9;}
+#IndicatorsViewWidget #btn_review:disabled {color: #BDBDBD;}
+
+#IndicatorsViewWidget #frame_indicators_tool {border-top: 1px solid #000000; border-bottom: 1px solid #000000;}
+#IndicatorsViewWidget #frame_indicators_tool QPushButton {border: none;}
+#IndicatorsViewWidget #frame_indicators_tool QPushButton:hover {color: #2982FF;}
+#IndicatorsViewWidget #frame_indicators_tool QPushButton:pressed {color: #0053D9;}
+#IndicatorsViewWidget #frame_indicators_tool QPushButton:checked {color: #0066FF;}
+#IndicatorsViewWidget #frame_indicators_tool QPushButton:disabled {color: #BDBDBD;}
+
+#MainWidget #btn_close{image: url(:/icon/general/close_without_background_normal.svg); border: none;}
+#MainWidget #btn_close:hover{image: url(:/icon/general/close_without_background_hovered.svg);background: #D8D8D8;}
+#MainWidget #btn_close:pressed{image: url(:/icon/general/close_without_background_pressed.svg); background: #D8D8D8;}
+#MainWidget #btn_close:disabled{image: url(:/icon/general/close_without_background_disabled.svg);}
+
+#IndicatorsViewWidget #btn_setting{image: url(:/icon/general/setting_normal.svg); border: none;}
+#IndicatorsViewWidget #btn_setting:hover{image: url(:/icon/general/setting_hover.svg);}
+#IndicatorsViewWidget #btn_setting:pressed{image: url(:/icon/general/setting_pressed.svg);}
+#IndicatorsViewWidget #btn_setting:disabled{image: url(:/icon/general/setting_disabled.svg);}
+
+/*KLineWidget*/
+#IndicatorsViewWidget #KLineWidget #btn_restore {image: url(:/icon/general/reset_normal.svg); border: none;}
+#IndicatorsViewWidget #KLineWidget #btn_restore:hover {image: url(:/icon/general/reset_hovered.svg);}
+#IndicatorsViewWidget #KLineWidget #btn_restore:pressed {image: url(:/icon/general/reset_pressed.svg);}
+#IndicatorsViewWidget #KLineWidget #btn_restore:disabled {image: url(:/icon/general/reset_disabled.svg);}
+
+#IndicatorsViewWidget #KLineWidget #btn_zoom_in {
+    image: url(:/icon/general/zoom_in_normal.svg); 
+    border: none;
+    min-width: 12px;
+    min-height: 12px;
+    max-width: 12px;
+    max-height: 12px;
+    }
+#IndicatorsViewWidget #KLineWidget #btn_zoom_in:hover {image: url(:/icon/general/zoom_in_hovered.svg);}
+#IndicatorsViewWidget #KLineWidget #btn_zoom_in:pressed {image: url(:/icon/general/zoom_in_pressed.svg);}
+#IndicatorsViewWidget #KLineWidget #btn_zoom_in:disabled {image: url(:/icon/general/zoom_in_disabled.svg);}
+
+#IndicatorsViewWidget #KLineWidget #btn_zoom_out {
+    image: url(:/icon/general/zoom_out_normal.svg); 
+    border: none;
+    min-width: 12px;
+    min-height: 12px;
+    max-width: 12px;
+    max-height: 12px;
+    }
+#IndicatorsViewWidget #KLineWidget #btn_zoom_out:hover {image: url(:/icon/general/zoom_out_hovered.svg);}
+#IndicatorsViewWidget #KLineWidget #btn_zoom_out:pressed {image: url(:/icon/general/zoom_out_pressed.svg);}
+#IndicatorsViewWidget #KLineWidget #btn_zoom_out:disabled {image: url(:/icon/general/zoom_out_disabled.svg);}
+

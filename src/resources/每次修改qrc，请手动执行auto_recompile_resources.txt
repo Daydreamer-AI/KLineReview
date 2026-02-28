@@ -1,0 +1,1 @@
+每次修改qrc，请手动执行auto_recompile_resources。

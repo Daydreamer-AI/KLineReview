@@ -1,0 +1,7 @@
+akshare
+baostock
+PyQt5
+PyQtGraph
+Pandas
+PyQtChart
+psutil

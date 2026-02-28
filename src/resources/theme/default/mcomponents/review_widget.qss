@@ -1,0 +1,62 @@
+/*ReviewWidget*/
+#frame_review {border: 1px solid #000000;}
+#frame_review #btn_load_data_random {image: url(:/icon/general/random_normal.svg); border: none;}
+#frame_review #btn_load_data_random:hover {image: url(:/icon/general/random_hovered.svg);}
+#frame_review #btn_load_data_random:pressed {image: url(:/icon/general/random_pressed.svg);}
+#frame_review #btn_load_data_random:disabled {image: url(:/icon/general/random_disabled.svg);}
+
+#frame_review #btn_play[is_play="false"] {image: url(:/icon/general/play_with_border_normal.svg); border: none;}
+#frame_review #btn_play[is_play="false"]:hover {image: url(:/icon/general/play_with_border_hovered.svg); }
+#frame_review #btn_play[is_play="false"]:pressed {image: url(:/icon/general/play_with_border_pressed.svg); }
+#frame_review #btn_play[is_play="false"]:disabled {image: url(:/icon/general/play_with_border_disabled.svg); }
+
+#frame_review #btn_play[is_play="true"] {image: url(:/icon/general/pause_with_border_normal.svg); border: none;}
+#frame_review #btn_play[is_play="true"]:hover {image: url(:/icon/general/pause_with_border_hovered.svg); }
+#frame_review #btn_play[is_play="true"]:pressed {image: url(:/icon/general/pause_with_border_pressed.svg); }
+#frame_review #btn_play[is_play="true"]:disabled {image: url(:/icon/general/pause_with_border_disabled.svg); }
+
+#frame_review #btn_back_to_front {image: url(:/icon/general/fast_backward_to_the_head_normal.svg); border: none;}
+#frame_review #btn_back_to_front:hover {image: url(:/icon/general/fast_backward_to_the_head_hovered.svg); }
+#frame_review #btn_back_to_front:pressed {image: url(:/icon/general/fast_backward_to_the_head_pressed.svg); }
+#frame_review #btn_back_to_front:disabled {image: url(:/icon/general/fast_backward_to_the_head_disabled.svg); }
+
+#frame_review #btn_back_ten {image: url(:/icon/general/fast_backward_normal.svg); border: none;}
+#frame_review #btn_back_ten:hover {image: url(:/icon/general/fast_backward_hovered.svg); }
+#frame_review #btn_back_ten:pressed {image: url(:/icon/general/fast_backward_pressed.svg); }
+#frame_review #btn_back_ten:disabled {image: url(:/icon/general/fast_backward_disabled.svg); }
+
+#frame_review #btn_back {image: url(:/icon/general/backward_normal.svg); border: none;}
+#frame_review #btn_back:hover {image: url(:/icon/general/backward_hovered.svg); }
+#frame_review #btn_back:pressed {image: url(:/icon/general/backward_pressed.svg); }
+#frame_review #btn_back:disabled {image: url(:/icon/general/backward_disabled.svg); }
+
+#frame_review #btn_move_on {image: url(:/icon/general/forward_normal.svg); border: none;}
+#frame_review #btn_move_on:hover {image: url(:/icon/general/forward_hovered.svg); }
+#frame_review #btn_move_on:pressed {image: url(:/icon/general/forward_pressed.svg); }
+#frame_review #btn_move_on:disabled {image: url(:/icon/general/forward_disabled.svg); }
+
+#frame_review #btn_move_on_10 {image: url(:/icon/general/fast_forward_normal.svg); border: none;}
+#frame_review #btn_move_on_10:hover {image: url(:/icon/general/fast_forward_hovered.svg); }
+#frame_review #btn_move_on_10:pressed {image: url(:/icon/general/fast_forward_pressed.svg); }
+#frame_review #btn_move_on_10:disabled {image: url(:/icon/general/fast_forward_disabled.svg); }
+
+#frame_review #btn_move_to_last {image: url(:/icon/general/fast_forward_to_the_end_normal.svg); border: none;}
+#frame_review #btn_move_to_last:hover {image: url(:/icon/general/fast_forward_to_the_end_hovered.svg); }
+#frame_review #btn_move_to_last:pressed {image: url(:/icon/general/fast_forward_to_the_end_pressed.svg); }
+#frame_review #btn_move_to_last:disabled {image: url(:/icon/general/fast_forward_to_the_end_disabled.svg); }
+
+
+#frame_review #btn_buy {background: #E5403C; border: none;}
+#frame_review #btn_buy:hover {background: #F26D66;}
+#frame_review #btn_buy:pressed {background: #BE282A;}
+#frame_review #btn_buy:disabled {background: #FFC4BE;}
+
+#frame_review #btn_sell {background: #1BCB34; border: none;}
+#frame_review #btn_sell:hover {background: #45BF52;}
+#frame_review #btn_sell:pressed {background: #158B2A;}
+#frame_review #btn_sell:disabled {background: #92D995;}
+
+#frame_review #btn_pending_order_cancel {background: #F18125; border: none;}
+#frame_review #btn_pending_order_cancel:hover {background: #FF9E4F;}
+#frame_review #btn_pending_order_cancel:pressed {background: #DA6017;}
+#frame_review #btn_pending_order_cancel:disabled {background: #FFD1A0;}
