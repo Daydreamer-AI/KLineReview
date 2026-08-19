@@ -27,28 +27,20 @@ class MainWidget(QWidget):
         self.logger = get_logger(__name__)
 
     def init_ui(self):
+        self.frame_tab.hide()
+
         self.main_button_group = QtWidgets.QButtonGroup(self)
-        self.main_button_group.addButton(self.btn_home, 0)
-        self.main_button_group.addButton(self.btn_market, 1)
-        self.main_button_group.addButton(self.btn_review, 2)
+        self.main_button_group.addButton(self.btn_review, 0)
 
-
-        self.home_page = HomeWidget()
-        self.market_page = MarketHomeWidget()
         self.review_page = ReviewWidget()
-
-        self.stackedWidget.addWidget(self.home_page)
-        self.stackedWidget.addWidget(self.market_page)
 
         self.stackedWidget.addWidget(self.review_page)
 
-        self.stackedWidget.setCurrentWidget(self.market_page)
+        self.stackedWidget.setCurrentWidget(self.review_page)
 
         self.load_qss()
 
     def init_connect(self):
-        self.btn_home.clicked.connect(self.slot_btn_home_clicked)
-        self.btn_market.clicked.connect(self.slot_btn_market_clicked)
         self.btn_review.clicked.connect(self.slot_btn_review_clicked)
 
 
@@ -97,14 +89,5 @@ class MainWidget(QWidget):
 
 
     # --------------槽函数---------------
-
-    @pyqtSlot()
-    def slot_btn_home_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.home_page)
-
-    @pyqtSlot()
-    def slot_btn_market_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.market_page)
-
     def slot_btn_review_clicked(self):
         self.stackedWidget.setCurrentWidget(self.review_page)
