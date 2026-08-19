@@ -9,6 +9,8 @@ from gui.qt_widgets.market.market_home_widget import MarketHomeWidget
 from gui.qt_widgets.MComponents.review_widget import ReviewWidget
 from thread.task_pool import get_default_task_pool
 
+from processor.baostock_processor import BaoStockProcessor
+
 class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -81,7 +83,15 @@ class MainWidget(QWidget):
             task_pool = get_default_task_pool()
             task_pool.shutdown(wait=True, cancel_running=True)
             print("应用程序正在退出...")
-            event.accept()  # 接受关闭事件
+            self.logger.info("开始执行清理操作...")
+            try:
+                BaoStockProcessor().cleanup() # 清理所有处理器
+            except Exception as e:
+                self.logger.info(f"清理过程中发生错误: {e}")
+            finally:
+                # 确保事件继续传递，允许窗口关闭
+                event.accept()
+                self.logger.info("清理完成，窗口关闭。")
         else:
             event.ignore()  # 忽略关闭事件，取消关闭操作
 
