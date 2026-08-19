@@ -17,6 +17,15 @@
 2. **首次运行前必须有本地数据**：可运行 `scripts/run_baostock_data_update.bat` 下载，或按 README 使用网盘备份把 `stocks` 目录放入 `data/database/`（确认自 [README.md](README.md)）。
 3. **数据更新脚本与主程序互斥**：主程序运行期间不要执行 `scripts/*.bat`/`*.sh` 数据更新脚本（确认自 [scripts/check_process.py](scripts/check_process.py) 与 [scripts/auto_update_baostrock_data.py](scripts/auto_update_baostrock_data.py) 的互斥检查逻辑）。
 
+## 日常开发与维护流程（Agent 必须遵守）
+
+1. **新需求/功能必须先生成需求文档**：接到新增需求/功能任务时，若 `docs/需求文档/<版本>/<模块>/` 下没有对应文档，先按 [docs/需求文档/需求文档模板.md](docs/需求文档/需求文档模板.md) 创建 `docs/需求文档/<版本>/<模块>/<YYYYMMDD>-<功能名>.md`（模块归类见 [docs/需求文档/模块划分说明.md](docs/需求文档/模块划分说明.md)），开发完成后更新其状态。
+2. **开发前必读**：[docs/项目导读.md](docs/项目导读.md)、[docs/开发规范/版本控制.md](docs/开发规范/版本控制.md)、[docs/开发规范/日常开发维护流程.md](docs/开发规范/日常开发维护流程.md) 与本文件。
+3. **分支与提交规范**：按 [docs/开发规范/版本控制.md](docs/开发规范/版本控制.md) 创建分支（`release/`、`feature/`、`fix/`、`hotfix/`）；提交信息使用 Conventional Commits（`feat`/`fix`/`docs`/`refactor`/`test`/`chore`）。
+4. **自测**：当前无自动化测试，改动后从项目根目录运行 `python ./src/main.py` 冒烟验证，并检查 `data/logs/` 是否有新报错。
+5. **文档同步**：若改动影响目录结构、程序入口、运行命令或规范，同步更新 [docs/项目导读.md](docs/项目导读.md) 与本文件；需求文档标记“已完成”并记录分支/提交。
+6. **不确定事项**：一律标注 TODO，不猜测。
+
 ## 目录说明
 
 | 目录/文件 | 职责（均已从代码确认） |
@@ -36,7 +45,7 @@
 | `src/config/` | `logging_config.yaml`：**未被任何代码引用**（main.py 通过参数调用 `setup_logging`）（TODO：确认用途或删除） |
 | `scripts/` | 数据更新与进程检查脚本：`run_baostock_data_update.bat`、`run_akshare.update.bat`、`run_akshare_update.sh`、`auto_update_baostrock_data.py`、`auto_update_akshare_board_data.py`、`check_process.py` |
 | `data/` | 运行时数据：`database/stocks/db/baostock|akshare` 为 SQLite 行情库，`logs` 为日志 |
-| `docs/` | 文档与效果图（当前仅有截图类素材，无架构文档） |
+| `docs/` | 文档体系：项目导读、开发规范（版本控制/日常流程）、需求文档（按版本/模块划分，含模板与划分说明）、效果图素材 |
 | `.venv/` | 本地虚拟环境（已 gitignore） |
 | 根目录 | `README.md`、`LICENSE`、`requirements.txt`（未锁版本）、`create_venv.bat/.sh`、空 `__init__.py` |
 
