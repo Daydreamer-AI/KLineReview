@@ -614,6 +614,32 @@ class IndicatorsViewWidget(QWidget):
         for indicator_name, widget in self.indicator_widgets.items():
             widget.set_period(period)
 
+    def set_current_period(self, period):
+        """外部指定当前展示周期（如复盘数据加载完成后同步周期按钮/图表），不触发 slot_period_button_clicked 的切换逻辑"""
+        for btn in self.period_button_group.buttons():
+            if self.period_button_group.id(btn) < 0:  # btn_time（分时）不作为周期切换目标
+                continue
+            if TimePeriod.from_label(btn.text()) == period:
+                btn.setChecked(True)
+                self.last_period_btn_checked_id = self.period_button_group.id(btn)
+                self.set_period(period)
+                self.kline_widget.set_period_text(btn.text())
+                return True
+        self.logger.warning(f"未找到周期 {TimePeriod.get_chinese_label(period)} 对应的周期按钮")
+        return False
+
+    def set_period_buttons_enabled(self, periods=None):
+        """按周期列表启用/禁用切换按钮（不触碰分时按钮）。
+
+        复盘数据后台加载期间调用 set_period_buttons_enabled([]) 全部禁用；
+        加载完成同步后传入已加载周期列表，仅启用对应按钮。
+        """
+        enabled_periods = set(periods) if periods else set()
+        for btn in self.period_button_group.buttons():
+            if self.period_button_group.id(btn) < 0:  # btn_time
+                continue
+            btn.setEnabled(TimePeriod.from_label(btn.text()) in enabled_periods)
+
     def get_time_intervals_for_period(self, period):
         """
         根据周期返回对应的时间区间列表
@@ -891,8 +917,8 @@ class IndicatorsViewWidget(QWidget):
                             "start_date": review_period_process_data.current_start_date_time
                         }
 
-                        self.last_period_btn_checked_id = 7
-                        self.min_period = TimePeriod.DAY
+                        self.last_period_btn_checked_id = checked_id
+                        self.min_period = target_period
                 else:
                     self.logger.warning(f"普通处理--未找到匹配的日期记录：{start_date}")
             else:
@@ -1072,6 +1098,19 @@ class IndicatorsViewWidget(QWidget):
             self.logger.warning("数据为空，无法切换图表周期数据")
             return
         target_period = TimePeriod.from_label(btn.text())
+
+        # 复盘模式：周期数据只由外部（加载/随机加载按钮）按需注入；
+        # 未注入的周期不允许切换，回退到原周期并提示，不触发上层数据加载。
+        if self.property("review") is not None and target_period not in self.dict_stock_data:
+            self.logger.warning(
+                f"{self.current_selected_code}未注入{TimePeriod.get_chinese_label(target_period)}数据，"
+                f"请通过加载按钮加载该周期后再切换"
+            )
+            last_btn = self.period_button_group.button(self.last_period_btn_checked_id)
+            if last_btn is not None and last_btn is not btn:
+                last_btn.setChecked(True)
+            return
+
         self.set_period(target_period)
         if target_period not in self.dict_stock_data:
             self.logger.warning(f"{self.current_selected_code}未注入{TimePeriod.get_chinese_label(target_period)}数据，切换后图表可能为空")

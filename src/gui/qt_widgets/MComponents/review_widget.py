@@ -15,6 +15,15 @@ from manager.period_manager import TimePeriod
 from manager.review_demo_trading_manager import ReviewDemoTradingManager
 
 class ReviewWidget(QWidget):
+    # 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
+    _DEFAULT_LOAD_PERIODS = [
+        TimePeriod.MINUTE_15,
+        TimePeriod.MINUTE_30,
+        TimePeriod.MINUTE_60,
+        TimePeriod.DAY,
+        TimePeriod.WEEK,
+    ]
+
     def __init__(self, parent=None):
         super(ReviewWidget, self).__init__(parent) 
         uic.loadUi('./src/gui/qt_widgets/MComponents/ReviewWidget.ui', self)
@@ -29,9 +38,14 @@ class ReviewWidget(QWidget):
         self.logger = get_logger(__name__)
 
         self.type = 0   # 0: 模块；1：对话框
-        self.dict_progress_data = {}
+        self.dict_progress_data = {}    # 回放进度数据
 
         self.current_load_code = ""
+        self.current_load_period = None
+        self._is_loading = False
+        self._load_periods = list(self._DEFAULT_LOAD_PERIODS)
+        self._fetch_pending_periods = []
+        self._fetch_failed_periods = []
 
         self.demo_trading_manager = ReviewDemoTradingManager()
 
@@ -43,8 +57,8 @@ class ReviewWidget(QWidget):
 
         self.verticalLayout_indicators_view.addWidget(self.indicators_view_widget)
 
-        self.comboBox_period.addItems([TimePeriod.get_chinese_label(TimePeriod.DAY), TimePeriod.get_chinese_label(TimePeriod.WEEK), TimePeriod.get_chinese_label(TimePeriod.MINUTE_15), TimePeriod.get_chinese_label(TimePeriod.MINUTE_30), TimePeriod.get_chinese_label(TimePeriod.MINUTE_60)])
-        self.comboBox_period.setCurrentIndex(0)
+        self.comboBox_period.addItems([TimePeriod.get_chinese_label(period) for period in self.get_load_periods()])
+        self.comboBox_period.setCurrentText(TimePeriod.get_chinese_label(TimePeriod.DAY))
 
         self.btn_load_data_random.setAutoDefault(False)
         self.btn_load_data_random.setDefault(False)
@@ -74,7 +88,6 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.sig_current_animation_index_changed.connect(self.slot_current_animation_index_changed)
         self.indicators_view_widget.sig_init_review_animation_finished.connect(self.slot_init_review_animation_finished)
         self.indicators_view_widget.sig_animation_play_finished.connect(self.slot_animation_play_finished)
-        self.indicators_view_widget.sig_period_changed.connect(self.slot_indicators_period_changed)
 
         self.lineEdit_code.editingFinished.connect(self.slot_lineEdit_code_editingFinished)
         self.dateEdit.dateChanged.connect(self.slot_dateEdit_dateChanged)
@@ -225,89 +238,233 @@ class ReviewWidget(QWidget):
 
         # 清空交易记录列表
 
-    def load_data(self, code, date):
-        stock_codes = [code]
-        bao_stock_data_manager = BaostockDataManager()
-        new_dict_lastest_1d_stock_data = bao_stock_data_manager.get_lastest_row_data_dict_by_code_list_auto(stock_codes)
-        # self.logger.info(f"new_dict_lastest_1d_stock_data: {new_dict_lastest_1d_stock_data}")
+    def get_load_periods(self):
+        """获取当前复盘加载周期列表（预留调整接口）"""
+        return list(self._load_periods)
 
-        if new_dict_lastest_1d_stock_data:
-            data = new_dict_lastest_1d_stock_data[code].iloc[-1]
-
-            # 外部获取当前周期K线数据并注入，控件内部不再取数
-            period = self.indicators_view_widget.get_current_period()
-            if period is None:
-                self.logger.warning("当前未选中任何周期，无法加载复盘数据")
-                return
-            df = self._load_stock_data_with_indicators(code, period)
-            self.indicators_view_widget.set_stock_data(code, {period: df})
-
-            # self.indicators_view_widget.update_chart(data, '2025-12-08')
-            self.dict_progress_data = self.indicators_view_widget.init_animation(data, date)
-            # if self.dict_progress_data is not None and self.dict_progress_data != {}:
-            #     self.horizontalSlider_progress.setMinimum(self.dict_progress_data['min_index'])
-            #     self.horizontalSlider_progress.setMaximum(self.dict_progress_data['max_index'])
-
-            #     self.horizontalSlider_progress.blockSignals(True)
-            #     self.horizontalSlider_progress.setSliderPosition(self.dict_progress_data['start_date_index'])
-            #     self.horizontalSlider_progress.blockSignals(False)
-
-            #     self.update_progress_label(self.dict_progress_data['start_date_index'])
-            # else:
-            #     self.logger.info(f"初始化返回的进度数据为空")
-
-            self.current_load_code = code
-
-            # self.demo_trading_manager.reset_trading_record()  # 重新加载不用情况当前收益
-            self.playing_enabled(False)
-            self.update_trading_widgets_status()
-            self.reset_trading_record()
-
-        else:
-            self.logger.info(f"结果为空")
-
-    def slot_indicators_period_changed(self, period):
-        '''
-            周期切换时由外部补齐该周期数据，并重新初始化动画
-        '''
-        if not self.current_load_code:
+    def set_load_periods(self, periods):
+        """设置复盘加载周期列表（预留调整接口）"""
+        valid_periods = []
+        for period in periods:
+            if isinstance(period, TimePeriod) and period not in valid_periods:
+                valid_periods.append(period)
+        if not valid_periods:
+            self.logger.warning("加载周期列表为空或无效，保持原配置")
             return
+        self._load_periods = valid_periods
+
+        # 同步周期选择控件选项（保持当前选择，若不在新列表则回退到第一项）
+        current_label = self.comboBox_period.currentText()
+        period_labels = [TimePeriod.get_chinese_label(p) for p in valid_periods]
+        self.comboBox_period.blockSignals(True)
+        self.comboBox_period.clear()
+        self.comboBox_period.addItems(period_labels)
+        if current_label in period_labels:
+            self.comboBox_period.setCurrentText(current_label)
+        else:
+            self.comboBox_period.setCurrentIndex(0)
+        self.comboBox_period.blockSignals(False)
+
+        self.logger.info(f"复盘加载周期更新为: {[TimePeriod.get_chinese_label(p) for p in valid_periods]}")
+
+    def load_data(self, code, date):
+        """复盘数据统一加载入口：仅由“加载/随机加载”按钮触发。
+
+        一次性在后台加载所有配置周期（默认 5/15/30/60 分、日线、周线），
+        全部加载完成后统一同步到 indicators_view_widget，并按用户在
+        comboBox_period 中选择的周期作为初始显示周期。
+        """
+        if not code:
+            self.logger.warning("股票代码为空，无法加载复盘数据")
+            return
+        if self._is_loading:
+            self.logger.info("数据加载中，忽略重复加载请求")
+            return
+
+        selected_period = TimePeriod.from_label(self.comboBox_period.currentText())
+        self.logger.info(f"开始加载复盘数据: {code}, {date}, 显示周期={TimePeriod.get_chinese_label(selected_period)}")
+
+        # 1. 获取该股票最新一行（用于名称与动画起始定位）。
+        #    直接读库，不依赖 start_background_loading 的后台缓存：
+        #    缓存非空但缺少该 code 时 get_lastest_row_data_dict_by_code_list_auto 会抛 KeyError。
+        latest_row = None
+        bao_stock_data_manager = BaostockDataManager()
+        new_dict_lastest_1d_stock_data = bao_stock_data_manager.get_lastest_row_data_dict_by_code_list([code], TimePeriod.DAY)
+        if new_dict_lastest_1d_stock_data:
+            latest_row = new_dict_lastest_1d_stock_data[code].iloc[-1]
+
+        # 2. 同股票所有配置周期均已加载：仅按新日期重新定位动画，不重复取数
+        if self._all_periods_ready(code):
+            self._on_all_periods_loaded(code, date, selected_period, latest_row)
+            return
+
+        # 3. 启动后台加载：缺失周期逐个提交 BaostockDataFetchTask2
+        #    （baostock 为全局单会话，并发查询不安全，故按顺序串行下载）
+        self._start_period_fetch_chain(code, date, selected_period, latest_row)
+
+    def _all_periods_ready(self, code):
+        """当前代码的所有配置周期是否都已注入缓存"""
+        if self.current_load_code != code:
+            return False
+        for period in self.get_load_periods():
+            cached_df = self.indicators_view_widget.get_stock_data_by_period(period)
+            if cached_df is None or cached_df.empty:
+                return False
+        return True
+
+    def _period_data_ready(self, code, period):
+        """本地（缓存或数据库）是否已有该周期数据"""
+        cached_df = self.indicators_view_widget.get_stock_data_by_period(period)
+        if self.current_load_code == code and cached_df is not None and not cached_df.empty:
+            return True
+        df = self._load_stock_data_with_indicators(code, period)
+        return df is not None and not df.empty
+
+    def _start_period_fetch_chain(self, code, date, selected_period, latest_row):
+        """按顺序在后台加载缺失周期，全部完成后统一同步到 indicators_view_widget"""
+        self._is_loading = True
+        self.indicators_view_widget.set_period_buttons_enabled([])  # 加载中禁用周期切换按钮
+        self.indicators_view_widget.show_loading("dots", "loading...")
+
+        self._fetch_pending_periods = [
+            period for period in self.get_load_periods()
+            if not self._period_data_ready(code, period)
+        ]
+        self._fetch_failed_periods = []
+
+        if not self._fetch_pending_periods:
+            self._on_all_periods_loaded(code, date, selected_period, latest_row)
+            return
+
+        self.logger.info(f"需要后台加载的周期: {[TimePeriod.get_chinese_label(p) for p in self._fetch_pending_periods]}")
+        self._fetch_next_period(code, date, selected_period, latest_row)
+
+    def _fetch_next_period(self, code, date, selected_period, latest_row):
+        if not self._fetch_pending_periods:
+            self._on_all_periods_loaded(code, date, selected_period, latest_row)
+            return
+
+        period = self._fetch_pending_periods.pop(0)
+
+        from thread.baostock_data_fetch_task import BaostockDataFetchTask2
+        from thread.task_pool import get_default_task_pool
+
+        self.logger.info(f"开始从Baostock后台下载: {code} {TimePeriod.get_chinese_label(period)}")
+        baostock_data_fetch_task = BaostockDataFetchTask2(code=code, period=period)
+
+        def on_completed(task_id, result):
+            try:
+                baostock_data_fetch_task.task_completed.disconnect(on_completed)
+                baostock_data_fetch_task.task_error.disconnect(on_error)
+            except TypeError:
+                pass
+            self._fetch_next_period(code, date, selected_period, latest_row)
+
+        def on_error(task_id, error):
+            try:
+                baostock_data_fetch_task.task_completed.disconnect(on_completed)
+                baostock_data_fetch_task.task_error.disconnect(on_error)
+            except TypeError:
+                pass
+            self._fetch_failed_periods.append(period)
+            self.logger.error(f"后台下载失败: {code} {TimePeriod.get_chinese_label(period)}: {error}")
+            self._fetch_next_period(code, date, selected_period, latest_row)
+
+        baostock_data_fetch_task.task_completed.connect(on_completed)
+        baostock_data_fetch_task.task_error.connect(on_error)
+        get_default_task_pool().submit(baostock_data_fetch_task)
+
+    def _on_all_periods_loaded(self, code, date, selected_period, latest_row):
+        """所有周期加载完成：统一读库、同步 indicators_view_widget 并初始化动画"""
+        self._is_loading = False
+        self.indicators_view_widget.hide_loading()
+
+        if self._fetch_failed_periods:
+            failed_text = "、".join(TimePeriod.get_chinese_label(p) for p in self._fetch_failed_periods)
+            self.logger.warning(f"以下周期下载失败: {failed_text}")
+
+        bao_stock_data_manager = BaostockDataManager()
+        if latest_row is None:
+            new_dict_lastest_1d_stock_data = bao_stock_data_manager.get_lastest_row_data_dict_by_code_list([code], TimePeriod.DAY)
+            if new_dict_lastest_1d_stock_data:
+                latest_row = new_dict_lastest_1d_stock_data[code].iloc[-1]
+
+        # 1. 组装所有配置周期的本地数据（含指标），一次性注入 IndicatorsViewWidget
+        dict_stock_data = {}
+        for period in self.get_load_periods():
+            df = self._load_stock_data_with_indicators(code, period)
+            if df is not None and not df.empty:
+                dict_stock_data[period] = df
 
         indicators_view_widget = self.indicators_view_widget
-        # 缓存中已有该周期数据时无需重复获取（控件内部已完成切换）
-        if not indicators_view_widget.get_stock_data_by_period(period).empty:
-            return
+        indicators_view_widget.set_stock_data(code, dict_stock_data)
 
-        df = self._load_stock_data_with_indicators(self.current_load_code, period)
-        indicators_view_widget.set_stock_data(self.current_load_code, {period: df})
+        # 2. 仅启用已加载周期的切换按钮（加载期间已全部禁用）
+        indicators_view_widget.set_period_buttons_enabled(list(dict_stock_data.keys()))
 
-        # 控件内部切换时因缺少数据已提前返回，注入后按相同参数重试
-        if indicators_view_widget.df_data is None or indicators_view_widget.df_data.empty:
-            return
-        start_date = indicators_view_widget.df_data.iloc[indicators_view_widget.current_animation_index]['date']
-        self.dict_progress_data = indicators_view_widget.init_animation(
-            indicators_view_widget.df_data.iloc[0], start_date, False
+        # 3. 确定初始显示周期：优先用户选择，缺失时回退到第一个可用周期
+        display_period = selected_period if selected_period in dict_stock_data else (
+            next(iter(dict_stock_data)) if dict_stock_data else None
         )
+
+        if display_period is None:
+            self.logger.warning(f"{code} 所有周期均无数据，无法初始化复盘")
+            QMessageBox.warning(self, "提示", f"{code} 各周期均无数据，请检查网络或本地数据")
+            return
+
+        if display_period != selected_period:
+            self.logger.warning(
+                f"所选周期{TimePeriod.get_chinese_label(selected_period)}无数据，"
+                f"回退显示{TimePeriod.get_chinese_label(display_period)}"
+            )
+
+        indicators_view_widget.set_current_period(display_period)
+
+        # 周期选择控件与初始显示周期保持一致
+        self.comboBox_period.blockSignals(True)
+        self.comboBox_period.setCurrentText(TimePeriod.get_chinese_label(display_period))
+        self.comboBox_period.blockSignals(False)
+
+        if latest_row is None:
+            self.logger.warning(f"未获取到{code}的最新行情行，无法初始化动画")
+            return
+
+        # 4. 初始化复盘动画并刷新状态
+        self.dict_progress_data = indicators_view_widget.init_animation(latest_row, date)
+        if not self.dict_progress_data:
+            self.logger.warning(f"复盘动画初始化失败: {code}, {date}, {TimePeriod.get_chinese_label(display_period)}")
+
+        self.current_load_code = code
+        self.current_load_period = display_period
+
+        if 'name' in latest_row:
+            self.label_name.setText(str(latest_row['name']))
+
+        self.playing_enabled(False)
+        self.update_trading_widgets_status()
+        self.reset_trading_record()
+
+        # 用实际起始日期回填日期选择控件
+        start_date = self.dict_progress_data.get('start_date') if self.dict_progress_data else None
+        if start_date:
+            self.dateEdit.blockSignals(True)
+            self.dateEdit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
+            self.dateEdit.blockSignals(False)
 
     def _load_stock_data_with_indicators(self, code, period):
         '''
-            优先读取本地K线数据；本地无数据时提交后台任务从Baostock拉取
+            优先读取本地K线数据并计算指标；本地无数据时返回空 DataFrame，由调用方决定是否后台下载
         '''
         bao_stock_data_manager = BaostockDataManager()
-        df = bao_stock_data_manager.get_stock_data_from_db_by_period_with_indicators_auto(code, period)
+        try:
+            df = bao_stock_data_manager.get_stock_data_from_db_by_period_with_indicators_auto(code, period)
+        except Exception as e:
+            # 本地该周期表不存在或无数据时指标计算会抛异常，统一按“无数据”处理
+            self.logger.info(f"本地无{TimePeriod.get_chinese_label(period)}数据（读取失败按空处理）: {code}: {e}")
+            return None
 
         if df is None or df.empty:  # 无本地数据
-            self.logger.info(f"无本地数据，开始从Baostock获取{code}的{TimePeriod.get_chinese_label(period)}数据")
-
-            from thread.baostock_data_fetch_task import BaostockDataFetchTask2
-            from thread.task_pool import get_default_task_pool
-
-            baostock_data_fetch_task = BaostockDataFetchTask2(code=code, period=period)
-            baostock_data_fetch_task.task_completed.connect(
-                lambda task_id, result: self.indicators_view_widget.hide_loading()
-            )
-            get_default_task_pool().submit(baostock_data_fetch_task)
-            self.indicators_view_widget.show_loading("dots", "loading...")
+            self.logger.info(f"本地无{TimePeriod.get_chinese_label(period)}数据: {code}")
 
         return df
 
@@ -412,12 +569,13 @@ class ReviewWidget(QWidget):
 
     def slot_lineEdit_code_editingFinished(self):
         code = self.lineEdit_code.text()
-        dict_lastest_1d_data = BaostockDataManager().get_lastest_1d_stock_data_dict_from_cache()
-        if code not in dict_lastest_1d_data:
+        # 用本地股票信息库同步校验（不依赖后台日线缓存）
+        name = BaostockDataManager().get_stock_name_by_code(code)
+        if not name:
             QMessageBox.warning(self, "提示", "请输入正确的股票代码")
             return
-        
-        self.label_name.setText(str(dict_lastest_1d_data[code]['name'].iloc[0]))
+
+        self.label_name.setText(str(name))
 
         self.lineEdit_code.blockSignals(True)
         self.lineEdit_code.clearFocus()
@@ -433,48 +591,48 @@ class ReviewWidget(QWidget):
         self.logger.info(f"收到周期选择: {text}, index: {index}")
 
     def slot_btn_load_data_random_clicked(self):
-        # 从 dict_lastest_1d_data 中获取一个随机的 code 和对应的 name
-        dict_lastest_1d_data = BaostockDataManager().get_lastest_1d_stock_data_dict_from_cache()
-        if dict_lastest_1d_data:
-            # 随机选择一个 code
-            code = random.choice(list(dict_lastest_1d_data.keys()))
-            
-            # 获取对应的 name
-            name = dict_lastest_1d_data[code]['name'].iloc[0]
+        bao_stock_data_manager = BaostockDataManager()
 
-            newest_date = dict_lastest_1d_data[code]['date'].iloc[0]
-            
-            print(f"随机股票代码: {code}, 对应名称: {name}，最新日期: {newest_date}")
-        else:
-            print("没有可用的股票数据")
+        # 从本地股票信息库同步获取“个股代码-名称”映射（不依赖后台日线缓存）
+        dict_code_name = bao_stock_data_manager.get_all_stock_code_name_dict()
+        if not dict_code_name:
+            self.logger.warning("本地股票信息为空，无法随机加载")
+            QMessageBox.warning(self, "提示", "本地暂无股票信息数据，请先下载股票列表")
             return
-        
-        date = self.get_random_date(newest_date)
 
+        # 随机选股：优先选本地有日线数据的股票，避免选中后无起始日期（最多尝试 20 次）
+        code = None
+        name = None
+        newest_date = None
+        random_codes = list(dict_code_name.keys())
+        random.shuffle(random_codes)
+
+        for candidate in random_codes[:20]:
+            dict_latest_row = bao_stock_data_manager.get_lastest_row_data_dict_by_code_list([candidate], TimePeriod.DAY)
+            if dict_latest_row:
+                code = candidate
+                name = dict_code_name[candidate]
+                newest_date = dict_latest_row[candidate]['date'].iloc[0]
+                break
+
+        if code is None:
+            self.logger.warning("本地日线行情数据为空，无法随机加载")
+            QMessageBox.warning(self, "提示", "本地暂无日线行情数据，请先下载或更新行情数据")
+            return
+
+        print(f"随机股票代码: {code}, 对应名称: {name}，最新日期: {newest_date}")
+
+        date = self.get_random_date(newest_date)
         period = self.comboBox_period.currentText()
         self.logger.info(f"点击随机加载数据: {code}, {date}, {period}")
 
-        if self.current_load_code == code:
-            self.logger.info("当前股票数据已加载，无需重复加载")
-            return
-        
-        self.load_data(code, date)
-
-        start_date = self.dict_progress_data['start_date']
-        self.logger.info(f"实际开始日期--start_date: {start_date}")
-
-        self.label_name.setText(str(dict_lastest_1d_data[code]['name'].iloc[0]))
-
+        self.label_name.setText(str(name))
         self.lineEdit_code.blockSignals(True)
         self.lineEdit_code.setText(code)
         self.lineEdit_code.blockSignals(False)
 
-        self.dateEdit.blockSignals(True)
-        self.dateEdit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
-        self.dateEdit.blockSignals(False)
-
+        self.load_data(code, date)
         self.btn_buy.setDefault(True)
-
 
     def slot_btn_load_data_clicked(self):
         code = self.lineEdit_code.text()
@@ -482,19 +640,7 @@ class ReviewWidget(QWidget):
         period = self.comboBox_period.currentText()
         self.logger.info(f"点击加载数据: {code}, {date}, {period}")
 
-        if self.current_load_code == code:
-            self.logger.info("当前股票数据已加载，无需重复加载")
-            return
-        
         self.load_data(code, date)
-
-        start_date = self.dict_progress_data['start_date']
-        self.logger.info(f"实际开始日期--start_date: {start_date}")
-
-        self.dateEdit.blockSignals(True)
-        self.dateEdit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
-        self.dateEdit.blockSignals(False)
-
         self.btn_buy.setDefault(True)
 
     def slot_btn_play_clicked(self):

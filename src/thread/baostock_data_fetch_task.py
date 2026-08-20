@@ -120,9 +120,9 @@ class BaostockDataFetchTask2(BaseTask):
         if TimePeriod.is_minute_level(self.period):
             BaoStockProcessor().process_and_save_minute_level_stock_data(self.code, TimePeriod.get_number_label(self.period))
         else:
-            if TimePeriod == TimePeriod.DAY:
+            if self.period == TimePeriod.DAY:
                 result = BaoStockProcessor().process_and_save_daily_stock_data(self.code)
-            elif TimePeriod == TimePeriod.WEEK:
+            elif self.period == TimePeriod.WEEK:
                 result = BaoStockProcessor().process_and_save_weekly_stock_data(self.code)
 
         self.sig_progress_changed.emit(1, 1)
