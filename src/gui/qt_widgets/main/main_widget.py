@@ -7,6 +7,9 @@ from manager.logging_manager import get_logger
 from gui.qt_widgets.main.home_widget import HomeWidget
 from gui.qt_widgets.market.market_home_widget import MarketHomeWidget
 from gui.qt_widgets.MComponents.review_widget import ReviewWidget
+
+from gui.qt_widgets.setting.global_setting_widget import GlobalSettingWidget
+
 from thread.task_pool import get_default_task_pool
 
 from processor.baostock_processor import BaoStockProcessor
@@ -30,24 +33,30 @@ class MainWidget(QWidget):
         self.init_processors()
 
     def init_ui(self):
-        self.frame_tab.hide()
+        self.load_qss()
+        # self.frame_tab.hide()
+        self.btn_market.hide()
 
         self.main_button_group = QtWidgets.QButtonGroup(self)
-        self.main_button_group.addButton(self.btn_review, 0)
+        self.main_button_group.addButton(self.btn_market, 0)
+        self.main_button_group.addButton(self.btn_review, 1)
+        self.main_button_group.addButton(self.btn_setting, 2)
 
         self.market_widget = MarketHomeWidget()
         self.review_page = ReviewWidget()
+        self.setting_widget = GlobalSettingWidget()
 
         self.stackedWidget.addWidget(self.market_widget)
         self.stackedWidget.addWidget(self.review_page)
+        self.stackedWidget.addWidget(self.setting_widget)
 
         self.stackedWidget.setCurrentWidget(self.review_page)
-
-        self.load_qss()
+        self.btn_review.setChecked(True)
 
     def init_connect(self):
         self.btn_market.clicked.connect(self.slot_btn_market_clicked)
         self.btn_review.clicked.connect(self.slot_btn_review_clicked)
+        self.btn_setting.clicked.connect(self.slot_btn_setting_clicked)
 
     def init_processors(self):
             """初始化所有处理器（如Baostock）"""
@@ -118,3 +127,6 @@ class MainWidget(QWidget):
 
     def slot_btn_market_clicked(self):
         self.stackedWidget.setCurrentWidget(self.market_widget)
+
+    def slot_btn_setting_clicked(self):
+        self.stackedWidget.setCurrentWidget(self.setting_widget)

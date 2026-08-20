@@ -16,9 +16,9 @@
 }
 #MainWidget #frame_tab QPushButton:disabled {color: #BDBDBD; font-weight: normal; border: none;}
 
-QCheckBox::indicator { width: 16px;height: 16px;}
+QCheckBox::indicator { width: 24px;height: 24px;}
 QCheckBox::indicator:unchecked {image: url(:/icon/general/not_checked_normal.svg);}
-QCheckBox::indicator:unchecked:hover{image: url(:/icon/general/not_checked_hover.svg);}
+QCheckBox::indicator:unchecked:hover{image: url(:/icon/general/not_checked_hovered.svg);}
 QCheckBox::indicator:unchecked:pressed{image: url(:/icon/general/not_checked_pressed.svg);}
 QCheckBox::indicator:unchecked:disabled{image: url(:/icon/general/not_checked_disabled.svg);}
 
@@ -27,10 +27,10 @@ QCheckBox::indicator:checked:hover{image: url(:/icon/general/checked_with_backgr
 QCheckBox::indicator:checked:pressed{image: url(:/icon/general/checked_with_background_pressed.svg);}
 QCheckBox::indicator:checked:disabled{image: url(:/icon/general/checked_with_background_disabled.svg);}
 
-QCheckBox::indicator:partiallyChecked{image: url(:/icon/general/partially_checked_checked.svg);}
+/* QCheckBox::indicator:partiallyChecked{image: url(:/icon/general/partially_checked_checked.svg);}
 QCheckBox::indicator:partiallyChecked:hover{image: url(:/icon/general/partially_checked_hovered.svg);}
 QCheckBox::indicator:partiallyChecked:pressed{image: url(:/icon/general/partially_checked_pressed.svg);}
-QCheckBox::indicator:partiallyChecked:disabled{image: url(:/icon/general/partially_checked_disabled.svg);}
+QCheckBox::indicator:partiallyChecked:disabled{image: url(:/icon/general/partially_checked_disabled.svg);} */
 
 /* QRadioButton{font-size:24px;color:rgb(50,50,50);spacing:18px;} */
 QRadioButton::indicator { width: 16px;height: 16px;}
