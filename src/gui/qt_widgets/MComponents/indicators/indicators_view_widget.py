@@ -318,11 +318,6 @@ class IndicatorsViewWidget(QWidget):
         periods_text = [TimePeriod.get_chinese_label(period) for period in valid_dict.keys()]
         self.logger.info(f"已注入{code}的{len(valid_dict)}个周期数据：{periods_text}")
 
-    def update_stock_data_dict(self, code):
-        """已废弃：本控件不再内部获取数据，请改为外部获取数据后调用 set_stock_data(code, dict_stock_data)。"""
-        self.logger.warning(f"update_stock_data_dict 已废弃，请改为先由外部获取数据后调用 set_stock_data({code}, dict_stock_data)")
-        return pd.DataFrame()
-
     def show_default_indicator(self):
         self.btn_indicator_volume.setChecked(True)
         self.slot_btn_indicator_volume_clicked()

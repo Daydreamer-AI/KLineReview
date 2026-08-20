@@ -74,6 +74,7 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.sig_current_animation_index_changed.connect(self.slot_current_animation_index_changed)
         self.indicators_view_widget.sig_init_review_animation_finished.connect(self.slot_init_review_animation_finished)
         self.indicators_view_widget.sig_animation_play_finished.connect(self.slot_animation_play_finished)
+        self.indicators_view_widget.sig_period_changed.connect(self.slot_indicators_period_changed)
 
         self.lineEdit_code.editingFinished.connect(self.slot_lineEdit_code_editingFinished)
         self.dateEdit.dateChanged.connect(self.slot_dateEdit_dateChanged)
@@ -231,8 +232,16 @@ class ReviewWidget(QWidget):
         # self.logger.info(f"new_dict_lastest_1d_stock_data: {new_dict_lastest_1d_stock_data}")
 
         if new_dict_lastest_1d_stock_data:
-            self.indicators_view_widget.update_stock_data_dict(code)
             data = new_dict_lastest_1d_stock_data[code].iloc[-1]
+
+            # 外部获取当前周期K线数据并注入，控件内部不再取数
+            period = self.indicators_view_widget.get_current_period()
+            if period is None:
+                self.logger.warning("当前未选中任何周期，无法加载复盘数据")
+                return
+            df = self._load_stock_data_with_indicators(code, period)
+            self.indicators_view_widget.set_stock_data(code, {period: df})
+
             # self.indicators_view_widget.update_chart(data, '2025-12-08')
             self.dict_progress_data = self.indicators_view_widget.init_animation(data, date)
             # if self.dict_progress_data is not None and self.dict_progress_data != {}:
@@ -256,6 +265,51 @@ class ReviewWidget(QWidget):
 
         else:
             self.logger.info(f"结果为空")
+
+    def slot_indicators_period_changed(self, period):
+        '''
+            周期切换时由外部补齐该周期数据，并重新初始化动画
+        '''
+        if not self.current_load_code:
+            return
+
+        indicators_view_widget = self.indicators_view_widget
+        # 缓存中已有该周期数据时无需重复获取（控件内部已完成切换）
+        if not indicators_view_widget.get_stock_data_by_period(period).empty:
+            return
+
+        df = self._load_stock_data_with_indicators(self.current_load_code, period)
+        indicators_view_widget.set_stock_data(self.current_load_code, {period: df})
+
+        # 控件内部切换时因缺少数据已提前返回，注入后按相同参数重试
+        if indicators_view_widget.df_data is None or indicators_view_widget.df_data.empty:
+            return
+        start_date = indicators_view_widget.df_data.iloc[indicators_view_widget.current_animation_index]['date']
+        self.dict_progress_data = indicators_view_widget.init_animation(
+            indicators_view_widget.df_data.iloc[0], start_date, False
+        )
+
+    def _load_stock_data_with_indicators(self, code, period):
+        '''
+            优先读取本地K线数据；本地无数据时提交后台任务从Baostock拉取
+        '''
+        bao_stock_data_manager = BaostockDataManager()
+        df = bao_stock_data_manager.get_stock_data_from_db_by_period_with_indicators_auto(code, period)
+
+        if df is None or df.empty:  # 无本地数据
+            self.logger.info(f"无本地数据，开始从Baostock获取{code}的{TimePeriod.get_chinese_label(period)}数据")
+
+            from thread.baostock_data_fetch_task import BaostockDataFetchTask2
+            from thread.task_pool import get_default_task_pool
+
+            baostock_data_fetch_task = BaostockDataFetchTask2(code=code, period=period)
+            baostock_data_fetch_task.task_completed.connect(
+                lambda task_id, result: self.indicators_view_widget.hide_loading()
+            )
+            get_default_task_pool().submit(baostock_data_fetch_task)
+            self.indicators_view_widget.show_loading("dots", "loading...")
+
+        return df
 
     def get_random_date(self, latest_date_str=None, days_before_start=360, days_before_end=120):
         '''
