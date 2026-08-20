@@ -37,6 +37,10 @@ class MarketWidget(QWidget):
         self.set_current_dict_1d_stock_keys = None   # 用于检测数据更新
 
         self.option_to_code_map = {}  # name - code 映射字典
+
+        self.current_selected_code = ""   # 当前图表展示的股票代码
+        self.current_data_row = None      # 当前图表展示股票的最新一行数据（Series）
+
     def init_ui(self):
         uic.loadUi('./src/gui/qt_widgets/market/MarketWidget.ui', self)
 
@@ -98,6 +102,7 @@ class MarketWidget(QWidget):
 
     def init_connect(self):
         self.lineEdit_search.optionSelected.connect(self.slot_stock_card_selected)
+        self.indicators_view_widget.sig_period_changed.connect(self.slot_period_changed)
 
     def select_first_item(self, first_item_data):
 
@@ -124,11 +129,55 @@ class MarketWidget(QWidget):
             点击股票列表中的股票时，更新图表
             data: pandas Series
         '''
-        # self.logger.info(f"点击的股票数据为：{data}")
+        self.current_selected_code = data['code']
+        self.current_data_row = data
 
-        # self.kline_widget.set_stock_name(data['code'])
-        # self.update_chart(data)
+        # 外部获取当前周期K线数据并注入，控件内部不再取数
+        period = self.indicators_view_widget.get_current_period()
+        if period is None:
+            self.logger.warning("当前未选中任何周期，无法加载K线数据")
+            return
+
+        df = self._load_stock_data_with_indicators(data['code'], period)
+        self.indicators_view_widget.set_stock_data(data['code'], {period: df})
         self.indicators_view_widget.update_chart(data)
+
+    def slot_period_changed(self, period):
+        '''
+            周期切换时由外部补齐该周期数据并刷新图表
+        '''
+        if not self.current_selected_code or self.current_data_row is None:
+            return
+
+        # 缓存中已有该周期数据时无需重复获取/重绘（控件内部已完成切换）
+        if not self.indicators_view_widget.get_stock_data_by_period(period).empty:
+            return
+
+        df = self._load_stock_data_with_indicators(self.current_selected_code, period)
+        self.indicators_view_widget.set_stock_data(self.current_selected_code, {period: df})
+        self.indicators_view_widget.update_chart(self.current_data_row)
+
+    def _load_stock_data_with_indicators(self, code, period):
+        '''
+            优先读取本地K线数据；本地无数据时提交后台任务从Baostock拉取
+        '''
+        bao_stock_data_manager = BaostockDataManager()
+        df = bao_stock_data_manager.get_stock_data_from_db_by_period_with_indicators_auto(code, period)
+
+        if df is None or df.empty:  # 无本地数据
+            self.logger.info(f"无本地数据，开始从Baostock获取{code}的{TimePeriod.get_chinese_label(period)}数据")
+
+            from thread.baostock_data_fetch_task import BaostockDataFetchTask2
+            from thread.task_pool import get_default_task_pool
+
+            baostock_data_fetch_task = BaostockDataFetchTask2(code=code, period=period)
+            baostock_data_fetch_task.task_completed.connect(
+                lambda task_id, result: self.indicators_view_widget.hide_loading()
+            )
+            get_default_task_pool().submit(baostock_data_fetch_task)
+            self.indicators_view_widget.show_loading("dots", "loading...")
+
+        return df
         
     def slot_bao_stock_data_load_finished(self, succsess):
         # self.logger.info(f"Baostock股票数据加载完成，结果为：{succsess}")

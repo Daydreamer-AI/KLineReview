@@ -22,7 +22,6 @@ from gui.qt_widgets.MComponents.mloading_widget import LoadingWidget
 from indicators import stock_data_indicators as sdi
 
 from manager.period_manager import TimePeriod, ReviewPeriodProcessData
-from manager.bao_stock_data_manager import BaostockDataManager
 
 from manager.indicators_config_manager import get_indicator_config_manager, IndicatrosEnum
 
@@ -32,6 +31,7 @@ class IndicatorsViewWidget(QWidget):
     sig_current_animation_index_changed = pyqtSignal(int)
     sig_init_review_animation_finished = pyqtSignal(bool, object)
     sig_animation_play_finished = pyqtSignal()
+    sig_period_changed = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(IndicatorsViewWidget, self).__init__(parent)
@@ -55,6 +55,7 @@ class IndicatorsViewWidget(QWidget):
 
         self.indicator_widgets = {} 
         self.kline_widget = None
+        self.loading_widget = None
 
         # self.df_data列结构：date, code, name, open, high, low, close, volume, amount, change_percent, turnover_rate, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
         self.df_data = None                 # pd.DataFrame
@@ -80,16 +81,6 @@ class IndicatorsViewWidget(QWidget):
         self.index_changed = False
 
     def init_ui(self):
-        # 创建新的Loading控件
-        self.loading_widget = LoadingWidget(
-            self, 
-            message='loading...',
-            animation_type='dots',
-            show_mask=True,
-            mask_opacity=0.5
-        )
-        self.hide_loading()
-
         self.period_button_group = QtWidgets.QButtonGroup(self)
         self.period_button_group.addButton(self.btn_time)
         self.period_button_group.addButton(self.btn_1m, 0)
@@ -106,7 +97,12 @@ class IndicatorsViewWidget(QWidget):
         self.btn_1m.setEnabled(False)
         self.btn_5m.setEnabled(False)
         self.btn_10m.setEnabled(False)
+        # self.btn_15m.setEnabled(False)
+        # self.btn_30m.setEnabled(False)
+        # self.btn_60m.setEnabled(False)
         self.btn_120m.setEnabled(False)
+        # self.btn_1d.setEnabled(False)
+        # self.btn_1w.setEnabled(False)
 
         # self.init_stock_card_list()
 
@@ -278,49 +274,55 @@ class IndicatorsViewWidget(QWidget):
     
         return self.dict_stock_data[period]
 
-    def update_stock_data_dict(self, code):
+    def get_current_period(self):
+        """返回当前选中的周期（TimePeriod），未选中时返回 None。"""
         checked_btn = self.period_button_group.checkedButton()
         if checked_btn is None:
-            return pd.DataFrame()
-        
+            return None
+        return TimePeriod.from_label(checked_btn.text())
+
+    def set_stock_data(self, code, dict_stock_data):
+        """
+        外部注入股票各周期K线数据，本控件不再自行获取数据，只负责缓存维护。
+
+        Args:
+            code: 股票代码，如 'sh.600000'
+            dict_stock_data: {TimePeriod: DataFrame}，各周期K线数据（建议含指标列，
+                             列结构参考 init_para 中的注释）
+        """
         if code != self.current_selected_code:
-            self.logger.info(f"self.current_selected_code为{self.current_selected_code}，code为{code}")
-            self.dict_stock_data.clear()
+            self.logger.info(f"切换股票：{self.current_selected_code} -> {code}")
             self.dict_stock_data = {}
             self.current_selected_code = code
-        
-        period_text = checked_btn.text()
-        time_period = TimePeriod.from_label(period_text)
-        
-        if time_period not in self.dict_stock_data.keys():   # 暂无该级别数据
 
-            # 优先加载本地数据
-            bao_stock_data_manager = BaostockDataManager()
-            df_time_period_stock_data = bao_stock_data_manager.get_stock_data_from_db_by_period_with_indicators_auto(code, time_period) # TODO：这里可优化成多数据来源接口。
+        if not dict_stock_data:
+            self.logger.warning(f"外部注入的{code}数据为空，跳过缓存更新")
+            return
 
-            # 无本地数据则从Baostock获取
-            if df_time_period_stock_data is None or df_time_period_stock_data.empty:  # 无本地数据
-                self.logger.info(f"无本地数据，开始从Baostock获取{code}的{period_text}数据")
-            
-                from thread.baostock_data_fetch_task import BaostockDataFetchTask2
-                from thread.task_pool import get_default_task_pool
-                
-                baostock_data_fetch_task = BaostockDataFetchTask2(code=code, period=time_period)
-                baostock_data_fetch_task.task_completed.connect(
-                    lambda task_id, result: self.hide_loading()
-                    )
-                task_id = get_default_task_pool().submit(baostock_data_fetch_task)
-                self.show_loading("dots", "loading...")
+        required_cols = ['open', 'high', 'low', 'close', 'volume']
+        valid_dict = {}
+        for period, df in dict_stock_data.items():
+            if df is None or df.empty:
+                self.logger.warning(f"{code}的{TimePeriod.get_chinese_label(period)}数据为空，跳过")
+                continue
+            missing_cols = [col for col in required_cols if col not in df.columns]
+            if missing_cols:
+                self.logger.warning(f"{code}的{TimePeriod.get_chinese_label(period)}数据缺少列：{missing_cols}，可能导致绘图异常")
+            valid_dict[period] = df
 
-            if self.dict_stock_data:
-                self.logger.info(f"重新获取{code}的{period_text}数据")
-                self.dict_stock_data[time_period] = df_time_period_stock_data
-            else:
-                self.logger.info(f"更新{code}的{period_text}数据")
-                self.dict_stock_data = {time_period: df_time_period_stock_data}
-        else:
-            # self.logger.info(f"{code}的{period_text}数据已存在，无需重复加载")
-            pass
+        if not valid_dict:
+            self.logger.warning(f"{code}的各周期数据均为空，缓存未更新")
+            return
+
+        self.dict_stock_data.update(valid_dict)
+        periods_text = [TimePeriod.get_chinese_label(period) for period in valid_dict.keys()]
+        self.logger.info(f"已注入{code}的{len(valid_dict)}个周期数据：{periods_text}")
+
+    def update_stock_data_dict(self, code):
+        """已废弃：本控件不再内部获取数据，请改为外部获取数据后调用 set_stock_data(code, dict_stock_data)。"""
+        self.logger.warning(f"update_stock_data_dict 已废弃，请改为先由外部获取数据后调用 set_stock_data({code}, dict_stock_data)")
+        return pd.DataFrame()
+
     def show_default_indicator(self):
         self.btn_indicator_volume.setChecked(True)
         self.slot_btn_indicator_volume_clicked()
@@ -334,10 +336,18 @@ class IndicatorsViewWidget(QWidget):
 
     def update_chart(self, data, start_index=None):
         code = data['code']
-        self.update_stock_data_dict(code)
+        if code != self.current_selected_code or not self.dict_stock_data:
+            self.logger.warning(f"未找到{code}的外部注入数据，请先调用 set_stock_data(code, dict_stock_data) 注入数据")
+            return
         self.kline_widget.set_stock_name(data['name'])
 
         df = self.get_stock_data()
+        if df is None or df.empty:
+            checked_btn = self.period_button_group.checkedButton()
+            period_text = checked_btn.text() if checked_btn else "未知"
+            self.logger.warning(f"{code}的当前周期[{period_text}]数据未注入，无法更新图表")
+            return
+
         if start_index is not None and start_index != "":  # 获取数据成功
             # self.logger.info(f"df的长度: {len(df)}")
             # if self.max_animation_index == -1:
@@ -838,7 +848,10 @@ class IndicatorsViewWidget(QWidget):
         dict_return = {}
         code = data['code']
         self.logger.info(f"初始化动画：{code}, 日期：{start_date}")
-        self.update_stock_data_dict(code)
+        if code != self.current_selected_code or not self.dict_stock_data:
+            self.logger.warning(f"未找到{code}的外部注入数据，请先调用 set_stock_data(code, dict_stock_data) 注入数据")
+            self.sig_init_review_animation_finished.emit(False, dict_return)
+            return dict_return
         df = self.get_stock_data()
 
         if df is None or df.empty:
@@ -1063,7 +1076,10 @@ class IndicatorsViewWidget(QWidget):
         if self.df_data is None or self.df_data.empty:
             self.logger.warning("数据为空，无法切换图表周期数据")
             return
-        self.set_period(TimePeriod.from_label(btn.text()))
+        target_period = TimePeriod.from_label(btn.text())
+        self.set_period(target_period)
+        if target_period not in self.dict_stock_data:
+            self.logger.warning(f"{self.current_selected_code}未注入{TimePeriod.get_chinese_label(target_period)}数据，切换后图表可能为空")
         checked_id = self.period_button_group.checkedId()
         if self.property("review") is not None:
             # self.logger.info(f"所属复盘模块，暂不支持周期切换")
@@ -1086,6 +1102,9 @@ class IndicatorsViewWidget(QWidget):
                 return
         else:
             self.update_chart(self.df_data.iloc[0])
+
+        # 周期切换完成后通知外部（外部可按需补齐该周期数据并刷新图表）
+        self.sig_period_changed.emit(target_period)
 
         self.kline_widget.set_period_text(btn.text())
         self.last_period_btn_checked_id = checked_id
