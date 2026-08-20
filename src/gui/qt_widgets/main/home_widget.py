@@ -26,27 +26,9 @@ class HomeWidget(QWidget):
         self.bao_stock_data_fetch_widget = StockDataFetchWidget(self)
         self.show_bao_stock_data_fetch_widget(False)
 
-        self.init_processors()
         self.init_connect()
     
-    def init_processors(self):
-        """初始化所有处理器（如Baostock）"""
-        self.logger.info("初始化所有处理器")
-        try:
-            ak_success = AKStockDataProcessor().initialize()
-            self.logger.info("AK股票数据初始化完成")
-            success = BaoStockProcessor().initialize()
-            if ak_success and success:
-                self.logger.info("所有处理器初始化成功")
-                # BaoStockProcessor().load_all_local_stock_data()     # 待优化，放后台加载
-                BaoStockProcessor().start_background_loading()
-                # BaoStockProcessor().create_baostock_table_indexes()   # 创建索引
-            else:
-                self.logger.info("处理器初始化失败")
-                # 可以进行一些UI提示，例如设置label的文本为红色警告
-                quit()
-        except Exception as e:
-            self.logger.info(f"初始化过程中发生错误: {e}")
+    
 
     def init_connect(self):
         """连接信号槽"""
@@ -102,21 +84,6 @@ class HomeWidget(QWidget):
             self.bao_stock_data_fetch_widget.show()
         else:
             self.bao_stock_data_fetch_widget.hide()
-
-    def closeEvent(self, event):
-        """
-        重写 closeEvent，当窗口请求关闭时调用。
-        这是执行清理操作的理想位置。
-        """
-        self.logger.info("开始执行清理操作...")
-        try:
-            BaoStockProcessor().cleanup() # 清理所有处理器
-        except Exception as e:
-            self.logger.info(f"清理过程中发生错误: {e}")
-        finally:
-            # 确保事件继续传递，允许窗口关闭
-            event.accept()
-            self.logger.info("清理完成，窗口关闭。")
 
     # 槽函数
     # Baostock

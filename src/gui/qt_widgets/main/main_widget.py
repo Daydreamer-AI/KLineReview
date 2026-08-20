@@ -10,6 +10,7 @@ from gui.qt_widgets.MComponents.review_widget import ReviewWidget
 from thread.task_pool import get_default_task_pool
 
 from processor.baostock_processor import BaoStockProcessor
+from processor.ak_stock_data_processor import AKStockDataProcessor
 
 class MainWidget(QWidget):
     def __init__(self):
@@ -26,14 +27,18 @@ class MainWidget(QWidget):
     def init_para(self):
         self.logger = get_logger(__name__)
 
+        self.init_processors()
+
     def init_ui(self):
         self.frame_tab.hide()
 
         self.main_button_group = QtWidgets.QButtonGroup(self)
         self.main_button_group.addButton(self.btn_review, 0)
 
+        self.market_widget = MarketHomeWidget()
         self.review_page = ReviewWidget()
 
+        self.stackedWidget.addWidget(self.market_widget)
         self.stackedWidget.addWidget(self.review_page)
 
         self.stackedWidget.setCurrentWidget(self.review_page)
@@ -41,7 +46,26 @@ class MainWidget(QWidget):
         self.load_qss()
 
     def init_connect(self):
+        self.btn_market.clicked.connect(self.slot_btn_market_clicked)
         self.btn_review.clicked.connect(self.slot_btn_review_clicked)
+
+    def init_processors(self):
+            """初始化所有处理器（如Baostock）"""
+            self.logger.info("初始化所有处理器")
+            try:
+                ak_success = AKStockDataProcessor().initialize()
+                self.logger.info("AK股票数据初始化完成")
+                success = BaoStockProcessor().initialize()
+                if ak_success and success:
+                    self.logger.info("所有处理器初始化成功")
+                    # BaoStockProcessor().start_background_loading()
+
+                else:
+                    self.logger.info("处理器初始化失败")
+                    # 可以进行一些UI提示，例如设置label的文本为红色警告
+                    quit()
+            except Exception as e:
+                self.logger.info(f"初始化过程中发生错误: {e}")
 
 
     def load_qss(self, theme="default"):
@@ -91,3 +115,6 @@ class MainWidget(QWidget):
     # --------------槽函数---------------
     def slot_btn_review_clicked(self):
         self.stackedWidget.setCurrentWidget(self.review_page)
+
+    def slot_btn_market_clicked(self):
+        self.stackedWidget.setCurrentWidget(self.market_widget)
