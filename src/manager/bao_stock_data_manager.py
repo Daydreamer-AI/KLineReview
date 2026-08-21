@@ -55,7 +55,10 @@ class BaostockDataManager(QObject):
     def get_stock_info_dict(self):
         with self.lock:
             return MappingProxyType(self.dict_stocks_info)
-        
+
+    def update_stock_info_dict(self, dict_data):
+        with self.lock:
+            self.dict_stocks_info = dict_data
     def get_lastest_1d_stock_data_dict_from_cache(self):
         '''
             返回缓存中的最后一天（行）的股票数据
@@ -64,7 +67,7 @@ class BaostockDataManager(QObject):
         with self.lock:
             return MappingProxyType(self.dict_lastest_1d_stock_data)
 
-    def get_all_stock_code_name_dict(self):
+    def get_all_stock_code_name_dict(self, code_column_name='证券代码', name_column_name='证券名称'):
         """从本地股票信息库同步构建 {code: name} 映射（不依赖后台日线缓存）。
 
         供复盘随机选股及后续需要“个股代码-名称”的功能使用；结果按需缓存。
@@ -80,8 +83,8 @@ class BaostockDataManager(QObject):
             if board_data is None or board_data.empty:
                 continue
             for index, row in board_data.iterrows():
-                code = row.get('证券代码')
-                name = row.get('证券名称', '未知')
+                code = row.get(code_column_name)
+                name = row.get(name_column_name, '未知')
                 if code and code not in dict_code_name:
                     dict_code_name[code] = name
 

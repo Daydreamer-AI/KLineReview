@@ -15,6 +15,8 @@ from thread.task_pool import get_default_task_pool
 from processor.baostock_processor import BaoStockProcessor
 from processor.ak_stock_data_processor import AKStockDataProcessor
 
+from thread.baostock_data_fetch_task import *
+
 class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -26,6 +28,8 @@ class MainWidget(QWidget):
         self.init_para()
         self.init_ui()
         self.init_connect()
+
+        self.init_bao_stock_info()
 
     def init_para(self):
         self.logger = get_logger(__name__)
@@ -62,8 +66,9 @@ class MainWidget(QWidget):
             """初始化所有处理器（如Baostock）"""
             self.logger.info("初始化所有处理器")
             try:
-                ak_success = AKStockDataProcessor().initialize()
-                self.logger.info("AK股票数据初始化完成")
+                ak_success = True
+                # ak_success = AKStockDataProcessor().initialize()
+                # self.logger.info("AK股票数据初始化完成")
                 success = BaoStockProcessor().initialize()
                 if ak_success and success:
                     self.logger.info("所有处理器初始化成功")
@@ -75,6 +80,7 @@ class MainWidget(QWidget):
                     quit()
             except Exception as e:
                 self.logger.info(f"初始化过程中发生错误: {e}")
+                quit()
 
 
     def load_qss(self, theme="default"):
@@ -87,7 +93,11 @@ class MainWidget(QWidget):
             self.logger.warning("无法打开主页模块样式表文件")
         qssFile.close()
 
-
+    def init_bao_stock_info(self):
+        baostock_info_fetch_task = BaostockInfoFetchTask()
+        baostock_info_fetch_task.task_started.connect(self.review_page.slot_bao_stock_info_query_started)
+        baostock_info_fetch_task.task_completed.connect(self.review_page.slot_bao_stock_info_query_finished)
+        get_default_task_pool().submit(baostock_info_fetch_task)
     # ---------------重写----------------
     def closeEvent(self, event):
         """

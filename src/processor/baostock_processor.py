@@ -1019,6 +1019,52 @@ class BaoStockProcessor(QObject):
 
 
     # -----------------其他接口-------------------
+    def query_all_stock(self):
+        query_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        # 获取前一天的日期
+        yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+        query_date = yesterday
+
+        self.logger.info(f"开始获取所有股票列表，日期：{query_date}")
+        rs = bs.query_all_stock(query_date)     # 交易日调用返回空
+        self.logger.info('query_all_stock respond error_code:'+rs.error_code)
+        self.logger.info('query_all_stock respond  error_msg:'+rs.error_msg)
+
+        if rs.error_code != '0':
+            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}")
+            return False
+
+        data_list = []
+        while (rs.error_code == '0') & rs.next():
+            # 获取一条记录，将记录合并在一起
+            data_list.append(rs.get_row_data())
+
+        self.logger.info(f"获取所有股票列表成功，共有{len(data_list)}只股票")
+
+        result = pd.DataFrame(data_list, columns=rs.fields)
+
+        if result is None or result.empty:
+            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}")
+            return False
+
+        result['update_date'] = query_date
+        # result['update_date'] = pd.to_datetime(result['update_date'], format='%Y-%m-%d').dt.date
+
+        self.logger.info(f"result列信息：{result.columns}")
+
+        dict_stocks_info = classify_a_stocks_by_board(result)
+
+        total_count = 0
+        for board, df in dict_stocks_info.items():
+            self.logger.info(f"{board}股票数量：{len(df)}")
+            total_count += len(df)
+
+        self.logger.info(f"总股票数量：{total_count}")
+
+        BaostockDataManager().update_stock_info_dict(dict_stocks_info)
+
+        return True
+
     def get_and_save_all_stocks_from_bao(self):
         # 显示登陆返回信息
         # self.logger.info('login respond error_code:'+lg.error_code)

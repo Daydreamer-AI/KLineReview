@@ -10,6 +10,10 @@ import psutil
 import os
 import time
 
+import random
+import datetime
+from datetime import timedelta
+
 logger = get_logger(__name__)
 
 class StockCodeAnalyzer:
@@ -955,3 +959,59 @@ def normalize_stock_codes(stock_list):
             # 如果是其他类型（如numpy.str_），转换为字符串
             normalized.append(str(code).strip())
     return normalized
+
+def get_random_date(start_date: str = "2014-01-01", 
+                    end_months_ago: int = 3, 
+                    fmt: str = "%Y-%m-%d") -> str:
+    """
+    在指定的日期范围内随机生成一个日期字符串。
+    
+    :param start_date: 开始日期，格式为 "YYYY-MM-DD" 的字符串
+    :param end_months_ago: 结束日期距离当前时间的月数（默认为3个月前）
+    :param fmt: 返回的日期字符串格式，默认为 "%Y-%m-%d"
+    :return: 随机生成的日期字符串
+
+    示例：
+    # 使用默认参数（2014-01-01 至 当前日期前三个月）
+    print("默认范围随机日期:", get_random_date())
+    
+    # 自定义参数测试
+    print("自定义范围随机日期:", get_random_date("2020-05-01", end_months_ago=1))
+
+    """
+    # 1. 解析开始日期
+    start_dt = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+    
+    # 2. 计算结束日期（当前日期往前推 N 个月）
+    # 注意：直接减去 timedelta(days=90) 不够精确，这里采用按年月推算
+    today = datetime.datetime.today()
+    year = today.year
+    month = today.month - end_months_ago
+    
+    # 处理跨年/跨月的情况
+    while month <= 0:
+        month += 12
+        year -= 1
+        
+    # 处理结束日期超过当月最大天数的情况（如 3月31日往前推1个月）
+    max_day = [31, 29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28, 31, 30, 31, 30, 
+               31, 31, 30, 31, 30, 31][month - 1]
+    day = min(today.day, max_day)
+    
+    end_dt = datetime.datetime(year, month, day)
+    
+    # 3. 确保开始日期早于结束日期
+    if start_dt >= end_dt:
+        raise ValueError(f"开始日期 ({start_date}) 必须早于结束日期 ({end_dt.strftime('%Y-%m-%d')})")
+    
+    # 4. 计算两个日期之间的总天数差
+    delta_days = (end_dt - start_dt).days
+    if delta_days <= 0:
+        raise ValueError("日期范围无效，请检查参数。")
+    
+    # 5. 随机生成一个天数偏移量，并加到开始日期上
+    random_offset = random.randint(0, delta_days)
+    random_dt = start_dt + timedelta(days=random_offset)
+    
+    # 6. 格式化为字符串并返回
+    return random_dt.strftime(fmt)

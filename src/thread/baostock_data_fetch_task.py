@@ -108,30 +108,74 @@ class BaostockDataFetchTask2(BaseTask):
         }
     
     def execute(self):
+        # 检查暂停状态
+        self._check_pause()
+        
+        # 检查取消状态
+        if self.is_cancelled():
+            return {"result": False, "status": "cancelled", "message": "Task was cancelled"}
+
         self.sig_progress_changed.emit(0, 1)
+        self.set_progress(0)
+
+        if TimePeriod.is_minute_level(self.period):
+            # BaoStockProcessor().process_and_save_minute_level_stock_data(self.code, TimePeriod.get_number_label(self.period))
+            df_data = BaoStockProcessor().process_minute_level_stock_data(self.code, TimePeriod.get_number_label(self.period), self.start_date, self.end_date)
+        else:
+            if self.period == TimePeriod.DAY:
+                # df_data = BaoStockProcessor().process_and_save_daily_stock_data(self.code)
+                df_data = BaoStockProcessor().process_daily_stock_data(self.code, self.start_date, self.end_date)
+            elif self.period == TimePeriod.WEEK:
+                # df_data = BaoStockProcessor().process_and_save_weekly_stock_data(self.code)
+                df_data = BaoStockProcessor().process_weekly_stock_data(self.code, self.start_date, self.end_date)
+
+        self.sig_progress_changed.emit(1, 1)
+        self.set_progress(100)
+
+        bSuccess = df_data is not None or not df_data.empty
+
+        msg = f"Failed processed all data"
+        if bSuccess:
+            msg = f"Successfully processed all data"
+
+
+        # 校验更新结果
+        return {
+            "result": bSuccess,
+            "status": "completed", 
+            "message": msg,
+            "completed_tasks": 1,
+            "total_tasks": 1
+        }
+
+class BaostockInfoFetchTask(BaseTask):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def execute(self):
+        self.set_progress(0)
 
         # 检查暂停状态
         self._check_pause()
         
         # 检查取消状态
         if self.is_cancelled():
-            return {"status": "cancelled", "message": "Task was cancelled"}
+            return {"status": "cancelled", "message": "BaostockInfoFetchTask was cancelled"}
 
-        if TimePeriod.is_minute_level(self.period):
-            BaoStockProcessor().process_and_save_minute_level_stock_data(self.code, TimePeriod.get_number_label(self.period))
-        else:
-            if self.period == TimePeriod.DAY:
-                result = BaoStockProcessor().process_and_save_daily_stock_data(self.code)
-            elif self.period == TimePeriod.WEEK:
-                result = BaoStockProcessor().process_and_save_weekly_stock_data(self.code)
+        bRet = BaoStockProcessor().query_all_stock()
 
-        self.sig_progress_changed.emit(1, 1)
-        self.set_progress(1)
+        self.set_progress(100)
 
-        # 校验更新结果
+        task_status = "Failed"
+        task_msg = "Failed query_all_stock"
+        if bRet:
+            task_status = "completed"
+            task_msg = f"Successfully query_all_stock"
+
         return {
-            "status": "completed", 
-            "message": f"Successfully processed all data",
+            "result": bRet,
+            "status": task_status, 
+            "message": task_msg,
             "completed_tasks": 1,
             "total_tasks": 1
         }

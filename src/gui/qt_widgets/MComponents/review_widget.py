@@ -14,6 +14,8 @@ from manager.bao_stock_data_manager import BaostockDataManager
 from manager.period_manager import TimePeriod
 from manager.review_demo_trading_manager import ReviewDemoTradingManager
 
+from common.common_api import *
+
 class ReviewWidget(QWidget):
     # 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
     _DEFAULT_LOAD_PERIODS = [
@@ -474,8 +476,8 @@ class ReviewWidget(QWidget):
         
         Args:
             latest_date_str (str): 最新日期字符串，格式为 "YYYY-MM-DD"，默认为当前日期
-            days_before_start (int): 最新日期往前推的起始天数，默认为30天
-            days_before_end (int): 最新日期往前推的结束天数，默认为1天
+            days_before_start (int): 最新日期往前推的起始天数，默认为360天
+            days_before_end (int): 最新日期往前推的结束天数，默认为120天
         
         Returns:
             str: 格式为 "YYYY-MM-DD" 的随机日期字符串
@@ -513,9 +515,18 @@ class ReviewWidget(QWidget):
         
         return random_date.strftime("%Y-%m-%d")
 
-
-
     # -----------------槽函数----------------
+    def slot_bao_stock_info_query_started(self, task_id):
+        self.logger.info(f"baostock info query started, task_id: {task_id}")
+        self.frame_review.setEnabled(False)
+    def slot_bao_stock_info_query_finished(self, task_id, result):
+        self.logger.info(f"task_id: {task_id}, result: {result}")
+
+        if result["result"]:
+            self.frame_review.setEnabled(True)
+        else:
+            QMessageBox.warning(self, "提示", "BaoStock股票信息查询失败！请检查网络连接或稍后再试！")
+
     def slot_current_animation_index_changed(self, index):
         # self.logger.info(f"收到k线图进度: {index}")
 
@@ -594,7 +605,7 @@ class ReviewWidget(QWidget):
         bao_stock_data_manager = BaostockDataManager()
 
         # 从本地股票信息库同步获取“个股代码-名称”映射（不依赖后台日线缓存）
-        dict_code_name = bao_stock_data_manager.get_all_stock_code_name_dict()
+        dict_code_name = bao_stock_data_manager.get_all_stock_code_name_dict(code_column_name='code', name_column_name='code_name')
         if not dict_code_name:
             self.logger.warning("本地股票信息为空，无法随机加载")
             QMessageBox.warning(self, "提示", "本地暂无股票信息数据，请先下载股票列表")
@@ -608,12 +619,17 @@ class ReviewWidget(QWidget):
         random.shuffle(random_codes)
 
         for candidate in random_codes[:20]:
-            dict_latest_row = bao_stock_data_manager.get_lastest_row_data_dict_by_code_list([candidate], TimePeriod.DAY)
-            if dict_latest_row:
-                code = candidate
-                name = dict_code_name[candidate]
-                newest_date = dict_latest_row[candidate]['date'].iloc[0]
-                break
+            # dict_latest_row = bao_stock_data_manager.get_lastest_row_data_dict_by_code_list([candidate], TimePeriod.DAY)
+            # if dict_latest_row:
+            #     code = candidate
+            #     name = dict_code_name[candidate]
+            #     newest_date = dict_latest_row[candidate]['date'].iloc[0]
+            #     break
+            code = candidate
+            name = dict_code_name[candidate]
+
+            # 日期范围从2014-01-01 至 当前日期前三个月进行选择 
+            newest_date = get_random_date()
 
         if code is None:
             self.logger.warning("本地日线行情数据为空，无法随机加载")
