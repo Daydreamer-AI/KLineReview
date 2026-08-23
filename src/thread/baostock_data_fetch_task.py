@@ -5,6 +5,8 @@ import time
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from manager.period_manager import TimePeriod
+from manager.bao_stock_data_manager import BaostockDataManager
+from indicators import stock_data_indicators as sdi
 
 class BaostockDataFetchTask(BaseTask):
     sig_progress_changed = pyqtSignal(int, int)
@@ -83,7 +85,7 @@ class BaostockDataFetchTask(BaseTask):
 
 class BaostockDataFetchTask2(BaseTask):
     sig_progress_changed = pyqtSignal(int, int)
-    def __init__(self, code=None, start_date=None, end_date=None, period=None, **kwargs):
+    def __init__(self, code=None, start_date=None, end_date=None, period=None, adjustflag='2', **kwargs):
         super().__init__(**kwargs)
         self._current_board_type = None
         self._current_level = None
@@ -95,6 +97,8 @@ class BaostockDataFetchTask2(BaseTask):
         self.start_date = start_date
         self.end_date = end_date
         self.period = period
+        # baostock 前复权(2)仅提供最近约三年数据；复盘随机日期已按该窗口限定
+        self.adjustflag = adjustflag
 
 
     def get_task_status_info(self):
@@ -119,20 +123,20 @@ class BaostockDataFetchTask2(BaseTask):
         self.set_progress(0)
 
         if TimePeriod.is_minute_level(self.period):
-            # BaoStockProcessor().process_and_save_minute_level_stock_data(self.code, TimePeriod.get_number_label(self.period))
-            df_data = BaoStockProcessor().process_minute_level_stock_data(self.code, TimePeriod.get_number_label(self.period), self.start_date, self.end_date)
+            df_data = BaoStockProcessor().process_minute_level_stock_data(
+                self.code, TimePeriod.get_number_label(self.period), self.start_date, self.end_date, self.adjustflag)
         else:
             if self.period == TimePeriod.DAY:
-                # df_data = BaoStockProcessor().process_and_save_daily_stock_data(self.code)
-                df_data = BaoStockProcessor().process_daily_stock_data(self.code, self.start_date, self.end_date)
+                df_data = BaoStockProcessor().process_daily_stock_data(self.code, self.start_date, self.end_date, self.adjustflag)
             elif self.period == TimePeriod.WEEK:
-                # df_data = BaoStockProcessor().process_and_save_weekly_stock_data(self.code)
-                df_data = BaoStockProcessor().process_weekly_stock_data(self.code, self.start_date, self.end_date)
+                df_data = BaoStockProcessor().process_weekly_stock_data(self.code, self.start_date, self.end_date, self.adjustflag)
+
+        df_data = self._prepare_stock_data_with_indicators(df_data)
 
         self.sig_progress_changed.emit(1, 1)
         self.set_progress(100)
 
-        bSuccess = df_data is not None or not df_data.empty
+        bSuccess = df_data is not None and not df_data.empty
 
         msg = f"Failed processed all data"
         if bSuccess:
@@ -145,8 +149,28 @@ class BaostockDataFetchTask2(BaseTask):
             "status": "completed", 
             "message": msg,
             "completed_tasks": 1,
-            "total_tasks": 1
+            "total_tasks": 1,
+            "data": df_data,
         }
+
+    def _prepare_stock_data_with_indicators(self, df_data):
+        """远程拉取的原始 K 线数据：补充股票名称并计算指标列，便于直接注入展示组件"""
+        if df_data is None or df_data.empty:
+            return df_data
+
+        df_data = df_data.copy()
+        name = BaostockDataManager().get_stock_name_by_code(self.code)
+        df_data['name'] = str(name) if name else '未知'
+
+        # 统一日期/时间为 ISO 字符串（与本地历史数据格式一致），
+        # 避免 data_type_conversion 生成的 date/Timestamp 对象与下游字符串比较时报类型错误
+        if 'date' in df_data.columns:
+            df_data['date'] = df_data['date'].astype(str)
+        if 'time' in df_data.columns:
+            df_data['time'] = df_data['time'].astype(str)
+
+        sdi.default_indicators_auto_calculate(df_data)
+        return df_data
 
 class BaostockInfoFetchTask(BaseTask):
     def __init__(self, **kwargs):

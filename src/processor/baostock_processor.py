@@ -272,7 +272,7 @@ class BaoStockProcessor(QObject):
         
 
     # 日线全量更新
-    def process_daily_stock_data(self, code, start_date=None, end_date=None):
+    def process_daily_stock_data(self, code, start_date=None, end_date=None, adjustflag='2'):
         if start_date == None or end_date == None:
             # 默认计算近3年的日期范围
             end_date = (datetime.datetime.now()).strftime("%Y-%m-%d")
@@ -286,7 +286,7 @@ class BaoStockProcessor(QObject):
             rs = bs.query_history_k_data_plus(code,
                 "date,code,open,high,low,close,volume,amount,pctChg,turn,adjustflag",
                 start_date=start_date, end_date=end_date,
-                frequency="d", adjustflag="2")
+                frequency="d", adjustflag=adjustflag)
         # self.logger.info(rs.error_code)      # 0
         # self.logger.info(rs.error_msg)       # success
         # self.logger.info("rs的类型：", type(rs))       # <class 'baostock.data.resultset.ResultData'>
@@ -444,7 +444,7 @@ class BaoStockProcessor(QObject):
         pass
 
     # 周线全量更新
-    def process_weekly_stock_data(self, code, start_date=None, end_date=None):
+    def process_weekly_stock_data(self, code, start_date=None, end_date=None, adjustflag='2'):
         if start_date == None or end_date == None:
             # 默认计算近3年的日期范围（周线数据通常需要更长时间来计算指标）
             end_date = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -460,7 +460,7 @@ class BaoStockProcessor(QObject):
             rs = bs.query_history_k_data_plus(code,
                 "date,code,open,high,low,close,volume,amount,pctChg,turn,adjustflag",
                 start_date=start_date, end_date=end_date,
-                frequency="w", adjustflag="2")
+                frequency="w", adjustflag=adjustflag)
         # self.logger.info(rs.error_code)      # 0
         # self.logger.info(rs.error_msg)       # success
         # self.logger.info("rs的类型：", type(rs))       # <class 'baostock.data.resultset.ResultData'>
@@ -603,7 +603,7 @@ class BaoStockProcessor(QObject):
 
         return result
 
-    def process_minute_level_stock_data(self, code, level = '1', start_date=None, end_date=None):
+    def process_minute_level_stock_data(self, code, level = '1', start_date=None, end_date=None, adjustflag='2'):
         result = pd.DataFrame()
         allowed_levels = ['1', '3', '5', '10', '15', '30', '45', '60', '90', '120']
         if level not in allowed_levels:
@@ -631,7 +631,7 @@ class BaoStockProcessor(QObject):
             rs = bs.query_history_k_data_plus(code,
                 "date,time,code,open,high,low,close,volume,amount,adjustflag",
                 start_date=start_date, end_date=end_date,
-                frequency=level, adjustflag="2")
+                frequency=level, adjustflag=adjustflag)
 
 
         result_list = []
