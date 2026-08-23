@@ -89,18 +89,7 @@ class StockInfoDBBase(CommonDBBase):
             return "./data/database/stocks/db/akshare/stocks.db"
 
     def init_baostock_db(self):
-        create_table_sql = f"""
-        CREATE TABLE IF NOT EXISTS stock_basic_info (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,      -- 添加自增ID作为主键
-            "证券代码" TEXT NOT NULL,
-            "交易状态" TEXT NOT NULL,
-            "证券名称" TEXT NOT NULL,
-            "更新日期" DATE NOT NULL DEFAULT CURRENT_DATE,
-            "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE("证券代码", "更新日期")              -- 保持复合唯一约束
-        )
-        """
-        self.create_table('stock_basic_info', create_table_sql)
+        self.create_baostock_stocks_info_table()
 
     def init_efinance_db(self):
         self.create_table('stock_basic_info', '''
@@ -131,6 +120,23 @@ class StockInfoDBBase(CommonDBBase):
             self.init_efinance_db()
         self.logger.info(f"股票数据库已初始化: {self.db_path}")
 
+    def create_baostock_stocks_info_table(self):
+        create_table_sql = f"""
+                CREATE TABLE IF NOT EXISTS stock_basic_info (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    code TEXT NOT NULL,
+                    trade_status TEXT NOT NULL,
+                    name TEXT NOT NULL,
+                    is_deleted INTEGER  NOT NULL DEFAULT 0,
+                    version Text NOT NULL DEFAULT '1.0.0',
+                    update_at DATE NOT NULL DEFAULT CURRENT_DATE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(code, update_at)
+                )
+                """
+        self.create_table('stock_basic_info', create_table_sql)
+
+
     # ========================================================================AKShare相关接口========================================================================
     # AKShare
     def init_akshare_db(self):
@@ -139,8 +145,8 @@ class StockInfoDBBase(CommonDBBase):
         # 1. 创建A股所有股票表 - 使用父类方法（推荐）
         self.create_table('stock_basic_info', '''
             CREATE TABLE IF NOT EXISTS stock_basic_info (
-                证券代码 TEXT PRIMARY KEY NOT NULL,
-                证券名称 TEXT NOT NULL,
+                code TEXT PRIMARY KEY NOT NULL,
+                name TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -1072,7 +1078,7 @@ class StockInfoDBBase(CommonDBBase):
             return pd.DataFrame()
 
     # Baostock
-    def save_tao_stocks_to_db(self, stocks_data, table_name="stock_basic_info"):
+    def save_bao_stocks_to_db(self, stocks_data, table_name="stock_basic_info"):
         """
         线程安全地保存股票数据到数据库
         
@@ -1086,44 +1092,26 @@ class StockInfoDBBase(CommonDBBase):
             raise ValueError(f"Invalid table name: {table_name}")
 
         # 确保表存在 - 使用复合唯一键，不设主键
-        create_table_sql = f"""
-        CREATE TABLE IF NOT EXISTS {table_name} (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,      -- 添加自增ID作为主键
-            "证券代码" TEXT NOT NULL,
-            "交易状态" TEXT NOT NULL,
-            "证券名称" TEXT NOT NULL,
-            "更新日期" DATE NOT NULL DEFAULT CURRENT_DATE,
-            "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE("证券代码", "更新日期")              -- 保持复合唯一约束
-        )
-        """
-        
-        self.create_table(table_name, create_table_sql)
+        self.create_baostock_stocks_info_table()
         
         # 数据预处理
         if not stocks_data.empty:
-            # 确保必要列存在
-            required_columns = ['证券代码', '交易状态', '证券名称', '更新日期']
-            for col in required_columns:
-                if col not in stocks_data.columns:
-                    raise ValueError(f"缺少必要列: {col}")
-            
             try:
                 # 使用upsert插入数据
                 inserted_count = self.upsert_data(
                     table_name,
                     stocks_data.to_dict('records'),
-                    conflict_columns=['证券代码', '更新日期']  # 明确指定冲突检测列
+                    conflict_columns=['code', 'update_at']  # 明确指定冲突检测列
                 )
                 
                 self.logger.info(f"成功保存 {inserted_count} 条 {table_name} 股票数据")
-                return inserted_count
+                return True
             except Exception as e:
                 self.logger.error(f"插入数据失败: {e}")
                 return False
         
         self.logger.info(f"没有数据需要保存到 {table_name}")
-        return 0
+        return True
 
     def get_stocks_with_filter(self, table_name, status_filter=None):
         """
@@ -1136,7 +1124,7 @@ class StockInfoDBBase(CommonDBBase):
         df = self.get_table_data(table_name)
         
         if status_filter and not df.empty:
-            df = df[df['交易状态'] == status_filter]
+            df = df[df['trade_status'] == status_filter]
         
         return df
     def get_sh_main_stocks(self):
@@ -1157,7 +1145,7 @@ class StockInfoDBBase(CommonDBBase):
             with self._get_connection() as cur:
                 cur.execute(f'''
                     SELECT * FROM {table_name} 
-                    WHERE 更新日期 = (SELECT MAX(更新日期) FROM {table_name})
+                    WHERE update_at = (SELECT MAX(update_at) FROM {table_name})
                 ''')
                 
                 column_names = [description[0] for description in cur.description]

@@ -527,6 +527,9 @@ class ReviewWidget(QWidget):
         else:
             QMessageBox.warning(self, "提示", "BaoStock股票信息查询失败！请检查网络连接或稍后再试！")
 
+    def slot_bao_stock_info_query_error(self, task_id, error):
+        self.logger.info(f"task_id: {task_id}, error: {error}")
+
     def slot_current_animation_index_changed(self, index):
         # self.logger.info(f"收到k线图进度: {index}")
 

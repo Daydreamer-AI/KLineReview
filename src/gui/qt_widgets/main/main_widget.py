@@ -16,6 +16,7 @@ from processor.baostock_processor import BaoStockProcessor
 from processor.ak_stock_data_processor import AKStockDataProcessor
 
 from thread.baostock_data_fetch_task import *
+from manager.config_manager import ConfigManager
 
 class MainWidget(QWidget):
     def __init__(self):
@@ -33,6 +34,18 @@ class MainWidget(QWidget):
 
     def init_para(self):
         self.logger = get_logger(__name__)
+
+        config_manager = ConfigManager()
+
+        s_version = '0.0.1'
+        if config_manager.has_section('App'):
+            self.logger.info("已找到App配置项")
+            s_version = config_manager.get('App', 'version')
+            self.logger.info(f"当前版本为：{s_version}")
+        else:
+            s_version = '1.0.0'
+            config_manager.set('App', 'version', s_version)
+            config_manager.save()
 
         self.init_processors()
 
@@ -97,6 +110,7 @@ class MainWidget(QWidget):
         baostock_info_fetch_task = BaostockInfoFetchTask()
         baostock_info_fetch_task.task_started.connect(self.review_page.slot_bao_stock_info_query_started)
         baostock_info_fetch_task.task_completed.connect(self.review_page.slot_bao_stock_info_query_finished)
+        baostock_info_fetch_task.task_error.connect(self.review_page.slot_bao_stock_info_query_error)
         get_default_task_pool().submit(baostock_info_fetch_task)
     # ---------------重写----------------
     def closeEvent(self, event):

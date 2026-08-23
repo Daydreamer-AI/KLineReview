@@ -25,6 +25,7 @@ import json
 
 from manager.bao_stock_data_manager import BaostockDataManager
 from manager.period_manager import TimePeriod
+from manager.config_manager import ConfigManager
 
 from thread.task_pool import get_default_task_pool
 
@@ -791,8 +792,8 @@ class BaoStockProcessor(QObject):
                 if task.is_cancelled():
                     break
 
-            value = row['证券代码']
-            stock_name = row['证券名称'] if '证券名称' in row else '未知'
+            value = row['code']
+            stock_name = row['name'] if 'name' in row else '未知'
             # self.logger.info(f"获取第 {i} 只{board_name_chinese}股票 {value} 【{time_period_name_chinese}】数据")
 
             result = None
@@ -984,8 +985,8 @@ class BaoStockProcessor(QObject):
                 if task.is_cancelled():
                     break
 
-            value = row['证券代码']
-            stock_name = row['证券名称'] if '证券名称' in row else '未知'
+            value = row['code']
+            stock_name = row['name'] if 'name' in row else '未知'
             # self.logger.info(f"获取第 {i} 只{board_type}股票 {value} {level}分钟级别数据")
             
             result = self.process_and_save_minute_level_stock_data(value, level)
@@ -1022,17 +1023,20 @@ class BaoStockProcessor(QObject):
     def query_all_stock(self):
         query_date = datetime.datetime.now().strftime("%Y-%m-%d")
         # 获取前一天的日期
-        yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+        yesterday = (datetime.datetime.now() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
         query_date = yesterday
 
         self.logger.info(f"开始获取所有股票列表，日期：{query_date}")
-        rs = bs.query_all_stock(query_date)     # 交易日调用返回空
+        rs = bs.query_all_stock(query_date)     # 交易日查询18点前当日数据返回空，非交易日调用也返回空。
         self.logger.info('query_all_stock respond error_code:'+rs.error_code)
         self.logger.info('query_all_stock respond  error_msg:'+rs.error_msg)
 
+        dict_stock_info_local = BaostockDataManager().get_stock_info_dict()
         if rs.error_code != '0':
             self.logger.error(f"获取所有股票列表失败: {rs.error_msg}")
-            return False
+
+            b_ret = dict_stock_info_local != {}
+            return b_ret
 
         data_list = []
         while (rs.error_code == '0') & rs.next():
@@ -1041,14 +1045,15 @@ class BaoStockProcessor(QObject):
 
         self.logger.info(f"获取所有股票列表成功，共有{len(data_list)}只股票")
 
-        result = pd.DataFrame(data_list, columns=rs.fields)
+        basic_columns = ['code', 'trade_status', 'name', ]
+        result = pd.DataFrame(data_list, columns=basic_columns)
 
         if result is None or result.empty:
             self.logger.error(f"获取所有股票列表失败: {rs.error_msg}")
-            return False
+            b_ret = dict_stock_info_local != {}
+            return b_ret
 
-        result['update_date'] = query_date
-        # result['update_date'] = pd.to_datetime(result['update_date'], format='%Y-%m-%d').dt.date
+        result['version'] = ConfigManager().get('App', 'version', '0.0.1')
 
         self.logger.info(f"result列信息：{result.columns}")
 
@@ -1060,6 +1065,17 @@ class BaoStockProcessor(QObject):
             total_count += len(df)
 
         self.logger.info(f"总股票数量：{total_count}")
+
+
+        # 每周更新
+        current_date = datetime.datetime.now()
+        local_lastest_date = ""
+        if dict_stock_info_local != {} and 'sh_main' in dict_stock_info_local.keys():
+            local_lastest_date = dict_stock_info_local['sh_main']['update_at'].iloc[0]
+
+        self.logger.info(f"查询日期：{query_date}，本地个股信息数据最新更新日期：{local_lastest_date}")
+        if current_date.weekday() >= 2 and query_date > local_lastest_date:
+            BaostockDataManager().save_stock_info_to_db(result, 'stock_basic_info')
 
         BaostockDataManager().update_stock_info_dict(dict_stocks_info)
 
@@ -1082,11 +1098,14 @@ class BaoStockProcessor(QObject):
             # 获取一条记录，将记录合并在一起
             data_list.append(rs.get_row_data())
 
-        chinese_columns = ['证券代码', '交易状态', '证券名称']
-        result = pd.DataFrame(data_list, columns=chinese_columns)
+        basic_columns = ['code', 'trade_status', 'name', ]
+        result = pd.DataFrame(data_list, columns=basic_columns)
 
-        result['更新日期'] = query_date
-        result['更新日期'] = pd.to_datetime(result['更新日期'], format='%Y-%m-%d').dt.date
+        if result is None or result.empty:
+            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}")
+            return False
+
+        result['version'] = ConfigManager().get('App', 'version', '0.0.1')
 
         self.logger.info(f"获取所有股票数据完成，共有{len(result)}只股票。\n获取结果如下：\n{result.head(3)}")
 
@@ -1100,15 +1119,15 @@ class BaoStockProcessor(QObject):
 
             # 如需查看具体代码，可取消下一行的注释
             # self.logger.info(f"{board_name} 股票代码:\n {df_board['code'].tolist()}\n")
-            if board_name == '沪市主板':
+            if board_name == 'sh_main':
                 BaostockDataManager().save_stock_info_to_db(df_board, 'sh_main')
-            elif board_name == '深市主板':
+            elif board_name == 'sz_main':
                 BaostockDataManager().save_stock_info_to_db(df_board, 'sz_main')
-            elif board_name == '创业板':
+            elif board_name == 'gem':
                 BaostockDataManager().save_stock_info_to_db(df_board, 'gem')
-            elif board_name == '科创板':
+            elif board_name == 'star':
                 BaostockDataManager().save_stock_info_to_db(df_board, 'star')
-            elif board_name == '北交所':
+            elif board_name == 'bse':
                BaostockDataManager().save_stock_info_to_db(df_board, 'bse')
 
         #### 结果集输出到csv文件 ####   
@@ -1132,7 +1151,7 @@ class BaoStockProcessor(QObject):
 
         # 遍历每一行数据
         for index, row in df.iterrows():
-            code = row['证券代码']
+            code = row['code']
             
             if code.startswith('sh.600') or code.startswith('sh.601') or code.startswith('sh.602') or code.startswith('sh.603') or code.startswith('sh.605'):
                 sh_main = pd.concat([sh_main, row.to_frame().T], ignore_index=True)
@@ -1146,11 +1165,11 @@ class BaoStockProcessor(QObject):
                 bse = pd.concat([bse, row.to_frame().T], ignore_index=True)
         
         return {
-            '沪市主板': sh_main,
-            '深市主板': sz_main,
-            '创业板': gem,
-            '科创板': star,
-            '北交所': bse
+            'sh_main': sh_main,
+            'sz_main': sz_main,
+            'gem': gem,
+            'star': star,
+            'bse': bse
         }
 
     def auto_test(self):
@@ -1188,7 +1207,7 @@ class BaoStockProcessor(QObject):
             # 遍历该板块的每一行数据
             for index, row in board_data.iterrows():
                 try:
-                    code = row['证券代码']  # 使用正确的列名
+                    code = row['code']  # 使用正确的列名
                     
                     # 为不同时间级别的数据表创建索引
                     

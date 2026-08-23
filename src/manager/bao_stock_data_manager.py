@@ -67,7 +67,7 @@ class BaostockDataManager(QObject):
         with self.lock:
             return MappingProxyType(self.dict_lastest_1d_stock_data)
 
-    def get_all_stock_code_name_dict(self, code_column_name='证券代码', name_column_name='证券名称'):
+    def get_all_stock_code_name_dict(self, code_column_name='code', name_column_name='name'):
         """从本地股票信息库同步构建 {code: name} 映射（不依赖后台日线缓存）。
 
         供复盘随机选股及后续需要“个股代码-名称”的功能使用；结果按需缓存。
@@ -95,15 +95,8 @@ class BaostockDataManager(QObject):
     # ----------------------stock_info相关接口-----------------------------------------
     def get_all_stocks_from_db(self):
         with self.lock:
-            # self.dict_stocks_info['sh_main'] = self.stock_info_db_base.get_sh_main_stocks()
-            # self.dict_stocks_info['sz_main'] = self.stock_info_db_base.get_sz_main_stocks()
-            # self.dict_stocks_info['gem'] = self.stock_info_db_base.get_gem_stocks()
-            # self.dict_stocks_info['star'] = self.stock_info_db_base.get_star_stocks()
-
-            self.dict_stocks_info['sh_main'] = self.stock_info_db_base.get_lastest_stocks(table_name='sh_main')
-            self.dict_stocks_info['sz_main'] = self.stock_info_db_base.get_lastest_stocks(table_name='sz_main')
-            self.dict_stocks_info['gem'] = self.stock_info_db_base.get_lastest_stocks(table_name='gem')
-            self.dict_stocks_info['star'] = self.stock_info_db_base.get_lastest_stocks(table_name='star')
+            df_all_stocks_info = self.stock_info_db_base.get_lastest_stocks(table_name='stock_basic_info')
+            self.dict_stocks_info = classify_a_stocks_by_board(df_all_stocks_info)
 
         sh_main_count = len(self.dict_stocks_info['sh_main'])
         sz_main_count = len(self.dict_stocks_info['sz_main'])
@@ -117,9 +110,9 @@ class BaostockDataManager(QObject):
         self.logger.info(f"总股票数量(未计算北交所股票)：{sh_main_count + sz_main_count + gem_main_count + star_main_count}")
 
 
-    def save_stock_info_to_db(self, df_data, board='stock_basic_info'):
+    def save_stock_info_to_db(self, df_data, table_name='stock_basic_info'):
         with self.lock:
-            self.stock_info_db_base.save_tao_stocks_to_db(df_data, board)
+            self.stock_info_db_base.save_bao_stocks_to_db(df_data, table_name)
 
     def get_stock_name_by_code(self, code):
         try:
@@ -135,10 +128,10 @@ class BaostockDataManager(QObject):
                 return None
                 
             # 使用query方法（更直观）
-            matched_row = df_board_data[df_board_data['证券代码'] == code]
+            matched_row = df_board_data[df_board_data['code'] == code]
             
             if not matched_row.empty:
-                return matched_row.iloc[0].get('证券名称', '未知')
+                return matched_row.iloc[0].get('name', '未知')
             else:
                 return None
                 
@@ -199,8 +192,8 @@ class BaostockDataManager(QObject):
                 #     break
 
                 try:
-                    stock_code = row['证券代码']
-                    stock_name = row['证券名称'] if '证券名称' in row else '未知'
+                    stock_code = row['code']
+                    stock_name = row['name'] if 'name' in row else '未知'
                     
                     # 获取日线和周线数据
                     daily_data = self.get_stock_data_from_db_by_period_with_indicators(stock_code, TimePeriod.DAY)
@@ -300,8 +293,8 @@ class BaostockDataManager(QObject):
                 #     break
 
                 try:
-                    code = row['证券代码']
-                    name = row['证券名称'] if '证券名称' in row else '未知'
+                    code = row['code']
+                    name = row['code'] if 'name' in row else '未知'
                     
                     with self.lock:
                         lastest_1d_data = self.stock_db_base.get_lastest_stock_data(code, table_name)     

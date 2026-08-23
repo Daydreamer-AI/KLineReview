@@ -49,7 +49,7 @@ class AKStockDataProcessor:
         self.logger.info("AKStockDataProcessor--StockInfoDBBasePool().get_manager(0) end")
         self.stock_db_base = StockDbBase("./data/database/stocks/db/akshare")
 
-        self.dict_stocks = {}   # key: 板块，value：板块对应的股票信息（证券代码、证券名称）- pandas.DataFrame对象
+        self.dict_stocks = {}   # key: 板块，value：板块对应的股票信息（code、name）- pandas.DataFrame对象
         self.df_stocks_eastmoney = pd.DataFrame() # 带有市值信息的股票数据 - pandas.DataFrame对象
         self.dict_chip_distribution_data_eastmoney = {}   # 东方财富的筹码分布数据 - 字典对象，key：股票代码，value： pandas.DataFrame对象
         self.logger.info("AKStockDataProcessor::__init__ done")
@@ -83,11 +83,11 @@ class AKStockDataProcessor:
         df = ak.stock_info_a_code_name()
         # self.logger.info("原始数据验证:\n", df.tail(3))
 
-        df.columns = ['证券代码', '证券名称']
+        df.columns = ['code', 'name']
         # self.logger.info("验证:\n", df.tail(3))
 
         # 建表。self.stock_info_db_base初始化时已创建
-        # self.stock_info_db_base.create_table("stock_basic_info", "CREATE TABLE IF NOT EXISTS stock_basic_info (证券代码 TEXT PRIMARY KEY, 证券名称 TEXT)")
+        # self.stock_info_db_base.create_table("stock_basic_info", "CREATE TABLE IF NOT EXISTS stock_basic_info (code TEXT PRIMARY KEY, name TEXT)")
 
 
         # 保存到数据库
@@ -288,7 +288,7 @@ class AKStockDataProcessor:
             index = 1
             for index, row in value.iterrows():
                 try:
-                    stock_code = row['证券代码']
+                    stock_code = row['code']
                     # self.logger.info("stock_code的类型：", type(stock_code))
                     # self.logger.info(f"正在获取第 {index} 只股票：{stock_code}")
                     stock_individual_info_em_df = ak.stock_individual_info_em(symbol=stock_code, timeout=30000)
@@ -568,7 +568,7 @@ class AKStockDataProcessor:
             self.stock_db_base.set_db_dir(db_dir)
 
             for index, row in df_data.iterrows():
-                stock_code = row['证券代码']
+                stock_code = row['code']
                 # self.logger.info("stock_code的类型：", type(stock_code))
 
                 self.logger.info(f"正在获取第 {index} 只股票的筹码分布信息：{stock_code}")
@@ -629,7 +629,7 @@ class AKStockDataProcessor:
             self.logger.info(f"db_dir: {db_dir}")
             self.stock_db_base.set_db_dir(db_dir)
             for index, row in df_data.iterrows():
-                stock_code = row['证券代码']
+                stock_code = row['code']
                 df_chip_distribution_data = self.stock_db_base.query_eastmoney_stock_chip_distribution_data(stock_code)
 
                 # 优化：策略筛选只需要最后一行数据

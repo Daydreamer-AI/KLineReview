@@ -85,7 +85,7 @@ def main():
     if qssFile.open(QFile.ReadOnly):
         # 使用 data() 方法获取字节数据并解码
         app.setStyleSheet(str(qssFile.readAll(), encoding='utf-8'))
-        app.setStyleSheet("*{font-family: 'Microsoft YaHei';font-size: 18px;}")
+        # app.setStyleSheet("*{font-family: 'Microsoft YaHei';font-size: 18px;}")
     else:
         logger.warning("无法打开整体样式表文件")
     qssFile.close()
