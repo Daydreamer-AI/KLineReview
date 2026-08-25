@@ -22,6 +22,7 @@ from gui.qt_widgets.MComponents.mloading_widget import LoadingWidget
 from indicators import stock_data_indicators as sdi
 
 from manager.period_manager import TimePeriod, ReviewPeriodProcessData
+from processor.period_aggregator import period_start_key, aggregate_period
 
 from manager.indicators_config_manager import get_indicator_config_manager, IndicatrosEnum
 
@@ -875,6 +876,50 @@ class IndicatorsViewWidget(QWidget):
             
         return -1
 
+    def _get_anchor_matching_indices(self, df, period, as_of):
+        """通用锚定匹配：返回目标周期中“周期开始时刻 <= as_of”的 bar 位置列表。
+
+        日线及以上：周期开始由 bar 日期推导（周=周一、月=1 日、日=当日），
+        进行中（未走完）的 bar 周期开始时刻早于 as_of，也会被匹配到；
+        分钟级：限定 as_of 当日，匹配“bar 开始时刻 <= as_of”的 bar
+        （当前分钟级获取暂屏蔽，保留原按日定位语义作为扩展预留）。
+        """
+        if df is None or df.empty:
+            return []
+        if TimePeriod.is_minute_level(period):
+            if 'time' not in df.columns:
+                return []
+            dates = pd.to_datetime(df['date'])
+            times = pd.to_datetime(
+                df['date'].astype(str) + ' ' + df['time'].astype(str).str[-8:], errors='coerce')
+            interval = int(TimePeriod.get_number_label(period))
+            return [
+                i for i, (d, t) in enumerate(zip(dates, times))
+                if pd.notna(t) and d.date() == as_of.date()
+                and (t - pd.Timedelta(minutes=interval)) <= as_of
+            ]
+        dates = pd.to_datetime(df['date'])
+        starts = [period_start_key(period, d) for d in dates]
+        return [i for i, s in enumerate(starts) if s <= as_of]
+
+    def _refresh_derived_period_data(self, period, as_of):
+        """周期切换前按当前复盘位置重新生成上级周期数据（上级周期由基周期本地聚合）。
+
+        复盘动画前进后，进行中周期（如当周）的 bar 随复盘位置变化，切换前需重新聚合，
+        否则会锚定到加载时刻生成的部分周期 bar，或把未走完的周期显示为完整周期。
+        """
+        if period <= TimePeriod.DAY:
+            return
+        base_df = self.dict_stock_data.get(TimePeriod.DAY)
+        if base_df is None or base_df.empty:
+            return
+        try:
+            derived_df = aggregate_period(base_df, period, as_of=as_of)
+        except Exception as e:
+            self.logger.error(f"周期{TimePeriod.get_chinese_label(period)}切换前聚合失败: {e}")
+            return
+        if derived_df is not None and not derived_df.empty:
+            self.dict_stock_data[period] = derived_df
 
     # -----------------------复盘回放相关接口----------------------
     def init_animation(self, data, start_date, b_init=True):
@@ -904,8 +949,23 @@ class IndicatorsViewWidget(QWidget):
             target_period = TimePeriod.from_label(target_period_text)
             current_period_date_col = 'time' if TimePeriod.is_minute_level(last_period) else 'date'
 
+            # 统一锚定：以复盘基准时刻 as_of 为准，匹配“周期开始时刻 <= as_of”的 bar。
+            # 上级周期包含进行中（未走完）bar：周中复盘时当周 bar 由基周期聚合生成，
+            # 其周期开始（如周一）<= as_of 即应被选中，不再使用 date < start_date 跳过当周。
+            as_of = pd.Timestamp(start_date)
+            if TimePeriod.is_minute_level(last_period) or TimePeriod.is_minute_level(target_period):
+                last_process = self.dict_period_process_data.get(last_period)
+                if last_process is not None and last_process.current_date_time:
+                    try:
+                        as_of = pd.to_datetime(last_process.current_date_time)
+                    except (ValueError, TypeError):
+                        pass
+                elif TimePeriod.is_minute_level(target_period):
+                    # 分钟级目标周期且来源非分钟：以当日收盘时刻定位（分钟级获取暂屏蔽，扩展预留）
+                    as_of = pd.Timestamp(start_date) + pd.Timedelta(hours=15)
+            matching_indices = self._get_anchor_matching_indices(df, target_period, as_of)
+
             if b_init:
-                matching_indices = df[df['date'] <= start_date].index
                 if len(matching_indices) > 0:
                         # 普通处理
                         self.logger.info(f"动画初始化--找到 {len(matching_indices)} 个匹配的日期记录")
@@ -934,10 +994,6 @@ class IndicatorsViewWidget(QWidget):
                 else:
                     self.logger.warning(f"普通处理--未找到匹配的日期记录：{start_date}")
             else:
-                if checked_id >= 8:
-                    matching_indices = df[df['date'] < start_date].index    # 这里使用<是因为本周未结束时，Baostock无本周周线数据，因此加载上周周线数据。
-                else:
-                    matching_indices = df[df['date'] == start_date].index
 
                 matching_indices_len = len(matching_indices)
                 self.logger.info(f"切换--找到 {matching_indices_len} 个匹配的日期记录")
@@ -1134,6 +1190,9 @@ class IndicatorsViewWidget(QWidget):
                 target_period_text = self.period_button_group.button(checked_id).text()
                 last_period_text = self.period_button_group.button(self.last_period_btn_checked_id).text()
                 self.logger.info(f"此前周期id：{self.last_period_btn_checked_id}，名称：{last_period_text}，切换到目标周期id：{checked_id}，名称：{target_period_text}")
+                # 切换前按当前复盘位置重新生成上级周期数据（上级周期由基周期本地聚合）
+                self._refresh_derived_period_data(
+                    target_period, self.df_data.iloc[self.current_animation_index]['date'])
                 self.init_animation(self.df_data.iloc[0], self.df_data.iloc[self.current_animation_index]['date'], False)
                 # if checked_id < self.last_period_btn_checked_id:
                 #     # 大周期切小周期

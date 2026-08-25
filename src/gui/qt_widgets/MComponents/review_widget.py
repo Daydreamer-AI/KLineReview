@@ -10,6 +10,7 @@ from gui.qt_widgets.MComponents.demo_trading_card_widget import DemoTradingCardW
 from gui.qt_widgets.MComponents.demo_trading_record_widget import DemoTradingRecordWidget
 
 from processor.baostock_processor import BaoStockProcessor
+from processor.period_aggregator import aggregate_period
 from manager.bao_stock_data_manager import BaostockDataManager
 from manager.period_manager import TimePeriod
 from manager.review_demo_trading_manager import ReviewDemoTradingManager
@@ -24,6 +25,11 @@ class ReviewWidget(QWidget):
         # TimePeriod.MINUTE_60,
         TimePeriod.DAY,
         TimePeriod.WEEK,
+    ]
+
+    # 基周期：远程只拉取基周期，周线等上级周期由基周期本地聚合生成（不依赖远程上级周期接口）
+    _BASE_LOAD_PERIODS = [
+        TimePeriod.DAY,
     ]
 
     def __init__(self, parent=None):
@@ -46,6 +52,7 @@ class ReviewWidget(QWidget):
         self.current_load_period = None
         self._is_loading = False
         self._load_periods = list(self._DEFAULT_LOAD_PERIODS)
+        self._base_load_periods = list(self._BASE_LOAD_PERIODS)
         self._fetch_pending_periods = []
         self._fetch_failed_periods = []
         self._fetched_period_data = {}
@@ -266,6 +273,10 @@ class ReviewWidget(QWidget):
         """获取当前复盘加载周期列表（预留调整接口）"""
         return list(self._load_periods)
 
+    def get_base_load_periods(self):
+        """获取远程实际拉取的基周期列表（上级周期由基周期本地聚合，不远程拉取）"""
+        return list(self._base_load_periods)
+
     def set_load_periods(self, periods):
         """设置复盘加载周期列表（预留调整接口）"""
         valid_periods = []
@@ -294,8 +305,8 @@ class ReviewWidget(QWidget):
     def load_data(self, code, date):
         """复盘数据统一加载入口：仅由“加载/随机加载”按钮触发。
 
-        一次性在后台从远程 Baostock 获取所有配置周期（默认 15/30/60 分、日线、周线），
-        不再从本地读取个股 K 线数据，
+        一次性在后台从远程 Baostock 获取基周期（默认日线），
+        周线等上级周期由基周期按复盘日期本地聚合生成（不依赖远程上级周期接口），
         全部加载完成后统一同步到 indicators_view_widget，并按用户在
         comboBox_period 中选择的周期作为初始显示周期。
         """
@@ -327,7 +338,7 @@ class ReviewWidget(QWidget):
         """当前代码的所有配置周期是否都已注入内存缓存（本次会话由远程数据构建）"""
         if self.current_load_code != code:
             return False
-        for period in self.get_load_periods():
+        for period in self.get_base_load_periods():
             cached_df = self.indicators_view_widget.get_stock_data_by_period(period)
             if cached_df is None or cached_df.empty:
                 return False
@@ -347,12 +358,12 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.show_loading("dots", "loading...")
 
         # 分钟级数据获取暂屏蔽：即使通过 set_load_periods 配置了分钟周期也跳过
-        skipped_minute_periods = [p for p in self.get_load_periods() if TimePeriod.is_minute_level(p)]
+        skipped_minute_periods = [p for p in self.get_base_load_periods() if TimePeriod.is_minute_level(p)]
         if skipped_minute_periods:
             self.logger.warning(f"分钟级数据获取暂屏蔽，跳过: {[TimePeriod.get_chinese_label(p) for p in skipped_minute_periods]}")
 
         self._fetch_pending_periods = [
-            period for period in self.get_load_periods()
+            period for period in self.get_base_load_periods()
             if not TimePeriod.is_minute_level(period) and not self._period_in_cache(code, period)
         ]
         self._fetch_failed_periods = []
@@ -436,9 +447,11 @@ class ReviewWidget(QWidget):
             failed_text = "、".join(TimePeriod.get_chinese_label(p) for p in self._fetch_failed_periods)
             self.logger.warning(f"以下周期获取失败: {failed_text}")
 
-        # 1. 组装各周期 DataFrame：本轮远程拉取结果优先，其余取内存缓存（均为远程数据）
+        # 1. 组装各周期 DataFrame
+        # 1.1 先组装基周期（本轮远程拉取结果优先，其余取内存缓存，均为远程数据）
         dict_stock_data = {}
-        for period in self.get_load_periods():
+        base_df = None
+        for period in self.get_base_load_periods():
             df = None
             if period in self._fetched_period_data:
                 df = self._fetched_period_data[period]
@@ -448,6 +461,19 @@ class ReviewWidget(QWidget):
                     df = cached_df
             if df is not None and not df.empty:
                 dict_stock_data[period] = df
+                if base_df is None:
+                    base_df = df
+        # 1.2 上级周期由基周期按复盘基准时刻 as_of 本地聚合生成，不依赖远程上级周期接口
+        for period in self.get_load_periods():
+            if period in dict_stock_data or base_df is None or base_df.empty:
+                continue
+            try:
+                derived_df = aggregate_period(base_df, period, as_of=date)
+            except Exception as e:
+                self.logger.error(f"{code} 周期{TimePeriod.get_chinese_label(period)}聚合失败: {e}")
+                derived_df = None
+            if derived_df is not None and not derived_df.empty:
+                dict_stock_data[period] = derived_df
 
         indicators_view_widget = self.indicators_view_widget
         indicators_view_widget.set_stock_data(code, dict_stock_data)
