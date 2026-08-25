@@ -1024,7 +1024,7 @@ class BaoStockProcessor(QObject):
         query_date = datetime.datetime.now().strftime("%Y-%m-%d")
         # 获取前一天的日期
         yesterday = (datetime.datetime.now() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
-        query_date = yesterday
+        # query_date = yesterday
 
         self.logger.info(f"开始获取所有股票列表，日期：{query_date}")
         rs = bs.query_all_stock(query_date)     # 交易日查询18点前当日数据返回空，非交易日调用也返回空。
@@ -1033,7 +1033,7 @@ class BaoStockProcessor(QObject):
 
         dict_stock_info_local = BaostockDataManager().get_stock_info_dict()
         if rs.error_code != '0':
-            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}")
+            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}，即将使用本地个股信息")
 
             b_ret = dict_stock_info_local != {}
             return b_ret
@@ -1043,13 +1043,13 @@ class BaoStockProcessor(QObject):
             # 获取一条记录，将记录合并在一起
             data_list.append(rs.get_row_data())
 
-        self.logger.info(f"获取所有股票列表成功，共有{len(data_list)}只股票")
+        self.logger.info(f"获取所有股票列表完成，共有{len(data_list)}只股票")
 
         basic_columns = ['code', 'trade_status', 'name', ]
         result = pd.DataFrame(data_list, columns=basic_columns)
 
         if result is None or result.empty:
-            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}")
+            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}，即将使用本地个股信息")
             b_ret = dict_stock_info_local != {}
             return b_ret
 
