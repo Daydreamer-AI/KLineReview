@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QListWidget, QListWidgetItem
+from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QListWidget, QListWidgetItem, QButtonGroup
 from PyQt5.QtCore import QDate, QFile
 
 import random
@@ -77,6 +77,14 @@ class ReviewWidget(QWidget):
         self.listWidget_trading_record = QListWidget(self)
         self.demo_trading_record_widget = DemoTradingRecordWidget(self)
 
+        self.amout_button_group = QButtonGroup(self)
+        self.amout_button_group.addButton(self.btn_all, 0)
+        self.amout_button_group.addButton(self.btn_one_half, 1)
+        self.amout_button_group.addButton(self.btn_one_third, 2)
+        self.amout_button_group.addButton(self.btn_a_quarter, 3)
+        self.amout_button_group.addButton(self.btn_one_in_five, 4)
+
+
         self.stackedWidget_trading_record.addWidget(self.listWidget_trading_record)
         self.stackedWidget_trading_record.addWidget(self.demo_trading_record_widget)
         self.stackedWidget_trading_record.setCurrentWidget(self.listWidget_trading_record)
@@ -112,11 +120,12 @@ class ReviewWidget(QWidget):
 
         # 模拟交易
         self.lineEdit_price.editingFinished.connect(self.slot_lineEdit_price_editingFinished)
-        self.btn_all.clicked.connect(self.slot_btn_all_clicked)
-        self.btn_one_half.clicked.connect(self.slot_btn_one_half_clicked)
-        self.btn_one_third.clicked.connect(self.slot_btn_one_third_clicked)
-        self.btn_a_quarter.clicked.connect(self.slot_btn_a_quarter_clicked)
-        self.btn_one_in_five.clicked.connect(self.slot_btn_one_in_five_clicked)
+        self.amout_button_group.buttonClicked.connect(self.slot_amout_button_group_buttonClicked)
+        # self.btn_all.clicked.connect(self.slot_btn_all_clicked)
+        # self.btn_one_half.clicked.connect(self.slot_btn_one_half_clicked)
+        # self.btn_one_third.clicked.connect(self.slot_btn_one_third_clicked)
+        # self.btn_a_quarter.clicked.connect(self.slot_btn_a_quarter_clicked)
+        # self.btn_one_in_five.clicked.connect(self.slot_btn_one_in_five_clicked)
 
         self.btn_buy.clicked.connect(self.slot_btn_buy_clicked)
         self.btn_sell.clicked.connect(self.slot_btn_sell_clicked)
@@ -163,8 +172,25 @@ class ReviewWidget(QWidget):
         self.label_available_balance.setText(f"{available_balance:.2f}")
 
     def update_count_and_amount_labels(self, price, count):
+        self.logger.info(f"更新价格、股数和金额标签: {price}, {count}")
+        self.lineEdit_price.setText(f"{price:.2f}")
+        
+        # 持仓时无需更新
+        if self.demo_trading_manager.get_trading_status() == 5:
+            count = self.lineEdit_count.text()
+            self.lineEdit_amount.setText(f"{float(count) * price:.2f}")
+            return
+        
         self.lineEdit_count.setText(str(count))
-        self.lineEdit_amount.setText(str(count * price))
+        self.lineEdit_amount.setText(f"{count * price:.2f}")
+        
+    def update_count_and_amount_labels_by_kline_data(self, kline_data):
+        checked_id = self.amout_button_group.checkedId()
+        close = kline_data['close']
+        max_count = self.demo_trading_manager.get_buy_count(close, checked_id)
+
+        self.logger.info(f"最大可买数量: {max_count}")
+        self.update_count_and_amount_labels(close, max_count)
 
     def playing_enabled(self, is_playing, b_init=False):
         self.lineEdit_code.setEnabled(not is_playing and self.type == 0)
@@ -284,6 +310,11 @@ class ReviewWidget(QWidget):
         if self._is_loading:
             self.logger.info("数据加载中，忽略重复加载请求")
             return
+
+        # 更新模拟交易状态
+        if self.current_load_code != "" and self.current_load_code != code:
+            kline_data = self.indicators_view_widget.get_current_kline_data()
+            self.demo_trading_manager.force_update_trading(kline_data)
 
         selected_period = TimePeriod.from_label(self.comboBox_period.currentText())
         self.logger.info(f"开始加载复盘数据: {code}, {date}, 显示周期={TimePeriod.get_chinese_label(selected_period)}")
@@ -487,6 +518,9 @@ class ReviewWidget(QWidget):
             self.dateEdit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
             self.dateEdit.blockSignals(False)
 
+        current_kline_data = self.indicators_view_widget.get_current_kline_data()
+        self.update_count_and_amount_labels_by_kline_data(current_kline_data)
+
     def get_random_date(self, latest_date_str=None, days_before_start=360, days_before_end=120):
         '''
         根据给定的最新日期和范围参数，在指定范围内随机返回一个日期
@@ -555,6 +589,9 @@ class ReviewWidget(QWidget):
         self.horizontalSlider_progress.blockSignals(False)
 
         self.update_progress_label(index)
+
+        current_kline_data = self.indicators_view_widget.get_current_kline_data()
+        self.update_count_and_amount_labels_by_kline_data(current_kline_data)
 
         date_time = self.indicators_view_widget.get_current_date_time_by_index(index)
         dict_kline_price = self.indicators_view_widget.get_kline_price_by_index(index)
@@ -704,7 +741,19 @@ class ReviewWidget(QWidget):
 
         if str_price == "" or str_count == "":
             return
-        self.lineEdit_amount.setText(str(float(str_price) * int(str_count)))
+        amout = float(str_price) * int(str_count)
+        self.lineEdit_amount.setText(f'{amout:.2f}')
+
+    def slot_amout_button_group_buttonClicked(self, button):
+        checked_id = self.amout_button_group.checkedId()
+        str_price = self.lineEdit_price.text()
+        if str_price == "":
+            return
+        
+        max_count = self.demo_trading_manager.get_buy_count(float(str_price), checked_id)
+        self.logger.info(f"最大可买数量: {max_count}")
+        self.update_count_and_amount_labels(float(str_price), max_count)
+        
 
     def slot_btn_all_clicked(self):
         str_price = self.lineEdit_price.text()
@@ -716,6 +765,8 @@ class ReviewWidget(QWidget):
 
     def slot_btn_one_half_clicked(self):
         str_price = self.lineEdit_price.text()
+        if str_price == "":
+            return
         max_count = self.demo_trading_manager.get_buy_count(float(str_price), 1)
 
         self.logger.info(f"最大可买数量: {max_count}")

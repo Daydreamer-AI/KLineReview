@@ -57,7 +57,10 @@ class IndicatorsViewWidget(QWidget):
         self.kline_widget = None
         self.loading_widget = None
 
-        # self.df_data列结构：date, code, name, open, high, low, close, volume, amount, change_percent, turnover_rate, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
+        # self.df_data列结构：
+        # 日线级别：date, code, name, open, high, low, close, volume, amount, change_percent, turnover_rate, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
+        # 周线及以上级别（无change_percent）：date, code, name, open, high, low, close, volume, amount, turnover_rate, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
+        # 分钟级别（多time，无change_percent）：date, time, code, name, open, high, low, close, volume, amount, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
         self.df_data = None                 # pd.DataFrame
 
         self.current_selected_code = ""
@@ -254,6 +257,13 @@ class IndicatorsViewWidget(QWidget):
 
         return dict_return
 
+    def get_current_kline_data(self):
+        """返回最后一条K线数据"""
+        df_data = self.get_stock_data()
+        if df_data.empty:
+            return pd.DataFrame()
+        
+        return df_data.iloc[self.current_animation_index]
 
     def get_stock_data(self):
         checked_btn = self.period_button_group.checkedButton()
@@ -273,6 +283,8 @@ class IndicatorsViewWidget(QWidget):
             return pd.DataFrame()
     
         return self.dict_stock_data[period]
+
+
 
     def get_current_period(self):
         """返回当前选中的周期（TimePeriod），未选中时返回 None。"""
