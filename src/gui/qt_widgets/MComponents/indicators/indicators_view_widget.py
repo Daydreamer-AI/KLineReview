@@ -97,6 +97,8 @@ class IndicatorsViewWidget(QWidget):
         self.period_button_group.addButton(self.btn_1d, 7)
         self.period_button_group.addButton(self.btn_1w, 8)
         self.period_button_group.addButton(self.btn_M, 9)
+        self.period_button_group.addButton(self.btn_45m, 10)
+        self.period_button_group.addButton(self.btn_90m, 11)
 
         self.btn_time.setEnabled(False)
         self.btn_1m.setEnabled(False)
@@ -842,7 +844,8 @@ class IndicatorsViewWidget(QWidget):
             starts = [period_start_key(period, t) for t in times]
             return [
                 i for i, (d, s) in enumerate(zip(dates, starts))
-                if pd.notna(s) and d.date() == as_of.date() and s <= as_of
+                # 分钟 bar 区间为 [start, end)：as_of 恰为某根 bar 起始时刻时属于上一根 bar
+                if pd.notna(s) and d.date() == as_of.date() and s < as_of
             ]
         dates = pd.to_datetime(df['date'])
         starts = [period_start_key(period, d) for d in dates]
@@ -924,9 +927,9 @@ class IndicatorsViewWidget(QWidget):
                 # 非分钟级来源或初始加载切分钟级：以当日收盘时刻定位（进行中分钟数据由基周期聚合）
                 as_of = pd.Timestamp(start_date) + pd.Timedelta(hours=15)
             matching_indices = self._get_anchor_matching_indices(df, target_period, as_of)
-            # 数据未覆盖 as_of（如分钟数据源仅保留近 N 天，复盘日期早于分钟数据起点）：
-            # 回退到目标周期数据起始位置，避免切换后图表停留在旧周期导致取 time 列报错
-            if not matching_indices and df is not None and not df.empty:
+            # 初始加载时目标数据未覆盖 as_of（如分钟数据源仅保留当年，复盘日期早于分钟数据起点）：
+            # 回退到数据起始位置保证出图；周期切换场景由 slot 回退到来源周期，避免复盘位置漂移
+            if b_init and not matching_indices and df is not None and not df.empty:
                 self.logger.warning(
                     f"周期{TimePeriod.get_chinese_label(target_period)}在 as_of={start_date} 无匹配数据，回退到数据起始位置")
                 matching_indices = [0]
@@ -1167,7 +1170,20 @@ class IndicatorsViewWidget(QWidget):
                 )
                 self._refresh_derived_period_data(
                     target_period, current_date_time)
-                self.init_animation(self.df_data.iloc[0], current_date_time, False)
+                dict_return = self.init_animation(self.df_data.iloc[0], current_date_time, False)
+                if not dict_return:
+                    # 目标周期数据未覆盖当前复盘位置：回退到来源周期，避免复盘位置漂移
+                    self.logger.warning(
+                        f"周期{TimePeriod.get_chinese_label(target_period)}数据未覆盖当前位置 {current_date_time}，保持原周期")
+                    last_btn = self.period_button_group.button(self.last_period_btn_checked_id)
+                    if last_btn is not None:
+                        last_btn.setChecked(True)
+                    self.set_period(last_period)
+                    self.update_chart(self.df_data.iloc[0], self.current_animation_index)
+                    if last_btn is not None:
+                        self.kline_widget.set_period_text(last_btn.text())
+                    self.sig_period_changed.emit(last_period)
+                    return
                 # if checked_id < self.last_period_btn_checked_id:
                 #     # 大周期切小周期
                 #     # 需更新：self.current_animation_index，self.min_animation_index，self.max_animation_index，并通知外层控件

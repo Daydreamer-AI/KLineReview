@@ -184,9 +184,35 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="btn_45m">
+            <property name="text">
+             <string>45分</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btn_60m">
             <property name="text">
              <string>60分</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_90m">
+            <property name="text">
+             <string>90分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
