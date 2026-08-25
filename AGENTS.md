@@ -22,7 +22,7 @@
 1. **新需求/功能必须先生成需求文档**：接到新增需求/功能任务时，若 `docs/需求文档/<版本>/<模块>/` 下没有对应文档，先按 [docs/需求文档/需求文档模板.md](docs/需求文档/需求文档模板.md) 创建 `docs/需求文档/<版本>/<模块>/<YYYYMMDD>-<功能名>.md`（模块归类见 [docs/需求文档/模块划分说明.md](docs/需求文档/模块划分说明.md)），开发完成后更新其状态。
 2. **开发前必读**：[docs/项目导读.md](docs/项目导读.md)、[docs/开发规范/版本控制.md](docs/开发规范/版本控制.md)、[docs/开发规范/日常开发维护流程.md](docs/开发规范/日常开发维护流程.md) 与本文件。
 3. **分支与提交规范**：按 [docs/开发规范/版本控制.md](docs/开发规范/版本控制.md) 创建分支（`release/`、`feature/`、`fix/`、`hotfix/`）；提交信息使用 Conventional Commits（`feat`/`fix`/`docs`/`refactor`/`test`/`chore`）。
-4. **自测**：当前无自动化测试，改动后从项目根目录运行 `python ./src/main.py` 冒烟验证，并检查 `data/logs/` 是否有新报错。
+4. **自测**：先运行 `python -m unittest discover -s tests -v`（如有相关测试），再从项目根目录运行 `python ./src/main.py` 冒烟验证，并检查 `data/logs/` 是否有新报错。
 5. **文档同步**：若改动影响目录结构、程序入口、运行命令或规范，同步更新 [docs/项目导读.md](docs/项目导读.md) 与本文件；需求文档标记“已完成”并记录分支/提交。
 6. **不确定事项**：一律标注 TODO，不猜测。
 
@@ -34,7 +34,7 @@
 | `src/gui/qt_widgets/` | 界面：`main/`（首页、主窗口）、`market/`（行情页）、`MComponents/`（K 线、指标、复盘、模拟交易卡片等可复用组件） |
 | `src/gui/qml/` | 疑似遗留：`MainBridge` 在 `main.py` 被 import 但从未实例化使用（TODO：确认是否删除） |
 | `src/manager/` | 业务管理：`bao_stock_data_manager.py`（数据缓存与查询）、`review_demo_trading_manager.py`（模拟交易引擎）、`period_manager.py`（周期枚举）、`indicators_config_manager.py`、`config_manager.py`、`logging_manager.py` |
-| `src/processor/` | 数据源适配：`baostock_processor.py`（日/周/分钟线）、`ak_stock_data_processor.py`（股票列表/板块/市值/筹码等）；`efinance_processor.py` 为几行示例、未被其他模块引用（TODO：确认是否删除） |
+| `src/processor/` | 数据源适配：`baostock_processor.py`（日/周/分钟线）、`ak_stock_data_processor.py`（股票列表/板块/市值/筹码等）、`period_aggregator.py`（通用周期聚合：复盘上级周期由基周期本地生成）；`efinance_processor.py` 为几行示例、未被其他模块引用（TODO：确认是否删除） |
 | `src/db_base/` | SQLite 封装：`common_db_base.py`（通用连接池+CRUD）、`stock_db_base.py`（每只股票一个 K 线库）、`stock_info_db_base.py`（股票列表/板块/市值信息库） |
 | `src/indicators/` | 技术指标计算：`stock_data_indicators.py`（MACD/KDJ/RSI/BOLL/MA/量比等） |
 | `src/thread/` | 后台任务：`task_pool.py`（Qt 线程池）、`base_task.py`（可暂停/取消任务）、`base_thread_worker.py`、`baostock_data_fetch_task.py` |
@@ -45,7 +45,8 @@
 | `src/config/` | `logging_config.yaml`：**未被任何代码引用**（main.py 通过参数调用 `setup_logging`）（TODO：确认用途或删除） |
 | `scripts/` | 数据更新与进程检查脚本：`run_baostock_data_update.bat`、`run_akshare.update.bat`、`run_akshare_update.sh`、`auto_update_baostrock_data.py`、`auto_update_akshare_board_data.py`、`check_process.py` |
 | `data/` | 运行时数据：`database/stocks/db/baostock|akshare` 为 SQLite 行情库，`logs` 为日志 |
-| `docs/` | 文档体系：项目导读、开发规范（版本控制/日常流程）、需求文档（按版本/模块划分，含模板与划分说明）、效果图素材 |
+| `docs/` | 文档体系：项目导读、开发规范（版本控制/日常流程）、需求文档（按版本/模块划分，含模板与划分说明）、设计文档（复盘周期切换与聚合、维护与扩展指南）、效果图素材 |
+| `tests/` | 自动化测试（unittest，纯合成数据、无网络依赖）：周期聚合器单测、复盘周期切换集成测试（离屏 Qt） |
 | `.venv/` | 本地虚拟环境（已 gitignore） |
 | 根目录 | `README.md`、`LICENSE`、`requirements.txt`（未锁版本）、`create_venv.bat/.sh`、空 `__init__.py` |
 
@@ -75,9 +76,18 @@ python src/resources/auto_recompile_resources.py
 
 ## 测试命令
 
-- **仓库当前没有任何自动化测试**：无 `tests/` 目录、无 pytest/tox 配置、无 CI 配置（已全仓检索确认，`test` 相关文件仅存在于第三方依赖包内）。
-- 因此目前**没有可用的测试命令**；验证只能靠从根目录手动启动 `python ./src/main.py` 并查看 `data/logs/` 日志。
-- TODO：建议后续为以下核心逻辑补充单测后，再在此节写入真实命令：
+- 自动化测试（`unittest`，纯合成数据、无网络依赖，**从项目根目录运行**）：
+
+  ```bash
+  python -m unittest discover -s tests -v
+  ```
+
+  - `tests/test_period_aggregator.py`：周期聚合器单测（交易时段切槽、跨午休 120m、部分槽、
+    多日/多周/多月倍数、自定义分钟）；
+  - `tests/test_review_period_switch.py`：复盘周期切换集成测试（离屏 Qt，覆盖加载锚定、
+    全矩阵位置保持、盘中边界、进行中/自动走完、时间跨周期传播、未覆盖回退）。
+- 冒烟验证：从项目根目录运行 `python ./src/main.py`，并检查 `data/logs/` 是否有新报错。
+- TODO：后续为以下核心逻辑补充单测：
   - `src/indicators/stock_data_indicators.py`（指标计算）
   - `src/manager/review_demo_trading_manager.py`（模拟交易撮合/资金计算）
   - `src/db_base/`（SQLite 读写）
@@ -99,7 +109,7 @@ python src/resources/auto_recompile_resources.py
    - `data/database/` 下已跟踪的 `.db` 文件是否出现改动（确认是否是有意更新数据）。
 2. 若改动了 `resources.qrc` / 图标 / QSS：先运行 `python src/resources/auto_recompile_resources.py`，确认 `resources_rc.py` 已重新生成。
 3. 若改动了界面控件：确认对应 `.ui` 文件已同步（运行时按 `.ui` 加载，确认）。
-4. 冒烟验证：从项目根目录手动运行 `python ./src/main.py`，确认程序能启动、无 `data/logs` 中新报错（当前无自动化测试，只能手动）。
+4. 冒烟验证：先运行 `python -m unittest discover -s tests -v`（如改动涉及复盘周期/聚合），再从项目根目录手动运行 `python ./src/main.py`，确认程序能启动、无 `data/logs` 中新报错。
 5. TODO：仓库无 lint/format/CI 配置（未检索到），待引入后再补充对应检查项。
 
 ## 待确认事项（TODO 汇总）
