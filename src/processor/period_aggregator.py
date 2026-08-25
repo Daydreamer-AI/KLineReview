@@ -199,12 +199,20 @@ def aggregate_period(base_df, period, as_of=None):
     for key, grp in base.groupby('_key', sort=True):
         nominal_end = period_end_key(period, grp['_t'].max())
         complete = True
-        if as_of is not None and key <= as_of and as_of < nominal_end:
-            # 包含 as_of 且未走完的周期：只取 as_of 之前的基周期数据，标记为进行中
-            grp = grp[grp['_t'] <= as_of]
-            if grp.empty:
-                continue
-            complete = False
+        if as_of is not None:
+            if TimePeriod.is_minute_level(period):
+                cmp_key, cmp_as_of, cmp_end = key, as_of, nominal_end
+                cmp_t = grp['_t']
+            else:
+                # 日线及以上以日期粒度判断（基周期 bar 可能带 time 列，如进行中当日）
+                cmp_key, cmp_as_of, cmp_end = key.normalize(), as_of.normalize(), nominal_end.normalize()
+                cmp_t = grp['_t'].dt.normalize()
+            if cmp_key <= cmp_as_of and cmp_as_of < cmp_end:
+                # 包含 as_of 且未走完的周期：只取 as_of 之前的基周期数据，标记为进行中
+                grp = grp[cmp_t <= cmp_as_of]
+                if grp.empty:
+                    continue
+                complete = False
         label_t = grp['_t'].max()
         rows.append(_aggregate_group(grp, label_t, complete, period))
 

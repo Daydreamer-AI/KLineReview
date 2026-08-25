@@ -459,7 +459,7 @@ class ReviewWidget(QWidget):
             if period in self._fetched_period_data:
                 df = self._fetched_period_data[period]
             else:
-                cached_df = self.indicators_view_widget.get_stock_data_by_period(period)
+                cached_df = self.indicators_view_widget.get_base_stock_data_by_period(period)
                 if self.current_load_code == code and cached_df is not None and not cached_df.empty:
                     df = cached_df
             if df is not None and not df.empty:

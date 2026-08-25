@@ -69,6 +69,7 @@ class IndicatorsViewWidget(QWidget):
 
 
         # 复盘相关参数
+        self._base_stock_data = {}        # {TimePeriod: DataFrame}，注入时的原始基周期数据，供切换时重建进行中bar
         self.animation_timer = QtCore.QTimer()
         self.animation_timer.timeout.connect(self.slot_animation_step)
         self.start_animation_index = 0
@@ -231,7 +232,7 @@ class IndicatorsViewWidget(QWidget):
         checked_id = self.period_button_group.checkedId()
         target_period_text = self.period_button_group.button(checked_id).text()
         target_period = TimePeriod.from_label(target_period_text)
-        s_date_time_col = "time" if TimePeriod.is_minute_level(target_period) else "date"
+        s_date_time_col = "time" if "time" in self.df_data.columns else "date"
         current_date_time = self.df_data[s_date_time_col].iloc[-1]
         return current_date_time
     
@@ -289,6 +290,10 @@ class IndicatorsViewWidget(QWidget):
     
         return self.dict_stock_data[period]
 
+    def get_base_stock_data_by_period(self, period):
+        """获取注入时的原始基周期数据（不含切换时重建的进行中 bar）"""
+        return self._base_stock_data.get(period)
+
 
 
     def get_current_period(self):
@@ -310,6 +315,7 @@ class IndicatorsViewWidget(QWidget):
         if code != self.current_selected_code:
             self.logger.info(f"切换股票：{self.current_selected_code} -> {code}")
             self.dict_stock_data = {}
+            self._base_stock_data = {}
             self.current_selected_code = code
 
         if not dict_stock_data:
@@ -332,6 +338,7 @@ class IndicatorsViewWidget(QWidget):
             return
 
         self.dict_stock_data.update(valid_dict)
+        self._base_stock_data.update({period: df.copy() for period, df in valid_dict.items()})
         periods_text = [TimePeriod.get_chinese_label(period) for period in valid_dict.keys()]
         self.logger.info(f"已注入{code}的{len(valid_dict)}个周期数据：{periods_text}")
 
@@ -381,7 +388,7 @@ class IndicatorsViewWidget(QWidget):
             target_period_text = self.period_button_group.button(checked_id).text()
             target_period = TimePeriod.from_label(target_period_text)
             self.dict_period_process_data[target_period].current_index = start_index
-            s_date_time_col = "time" if TimePeriod.is_minute_level(target_period) else "date"
+            s_date_time_col = "time" if "time" in self.df_data.columns else "date"
             self.dict_period_process_data[target_period].current_date_time = self.df_data[s_date_time_col].iloc[-1]
 
             if start_index != self.current_animation_index:
@@ -857,7 +864,11 @@ class IndicatorsViewWidget(QWidget):
         复盘动画前进后，进行中周期（如当周）的 bar 随复盘位置变化，切换前需重新聚合，
         否则会锚定到加载时刻生成的部分周期 bar，或把未走完的周期显示为完整周期。
         """
+        as_of = pd.Timestamp(as_of)
         if period == TimePeriod.DAY:
+            day_df = self._build_partial_day_df(as_of)
+            if day_df is not None:
+                self.dict_stock_data[TimePeriod.DAY] = day_df
             return
         if TimePeriod.is_minute_level(period):
             minute_bases = [
@@ -867,9 +878,12 @@ class IndicatorsViewWidget(QWidget):
             if not minute_bases:
                 return
             base_period = min(minute_bases)
+            base_df = self._base_stock_data.get(base_period)
+            if base_df is None:
+                base_df = self.dict_stock_data.get(base_period)
         else:
-            base_period = TimePeriod.DAY
-        base_df = self.dict_stock_data.get(base_period)
+            # 周/月等：以“进行中当日”为基聚合（as_of 带时间时当日为盘中形态，否则为完整日线）
+            base_df = self._build_partial_day_df(as_of)
         if base_df is None or base_df.empty:
             return
         try:
@@ -879,6 +893,61 @@ class IndicatorsViewWidget(QWidget):
             return
         if derived_df is not None and not derived_df.empty:
             self.dict_stock_data[period] = derived_df
+
+    def _build_partial_day_df(self, as_of):
+        """构建日线展示数据：完整日线 + 盘中 as_of 时把当日 bar 重建为进行中形态。
+
+        返回的日线 DataFrame 带 time 列（完整日为 'YYYY-MM-DD 15:00:00'，进行中当日为 as_of），
+        便于从日线再切回分钟级时沿用盘中时间；周/月聚合也以该数据为基，保证未走完当日不泄漏。
+        """
+        base_day = self._base_stock_data.get(TimePeriod.DAY)
+        if base_day is None:
+            base_day = self.dict_stock_data.get(TimePeriod.DAY)
+        if base_day is None or base_day.empty:
+            return None
+        as_of = pd.Timestamp(as_of)
+        day_df = base_day.copy()
+        if 'time' not in day_df.columns:
+            day_df['time'] = pd.to_datetime(day_df['date']).dt.strftime('%Y-%m-%d') + ' 15:00:00'
+        day_df['is_complete'] = True
+        if as_of.time() == pd.Timestamp('00:00:00').time():
+            return day_df
+        minute_bases = [p for p in self.dict_stock_data if TimePeriod.is_minute_level(p)]
+        if not minute_bases:
+            return day_df
+        minute_base = self._base_stock_data.get(min(minute_bases))
+        if minute_base is None:
+            minute_base = self.dict_stock_data.get(min(minute_bases))
+        if minute_base is None or minute_base.empty:
+            return day_df
+        mdates = pd.to_datetime(minute_base['date'])
+        mtimes = pd.to_datetime(
+            minute_base['date'].astype(str) + ' ' + minute_base['time'].astype(str).str[-8:], errors='coerce')
+        day_mask = mdates.dt.date == as_of.date()
+        sub = minute_base[day_mask & (mtimes <= as_of)]
+        if sub.empty:
+            return day_df
+        target_idx = day_df.index[pd.to_datetime(day_df['date']).dt.date == as_of.date()]
+        if len(target_idx) == 0:
+            return day_df
+        idx = target_idx[0]
+        day_df.loc[idx, 'open'] = sub['open'].iloc[0]
+        day_df.loc[idx, 'high'] = sub['high'].max()
+        day_df.loc[idx, 'low'] = sub['low'].min()
+        day_df.loc[idx, 'close'] = sub['close'].iloc[-1]
+        day_df.loc[idx, 'volume'] = sub['volume'].sum()
+        if 'amount' in sub.columns and 'amount' in day_df.columns:
+            day_df.loc[idx, 'amount'] = sub['amount'].sum()
+        if 'turnover_rate' in sub.columns and 'turnover_rate' in day_df.columns:
+            day_df.loc[idx, 'turnover_rate'] = sub['turnover_rate'].sum()
+        day_df.loc[idx, 'time'] = as_of.strftime('%Y-%m-%d %H:%M:%S')
+        last_time = mtimes[day_mask].max()
+        day_df.loc[idx, 'is_complete'] = bool(pd.notna(last_time) and as_of >= last_time)
+        # 重算指标与涨跌幅（以进行中 close 为准，as-of 语义）
+        if 'change_percent' in day_df.columns:
+            day_df = day_df.drop(columns=['change_percent'])
+        sdi.default_indicators_auto_calculate(day_df)
+        return day_df
 
     # -----------------------复盘回放相关接口----------------------
     def init_animation(self, data, start_date, b_init=True):
@@ -912,17 +981,18 @@ class IndicatorsViewWidget(QWidget):
             # 上级周期包含进行中（未走完）bar：周中复盘时当周 bar 由基周期聚合生成，
             # 其周期开始（如周一）<= as_of 即应被选中，不再使用 date < start_date 跳过当周。
             as_of = pd.Timestamp(start_date)
-            source_is_minute = (
-                TimePeriod.is_minute_level(last_period)
-                and self.dict_period_process_data.get(last_period) is not None
+            last_process = self.dict_period_process_data.get(last_period)
+            source_has_time = (
+                last_process is not None
+                and last_process.current_date_time
+                and ' ' in str(last_process.current_date_time)
             )
-            if source_is_minute:
-                last_process = self.dict_period_process_data.get(last_period)
-                if last_process is not None and last_process.current_date_time:
-                    try:
-                        as_of = pd.to_datetime(last_process.current_date_time)
-                    except (ValueError, TypeError):
-                        pass
+            if source_has_time:
+                # 分钟级来源或日线进行中当日：沿用当前精确时间
+                try:
+                    as_of = pd.to_datetime(last_process.current_date_time)
+                except (ValueError, TypeError):
+                    pass
             elif TimePeriod.is_minute_level(target_period):
                 # 非分钟级来源或初始加载切分钟级：以当日收盘时刻定位（进行中分钟数据由基周期聚合）
                 as_of = pd.Timestamp(start_date) + pd.Timedelta(hours=15)
@@ -1165,7 +1235,7 @@ class IndicatorsViewWidget(QWidget):
                 last_period = TimePeriod.from_label(last_period_text)
                 current_date_time = (
                     self.df_data.iloc[self.current_animation_index]['time']
-                    if TimePeriod.is_minute_level(last_period)
+                    if 'time' in self.df_data.columns
                     else self.df_data.iloc[self.current_animation_index]['date']
                 )
                 self._refresh_derived_period_data(
