@@ -100,12 +100,13 @@ class IndicatorsViewWidget(QWidget):
 
         self.btn_time.setEnabled(False)
         self.btn_1m.setEnabled(False)
-        self.btn_5m.setEnabled(False)
-        self.btn_10m.setEnabled(False)
+        # 5/10/15/30/60/120 分钟默认启用；复盘加载完成后由 set_period_buttons_enabled 按注入周期控制
+        # self.btn_5m.setEnabled(False)
+        # self.btn_10m.setEnabled(False)
         # self.btn_15m.setEnabled(False)
         # self.btn_30m.setEnabled(False)
         # self.btn_60m.setEnabled(False)
-        self.btn_120m.setEnabled(False)
+        # self.btn_120m.setEnabled(False)
         # self.btn_1d.setEnabled(False)
         # self.btn_1w.setEnabled(False)
 
@@ -212,7 +213,7 @@ class IndicatorsViewWidget(QWidget):
             if btn.isChecked():  # 忽略选中的按钮
                 continue
             
-            if self.period_button_group.id(btn) in [0, 2, 6]:
+            if self.period_button_group.id(btn) in [0]:  # 仅 1 分钟无数据源，保持禁用
                 continue
 
             btn.setEnabled(b_enable)
@@ -658,69 +659,14 @@ class IndicatorsViewWidget(QWidget):
         """
         根据周期返回对应的时间区间列表
         返回: [(start_time, end_time), ...] 格式的列表
+        分钟级按 A 股两段交易时段（09:30-11:30、13:00-15:00）按周期分钟数切槽，
+        与聚合器共用同一时段规则；非分钟级返回空列表。
         """
-        # A股交易时间: 09:30-11:30, 13:00-15:00
-        morning_start = pd.Timestamp("09:30").time()
-        morning_end = pd.Timestamp("11:30").time()
-        afternoon_start = pd.Timestamp("13:00").time()
-        afternoon_end = pd.Timestamp("15:00").time()
-        
-        if period == TimePeriod.MINUTE_15:
-            # 16个15分钟区间
-            intervals = []
-            # 上午时段: 09:30-11:30 (9个区间)
-            current = morning_start
-            while current < morning_end:
-                next_time = self.add_minutes(current, 15)
-                if next_time > morning_end:
-                    next_time = morning_end
-                intervals.append((current, next_time))
-                current = next_time
-                
-            # 下午时段: 13:00-15:00 (8个区间)
-            current = afternoon_start
-            while current < afternoon_end:
-                next_time = self.add_minutes(current, 15)
-                if next_time > afternoon_end:
-                    next_time = afternoon_end
-                intervals.append((current, next_time))
-                current = next_time
-                
-            return intervals[:16]  # 确保只有16个区间
-            
-        elif period == TimePeriod.MINUTE_30:
-            # 8个30分钟区间
-            intervals = [
-                (pd.Timestamp("09:30").time(), pd.Timestamp("10:00").time()),
-                (pd.Timestamp("10:00").time(), pd.Timestamp("10:30").time()),
-                (pd.Timestamp("10:30").time(), pd.Timestamp("11:00").time()),
-                (pd.Timestamp("11:00").time(), pd.Timestamp("11:30").time()),
-                (pd.Timestamp("13:00").time(), pd.Timestamp("13:30").time()),
-                (pd.Timestamp("13:30").time(), pd.Timestamp("14:00").time()),
-                (pd.Timestamp("14:00").time(), pd.Timestamp("14:30").time()),
-                (pd.Timestamp("14:30").time(), pd.Timestamp("15:00").time())
-            ]
-            return intervals
-            
-        elif period == TimePeriod.MINUTE_60:
-            # 4个60分钟区间
-            intervals = [
-                (pd.Timestamp("09:30").time(), pd.Timestamp("10:30").time()),
-                (pd.Timestamp("10:30").time(), pd.Timestamp("11:30").time()),
-                (pd.Timestamp("13:00").time(), pd.Timestamp("14:00").time()),
-                (pd.Timestamp("14:00").time(), pd.Timestamp("15:00").time())
-            ]
-            return intervals
-            
-        elif period == TimePeriod.MINUTE_120:
-            # 2个120分钟区间
-            intervals = [
-                (pd.Timestamp("09:30").time(), pd.Timestamp("11:30").time()),
-                (pd.Timestamp("13:00").time(), pd.Timestamp("15:00").time())
-            ]
-            return intervals
-            
-        return []
+        if not TimePeriod.is_minute_level(period):
+            return []
+        minutes = int(TimePeriod.get_number_label(period))
+        from processor.period_aggregator import get_minute_slot_intervals
+        return get_minute_slot_intervals(minutes)
 
     def add_minutes(self, time_obj, minutes):
         """给time对象加上指定分钟数"""
@@ -893,11 +839,10 @@ class IndicatorsViewWidget(QWidget):
             dates = pd.to_datetime(df['date'])
             times = pd.to_datetime(
                 df['date'].astype(str) + ' ' + df['time'].astype(str).str[-8:], errors='coerce')
-            interval = int(TimePeriod.get_number_label(period))
+            starts = [period_start_key(period, t) for t in times]
             return [
-                i for i, (d, t) in enumerate(zip(dates, times))
-                if pd.notna(t) and d.date() == as_of.date()
-                and (t - pd.Timedelta(minutes=interval)) <= as_of
+                i for i, (d, s) in enumerate(zip(dates, starts))
+                if pd.notna(s) and d.date() == as_of.date() and s <= as_of
             ]
         dates = pd.to_datetime(df['date'])
         starts = [period_start_key(period, d) for d in dates]
@@ -909,9 +854,19 @@ class IndicatorsViewWidget(QWidget):
         复盘动画前进后，进行中周期（如当周）的 bar 随复盘位置变化，切换前需重新聚合，
         否则会锚定到加载时刻生成的部分周期 bar，或把未走完的周期显示为完整周期。
         """
-        if period <= TimePeriod.DAY:
+        if period == TimePeriod.DAY:
             return
-        base_df = self.dict_stock_data.get(TimePeriod.DAY)
+        if TimePeriod.is_minute_level(period):
+            minute_bases = [
+                p for p in self.dict_stock_data
+                if TimePeriod.is_minute_level(p) and p < period
+            ]
+            if not minute_bases:
+                return
+            base_period = min(minute_bases)
+        else:
+            base_period = TimePeriod.DAY
+        base_df = self.dict_stock_data.get(base_period)
         if base_df is None or base_df.empty:
             return
         try:
@@ -954,16 +909,20 @@ class IndicatorsViewWidget(QWidget):
             # 上级周期包含进行中（未走完）bar：周中复盘时当周 bar 由基周期聚合生成，
             # 其周期开始（如周一）<= as_of 即应被选中，不再使用 date < start_date 跳过当周。
             as_of = pd.Timestamp(start_date)
-            if TimePeriod.is_minute_level(last_period) or TimePeriod.is_minute_level(target_period):
+            source_is_minute = (
+                TimePeriod.is_minute_level(last_period)
+                and self.dict_period_process_data.get(last_period) is not None
+            )
+            if source_is_minute:
                 last_process = self.dict_period_process_data.get(last_period)
                 if last_process is not None and last_process.current_date_time:
                     try:
                         as_of = pd.to_datetime(last_process.current_date_time)
                     except (ValueError, TypeError):
                         pass
-                elif TimePeriod.is_minute_level(target_period):
-                    # 分钟级目标周期且来源非分钟：以当日收盘时刻定位（分钟级获取暂屏蔽，扩展预留）
-                    as_of = pd.Timestamp(start_date) + pd.Timedelta(hours=15)
+            elif TimePeriod.is_minute_level(target_period):
+                # 非分钟级来源或初始加载切分钟级：以当日收盘时刻定位（进行中分钟数据由基周期聚合）
+                as_of = pd.Timestamp(start_date) + pd.Timedelta(hours=15)
             matching_indices = self._get_anchor_matching_indices(df, target_period, as_of)
 
             if b_init:
@@ -1015,7 +974,8 @@ class IndicatorsViewWidget(QWidget):
                     last_start_index = self.dict_period_process_data[last_period].current_start_index
                     self.logger.info(f"来源周期[{s_last_period_text}]索引：{last_current_index}，日期：{self.dict_period_process_data[last_period].current_date_time}，来源周期[{s_last_period_text}]开始索引：{last_start_index}, 开始日期：{self.dict_period_process_data[last_period].current_start_date_time}")
                     
-                    index = self.get_target_index_auto(last_period, target_period)
+                    # 统一取“周期开始时刻 <= as_of”的最后一根 bar（进行中 bar 也包含）
+                    index = -1
                     self.logger.info(f"目标周期索引：{index}")
                     self.start_animation_index = matching_indices[index]
                     if target_period not in self.dict_period_process_data:
@@ -1192,9 +1152,16 @@ class IndicatorsViewWidget(QWidget):
                 last_period_text = self.period_button_group.button(self.last_period_btn_checked_id).text()
                 self.logger.info(f"此前周期id：{self.last_period_btn_checked_id}，名称：{last_period_text}，切换到目标周期id：{checked_id}，名称：{target_period_text}")
                 # 切换前按当前复盘位置重新生成上级周期数据（上级周期由基周期本地聚合）
+                # 分钟级需携带完整 date+time，否则进行中槽位会按日期 00:00 定位
+                last_period = TimePeriod.from_label(last_period_text)
+                current_date_time = (
+                    self.df_data.iloc[self.current_animation_index]['time']
+                    if TimePeriod.is_minute_level(last_period)
+                    else self.df_data.iloc[self.current_animation_index]['date']
+                )
                 self._refresh_derived_period_data(
-                    target_period, self.df_data.iloc[self.current_animation_index]['date'])
-                self.init_animation(self.df_data.iloc[0], self.df_data.iloc[self.current_animation_index]['date'], False)
+                    target_period, current_date_time)
+                self.init_animation(self.df_data.iloc[0], current_date_time, False)
                 # if checked_id < self.last_period_btn_checked_id:
                 #     # 大周期切小周期
                 #     # 需更新：self.current_animation_index，self.min_animation_index，self.max_animation_index，并通知外层控件

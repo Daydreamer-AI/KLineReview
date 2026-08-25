@@ -29,30 +29,109 @@ def get_period_interval_minutes(period):
     return int(TimePeriod.get_number_label(period))
 
 
-def period_start_key(period, ts):
-    """计算 bar（以其结束时刻 ts 标注）所属周期的开始时刻。
+_A_SHARE_SESSIONS = [
+    (pd.Timestamp('09:30').time(), pd.Timestamp('11:30').time()),
+    (pd.Timestamp('13:00').time(), pd.Timestamp('15:00').time()),
+]
 
-    通用锚定与周期聚合共用此规则：
-    - 分钟级：开始 = 结束 - 周期时长（baostock 分钟 bar 以结束时刻标注）；
-    - 日线：开始 = 当日；
-    - 周线：开始 = 当周周一（ISO 周）；
-    - 月线：开始 = 当月 1 日；季线/年线同理取季度/年度首日。
+
+def _period_multiplier(period):
+    """返回 (基准类型, 倍数)：minute/day/week/month/quarter/year 及其倍数。"""
+    value = period.value
+    if TimePeriod.is_minute_level(period):
+        return 'minute', int(value[:-1])
+    if value.endswith('d'):
+        return 'day', int(value[:-1])
+    if value.endswith('w'):
+        return 'week', int(value[:-1])
+    if value.endswith('M'):
+        return 'month', int(value[:-1])
+    if value.endswith('Q'):
+        return 'quarter', 1
+    if value.endswith('Y'):
+        return 'year', 1
+    return 'day', 1
+
+
+def minute_slot_bounds(ts, minutes):
+    """返回 bar（以结束时刻 ts 标注）所属 A 股交易时段槽位的 [start, end)。
+
+    09:30-11:30、13:00-15:00 两段连续竞价时段内各自按 minutes 分钟切槽，
+    槽位从时段起点开始，最后一槽可能不足 minutes（尾段）。
     """
     ts = pd.Timestamp(ts)
-    if TimePeriod.is_minute_level(period):
-        return ts - pd.Timedelta(minutes=get_period_interval_minutes(period))
-    if period == TimePeriod.DAY:
-        return ts.normalize()
-    if period == TimePeriod.WEEK:
-        return (ts - pd.Timedelta(days=ts.weekday())).normalize()
-    if period == TimePeriod.MONTH:
-        return pd.Timestamp(ts.year, ts.month, 1)
-    if period == TimePeriod.QUARTER:
-        q_start_month = ((ts.month - 1) // 3) * 3 + 1
-        return pd.Timestamp(ts.year, q_start_month, 1)
-    if period == TimePeriod.YEAR:
+    for session_start, session_end in _A_SHARE_SESSIONS:
+        if session_start <= ts.time() <= session_end:
+            day_start = pd.Timestamp.combine(ts.date(), session_start)
+            day_end = pd.Timestamp.combine(ts.date(), session_end)
+            elapsed_min = (ts - day_start).total_seconds() / 60.0
+            idx = max(0, (int(elapsed_min) - 1) // minutes)
+            slot_start = day_start + pd.Timedelta(minutes=idx * minutes)
+            slot_end = min(slot_start + pd.Timedelta(minutes=minutes), day_end)
+            return slot_start, slot_end
+    return ts.normalize(), ts.normalize() + pd.Timedelta(days=1)
+
+
+def get_minute_slot_intervals(minutes):
+    """返回给定分钟数在 A 股两个交易时段内的槽位 (开始时刻, 结束时刻) 列表。"""
+    intervals = []
+    dummy_date = pd.Timestamp('2020-01-01')
+    for session_start, session_end in _A_SHARE_SESSIONS:
+        current = session_start
+        while current < session_end:
+            next_time = (pd.Timestamp.combine(dummy_date, current)
+                         + pd.Timedelta(minutes=minutes)).time()
+            if next_time > session_end:
+                next_time = session_end
+            intervals.append((current, next_time))
+            current = next_time
+    return intervals
+
+
+def period_start_key(period, ts):
+    """计算 bar（以其结束时刻 ts 标注）所属目标周期的开始时刻。
+
+    通用锚定与周期聚合共用此规则：
+    - 分钟级：按 A 股交易时段切槽（跨午休不分组错误）；
+    - 日线：开始 = 当日；2/3 日线按自然日倍数分组；
+    - 周线：开始 = 当周周一（ISO 周）；2 周线按 14 日网格分组；
+    - 月线：开始 = 当月 1 日；2/3/6/12 月线按月份倍数分组；季线/年线同理。
+    """
+    ts = pd.Timestamp(ts)
+    kind, count = _period_multiplier(period)
+    if kind == 'minute':
+        slot_start, _ = minute_slot_bounds(ts, count)
+        return slot_start
+    if kind == 'day':
+        if count == 1:
+            return ts.normalize()
+        start_ordinal = ((ts.toordinal() - 1) // count) * count + 1
+        return pd.Timestamp.fromordinal(start_ordinal)
+    if kind == 'week':
+        monday = (ts - pd.Timedelta(days=ts.weekday())).normalize()
+        if count == 1:
+            return monday
+        start_ordinal = ((monday.toordinal() - 1) // (7 * count)) * (7 * count) + 1
+        return pd.Timestamp.fromordinal(start_ordinal)
+    if kind == 'month':
+        month_index = ts.year * 12 + (ts.month - 1)
+        start_index = (month_index // count) * count
+        return pd.Timestamp(start_index // 12, start_index % 12 + 1, 1)
+    if kind == 'quarter':
+        return pd.Timestamp(ts.year, ((ts.month - 1) // 3) * 3 + 1, 1)
+    if kind == 'year':
         return pd.Timestamp(ts.year, 1, 1)
     return ts.normalize()
+
+
+def period_end_key(period, ts):
+    """计算 bar 的名义结束时刻：分钟级为槽位结束时刻，日线及以上沿用 ts（组内最后交易日）。"""
+    ts = pd.Timestamp(ts)
+    kind, count = _period_multiplier(period)
+    if kind == 'minute':
+        _, slot_end = minute_slot_bounds(ts, count)
+        return slot_end
+    return ts
 
 
 def _get_base_timestamps(base_df):
@@ -118,7 +197,7 @@ def aggregate_period(base_df, period, as_of=None):
 
     rows = []
     for key, grp in base.groupby('_key', sort=True):
-        nominal_end = grp['_t'].max()
+        nominal_end = period_end_key(period, grp['_t'].max())
         complete = True
         if as_of is not None and key <= as_of and as_of < nominal_end:
             # 包含 as_of 且未走完的周期：只取 as_of 之前的基周期数据，标记为进行中
@@ -135,7 +214,7 @@ def aggregate_period(base_df, period, as_of=None):
     result = pd.DataFrame(rows)
     result['date'] = pd.to_datetime(result['_label']).dt.strftime('%Y-%m-%d')
     if TimePeriod.is_minute_level(period):
-        result['time'] = pd.to_datetime(result['_label']).dt.strftime('%H:%M:%S')
+        result['time'] = pd.to_datetime(result['_label']).dt.strftime('%Y-%m-%d %H:%M:%S')
     result = result.drop(columns=['_label'])
 
     result['change_percent'] = result['close'].pct_change() * 100

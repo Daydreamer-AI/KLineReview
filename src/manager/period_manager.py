@@ -4,8 +4,8 @@ from functools import total_ordering
 class TimePeriod(Enum):
     # 定义周期优先级顺序（使用字符串值避免初始化问题）
     _period_order = [
-        '1m', '3m', '5m', '10m', '15m', '30m', '45m', '60m', '90m', '120m',
-        '1d', '1w', '1M', '1Q', '1Y'
+        '1m', '3m', '5m', '7m', '10m', '15m', '25m', '30m', '45m', '60m', '90m', '120m',
+        '1d', '2d', '3d', '1w', '2w', '1M', '2M', '3M', '1Q', '6M', '12M', '1Y'
     ]
 
     MINUTE_1 = '1m'
@@ -23,6 +23,15 @@ class TimePeriod(Enum):
     MONTH = '1M'     
     QUARTER = '1Q'  
     YEAR = '1Y'
+    DAY_2 = '2d'
+    DAY_3 = '3d'
+    WEEK_2 = '2w'
+    MONTH_2 = '2M'
+    MONTH_3 = '3M'
+    MONTH_6 = '6M'
+    MONTH_12 = '12M'
+    MINUTE_7 = '7m'
+    MINUTE_25 = '25m'
     
     @classmethod
     def from_label(cls, label):
@@ -43,6 +52,15 @@ class TimePeriod(Enum):
             "60分": cls.MINUTE_60,
             "90分": cls.MINUTE_90,
             "120分": cls.MINUTE_120,
+            "7分": cls.MINUTE_7,
+            "25分": cls.MINUTE_25,
+            "2日线": cls.DAY_2,
+            "3日线": cls.DAY_3,
+            "2周线": cls.WEEK_2,
+            "2月线": cls.MONTH_2,
+            "3月线": cls.MONTH_3,
+            "6月线": cls.MONTH_6,
+            "12月线": cls.MONTH_12,
         }
         return mapping.get(label, cls.DAY)
     
@@ -68,6 +86,15 @@ class TimePeriod(Enum):
                 cls.MINUTE_60: "60分",
                 cls.MINUTE_90: "90分",
                 cls.MINUTE_120: "120分",
+                cls.MINUTE_7: "7分",
+                cls.MINUTE_25: "25分",
+                cls.DAY_2: "2日线",
+                cls.DAY_3: "3日线",
+                cls.WEEK_2: "2周线",
+                cls.MONTH_2: "2月线",
+                cls.MONTH_3: "3月线",
+                cls.MONTH_6: "6月线",
+                cls.MONTH_12: "12月线",
             }
         return cls._chinese_label_mapping.get(period, "日线")
     
@@ -85,6 +112,8 @@ class TimePeriod(Enum):
             "60": cls.MINUTE_60,
             "90": cls.MINUTE_90,
             "120": cls.MINUTE_120,
+            "7": cls.MINUTE_7,
+            "25": cls.MINUTE_25,
         }
         return mapping.get(label, cls.DAY)
     
@@ -104,6 +133,8 @@ class TimePeriod(Enum):
                 cls.MINUTE_60: "60",
                 cls.MINUTE_90: "90",
                 cls.MINUTE_120: "120",
+                cls.MINUTE_7: "7",
+                cls.MINUTE_25: "25",
             }
 
         return cls._number_label_mapping.get(period, "30")
@@ -117,8 +148,8 @@ class TimePeriod(Enum):
     
     @classmethod
     def is_minute_level(cls, period) -> bool:
-        return period in [cls.MINUTE_1, cls.MINUTE_3, cls.MINUTE_5, cls.MINUTE_10, 
-                         cls.MINUTE_15, cls.MINUTE_30, cls.MINUTE_45, cls.MINUTE_60, 
+        return period in [cls.MINUTE_1, cls.MINUTE_3, cls.MINUTE_5, cls.MINUTE_7, cls.MINUTE_10, 
+                         cls.MINUTE_15, cls.MINUTE_25, cls.MINUTE_30, cls.MINUTE_45, cls.MINUTE_60, 
                          cls.MINUTE_90, cls.MINUTE_120]
     
     def get_table_name(self):
@@ -142,8 +173,8 @@ class TimePeriod(Enum):
         
         # 定义周期优先级顺序
         period_order = [
-            '1m', '3m', '5m', '10m', '15m', '30m', '45m', '60m', '90m', '120m',
-            '1d', '1w', '1M', '1Q', '1Y'
+            '1m', '3m', '5m', '7m', '10m', '15m', '25m', '30m', '45m', '60m', '90m', '120m',
+            '1d', '2d', '3d', '1w', '2w', '1M', '2M', '3M', '1Q', '6M', '12M', '1Y'
         ]
         
         try:

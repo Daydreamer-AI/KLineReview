@@ -20,9 +20,12 @@ from common.common_api import *
 class ReviewWidget(QWidget):
     # 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
     _DEFAULT_LOAD_PERIODS = [
-        # TimePeriod.MINUTE_15,
-        # TimePeriod.MINUTE_30,
-        # TimePeriod.MINUTE_60,
+        TimePeriod.MINUTE_5,
+        TimePeriod.MINUTE_10,
+        TimePeriod.MINUTE_15,
+        TimePeriod.MINUTE_30,
+        TimePeriod.MINUTE_60,
+        TimePeriod.MINUTE_120,
         TimePeriod.DAY,
         TimePeriod.WEEK,
         TimePeriod.MONTH,
@@ -31,6 +34,7 @@ class ReviewWidget(QWidget):
     # 基周期：远程只拉取基周期，周线等上级周期由基周期本地聚合生成（不依赖远程上级周期接口）
     _BASE_LOAD_PERIODS = [
         TimePeriod.DAY,
+        TimePeriod.MINUTE_5,
     ]
 
     def __init__(self, parent=None):
@@ -306,7 +310,7 @@ class ReviewWidget(QWidget):
     def load_data(self, code, date):
         """复盘数据统一加载入口：仅由“加载/随机加载”按钮触发。
 
-        一次性在后台从远程 Baostock 获取基周期（默认日线），
+        一次性在后台从远程 Baostock 获取基周期（默认日线、5 分钟），
         周线等上级周期由基周期按复盘日期本地聚合生成（不依赖远程上级周期接口），
         全部加载完成后统一同步到 indicators_view_widget，并按用户在
         comboBox_period 中选择的周期作为初始显示周期。
@@ -358,14 +362,9 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.set_period_buttons_enabled([])  # 加载中禁用周期切换按钮
         self.indicators_view_widget.show_loading("dots", "loading...")
 
-        # 分钟级数据获取暂屏蔽：即使通过 set_load_periods 配置了分钟周期也跳过
-        skipped_minute_periods = [p for p in self.get_base_load_periods() if TimePeriod.is_minute_level(p)]
-        if skipped_minute_periods:
-            self.logger.warning(f"分钟级数据获取暂屏蔽，跳过: {[TimePeriod.get_chinese_label(p) for p in skipped_minute_periods]}")
-
         self._fetch_pending_periods = [
             period for period in self.get_base_load_periods()
-            if not TimePeriod.is_minute_level(period) and not self._period_in_cache(code, period)
+            if not self._period_in_cache(code, period)
         ]
         self._fetch_failed_periods = []
         self._fetched_period_data = {}
@@ -451,7 +450,8 @@ class ReviewWidget(QWidget):
         # 1. 组装各周期 DataFrame
         # 1.1 先组装基周期（本轮远程拉取结果优先，其余取内存缓存，均为远程数据）
         dict_stock_data = {}
-        base_df = None
+        day_base_df = None
+        minute_base_df = None
         for period in self.get_base_load_periods():
             df = None
             if period in self._fetched_period_data:
@@ -462,11 +462,19 @@ class ReviewWidget(QWidget):
                     df = cached_df
             if df is not None and not df.empty:
                 dict_stock_data[period] = df
-                if base_df is None:
-                    base_df = df
+                if TimePeriod.is_minute_level(period):
+                    if minute_base_df is None:
+                        minute_base_df = df
+                else:
+                    if day_base_df is None:
+                        day_base_df = df
         # 1.2 上级周期由基周期按复盘基准时刻 as_of 本地聚合生成，不依赖远程上级周期接口
+        # 分钟级目标周期以 5 分钟基周期聚合，日线及以上以日线基周期聚合
         for period in self.get_load_periods():
-            if period in dict_stock_data or base_df is None or base_df.empty:
+            if period in dict_stock_data:
+                continue
+            base_df = minute_base_df if TimePeriod.is_minute_level(period) else day_base_df
+            if base_df is None or base_df.empty:
                 continue
             try:
                 derived_df = aggregate_period(base_df, period, as_of=date)
