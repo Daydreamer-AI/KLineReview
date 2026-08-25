@@ -43,10 +43,11 @@
 | `src/utils/` | 进程检查：`process_checker.py`（供数据脚本与主程序互斥使用） |
 | `src/resources/` | 图标、QSS 主题、`resources.qrc` 与生成文件 `resources_rc.py`、`auto_recompile_resources.py` 编译脚本、`config/config.ini` |
 | `src/config/` | `logging_config.yaml`：**未被任何代码引用**（main.py 通过参数调用 `setup_logging`）（TODO：确认用途或删除） |
-| `scripts/` | 数据更新与进程检查脚本：`run_baostock_data_update.bat`、`run_akshare.update.bat`、`run_akshare_update.sh`、`auto_update_baostrock_data.py`、`auto_update_akshare_board_data.py`、`check_process.py` |
+| `scripts/` | 数据更新与进程检查脚本：`run_baostock_data_update.bat`、`run_akshare.update.bat`、`run_akshare_update.sh`、`auto_update_baostrock_data.py`、`auto_update_akshare_board_data.py`、`check_process.py`；`smoke_review_baostock.py`（复盘真实数据冒烟，可选/联网） |
 | `data/` | 运行时数据：`database/stocks/db/baostock|akshare` 为 SQLite 行情库，`logs` 为日志 |
 | `docs/` | 文档体系：项目导读、开发规范（版本控制/日常流程）、需求文档（按版本/模块划分，含模板与划分说明）、设计文档（复盘周期切换与聚合、维护与扩展指南）、效果图素材 |
 | `tests/` | 自动化测试（unittest，纯合成数据、无网络依赖）：周期聚合器单测、复盘周期切换集成测试（离屏 Qt） |
+| `.github/workflows/` | CI：GitHub Actions 在 push/PR 到 `master`/`release/*` 时运行 unittest |
 | `.venv/` | 本地虚拟环境（已 gitignore） |
 | 根目录 | `README.md`、`LICENSE`、`requirements.txt`（未锁版本）、`create_venv.bat/.sh`、空 `__init__.py` |
 
@@ -86,6 +87,8 @@ python src/resources/auto_recompile_resources.py
     多日/多周/多月倍数、自定义分钟）；
   - `tests/test_review_period_switch.py`：复盘周期切换集成测试（离屏 Qt，覆盖加载锚定、
     全矩阵位置保持、盘中边界、进行中/自动走完、时间跨周期传播、未覆盖回退）。
+- CI：`.github/workflows/unittest.yml`（GitHub Actions，push/PR 到 `master`/`release/*` 自动运行 unittest）。
+- 真实数据冒烟（可选，需联网）：`python scripts/smoke_review_baostock.py [--code sz.000615] [--date YYYY-MM-DD]`
 - 冒烟验证：从项目根目录运行 `python ./src/main.py`，并检查 `data/logs/` 是否有新报错。
 - TODO：后续为以下核心逻辑补充单测：
   - `src/indicators/stock_data_indicators.py`（指标计算）
