@@ -368,6 +368,11 @@ class IndicatorsViewWidget(QWidget):
             return
 
         if start_index is not None and start_index != "":  # 获取数据成功
+            # 若当前周期含进行中 bar，先按目标位置同步（前进后未走完 bar 自动走完）
+            self._sync_partial_bar_for_position(start_index)
+            df = self.get_stock_data()
+            if df is None or df.empty:
+                return
             # self.logger.info(f"df的长度: {len(df)}")
             # if self.max_animation_index == -1:
             #     self.max_animation_index = len(df) - 1
@@ -426,6 +431,29 @@ class IndicatorsViewWidget(QWidget):
         self.kline_widget.auto_scale_to_latest(120)
 
         # 更新最后一根k线指标值
+
+    def _sync_partial_bar_for_position(self, index):
+        """当前周期数据若含进行中 bar，按目标索引代表的复盘位置重新构建（前进后自动走完）。
+
+        复盘动画在周期内前进时，未走完的 bar（如盘中当日、周中当周、进行中分钟槽）
+        应随位置前进自动补全；以目标索引 bar 的 as_of 时刻重建当前周期数据，
+        随后 update_chart 用重建后的数据重新截断。
+        """
+        if self.property("review") is None:
+            return
+        period = self.get_current_period()
+        df = self.get_stock_data()
+        if df is None or df.empty:
+            return
+        if 'is_complete' not in df.columns or bool(df['is_complete'].all()):
+            return
+        if index < 0 or index >= len(df):
+            return
+        if 'time' in df.columns:
+            as_of = df['time'].iloc[index]
+        else:
+            as_of = df['date'].iloc[index]
+        self._refresh_derived_period_data(period, as_of)
 
     def update_indicator_chart(self, df_data):
         is_volume_checked = self.btn_indicator_volume.isChecked()
