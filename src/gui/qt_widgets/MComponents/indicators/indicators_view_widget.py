@@ -924,6 +924,12 @@ class IndicatorsViewWidget(QWidget):
                 # 非分钟级来源或初始加载切分钟级：以当日收盘时刻定位（进行中分钟数据由基周期聚合）
                 as_of = pd.Timestamp(start_date) + pd.Timedelta(hours=15)
             matching_indices = self._get_anchor_matching_indices(df, target_period, as_of)
+            # 数据未覆盖 as_of（如分钟数据源仅保留近 N 天，复盘日期早于分钟数据起点）：
+            # 回退到目标周期数据起始位置，避免切换后图表停留在旧周期导致取 time 列报错
+            if not matching_indices and df is not None and not df.empty:
+                self.logger.warning(
+                    f"周期{TimePeriod.get_chinese_label(target_period)}在 as_of={start_date} 无匹配数据，回退到数据起始位置")
+                matching_indices = [0]
 
             if b_init:
                 if len(matching_indices) > 0:

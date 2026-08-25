@@ -195,7 +195,7 @@ class BaseIndicatorWidget(QWidget):
             
             # 使用 .loc 访问器获取指定行的 时间列数据
             s_col_name = 'date'
-            if TimePeriod.is_minute_level(self.period):
+            if TimePeriod.is_minute_level(self.period) and 'time' in self.df_data.columns:
                 s_col_name = 'time'
                 
             date_str = self.df_data.loc[index, s_col_name]
