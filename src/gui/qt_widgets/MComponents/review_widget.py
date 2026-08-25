@@ -121,11 +121,6 @@ class ReviewWidget(QWidget):
         # 模拟交易
         self.lineEdit_price.editingFinished.connect(self.slot_lineEdit_price_editingFinished)
         self.amout_button_group.buttonClicked.connect(self.slot_amout_button_group_buttonClicked)
-        # self.btn_all.clicked.connect(self.slot_btn_all_clicked)
-        # self.btn_one_half.clicked.connect(self.slot_btn_one_half_clicked)
-        # self.btn_one_third.clicked.connect(self.slot_btn_one_third_clicked)
-        # self.btn_a_quarter.clicked.connect(self.slot_btn_a_quarter_clicked)
-        # self.btn_one_in_five.clicked.connect(self.slot_btn_one_in_five_clicked)
 
         self.btn_buy.clicked.connect(self.slot_btn_buy_clicked)
         self.btn_sell.clicked.connect(self.slot_btn_sell_clicked)
@@ -176,7 +171,7 @@ class ReviewWidget(QWidget):
         self.lineEdit_price.setText(f"{price:.2f}")
         
         # 持仓时无需更新
-        if self.demo_trading_manager.get_trading_status() == 5:
+        if self.demo_trading_manager.get_trading_status() == 3 or self.demo_trading_manager.get_trading_status() == 5:
             count = self.lineEdit_count.text()
             self.lineEdit_amount.setText(f"{float(count) * price:.2f}")
             return
@@ -753,47 +748,6 @@ class ReviewWidget(QWidget):
         max_count = self.demo_trading_manager.get_buy_count(float(str_price), checked_id)
         self.logger.info(f"最大可买数量: {max_count}")
         self.update_count_and_amount_labels(float(str_price), max_count)
-        
-
-    def slot_btn_all_clicked(self):
-        str_price = self.lineEdit_price.text()
-        max_count = self.demo_trading_manager.get_buy_count(float(str_price))
-
-        self.logger.info(f"最大可买数量: {max_count}")
-        self.lineEdit_count.setText(str(max_count))
-        self.lineEdit_amount.setText(str(max_count * float(str_price)))
-
-    def slot_btn_one_half_clicked(self):
-        str_price = self.lineEdit_price.text()
-        if str_price == "":
-            return
-        max_count = self.demo_trading_manager.get_buy_count(float(str_price), 1)
-
-        self.logger.info(f"最大可买数量: {max_count}")
-        self.lineEdit_count.setText(str(max_count))
-        self.lineEdit_amount.setText(str(max_count * float(str_price)))
-
-    def slot_btn_one_third_clicked(self):
-        str_price = self.lineEdit_price.text()
-        max_count = self.demo_trading_manager.get_buy_count(float(str_price), 2)
-        self.logger.info(f"最大可买数量: {max_count}")
-        self.lineEdit_count.setText(str(max_count))
-        self.lineEdit_amount.setText(str(max_count * float(str_price)))
-
-    def slot_btn_a_quarter_clicked(self):
-        str_price = self.lineEdit_price.text()
-        max_count = self.demo_trading_manager.get_buy_count(float(str_price), 3)
-        self.logger.info(f"最大可买数量: {max_count}")
-        self.lineEdit_count.setText(str(max_count))
-        self.lineEdit_amount.setText(str(max_count * float(str_price)))
-
-    def slot_btn_one_in_five_clicked(self):
-        str_price = self.lineEdit_price.text()
-        max_count = self.demo_trading_manager.get_buy_count(float(str_price), 4)
-
-        self.logger.info(f"最大可买数量: {max_count}")
-        self.lineEdit_count.setText(str(max_count))
-        self.lineEdit_amount.setText(str(max_count * float(str_price)))
 
     def slot_btn_buy_clicked(self):
         if self.current_load_code == "":
