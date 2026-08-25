@@ -96,6 +96,7 @@ class IndicatorsViewWidget(QWidget):
         self.period_button_group.addButton(self.btn_120m, 6)
         self.period_button_group.addButton(self.btn_1d, 7)
         self.period_button_group.addButton(self.btn_1w, 8)
+        self.period_button_group.addButton(self.btn_M, 9)
 
         self.btn_time.setEnabled(False)
         self.btn_1m.setEnabled(False)

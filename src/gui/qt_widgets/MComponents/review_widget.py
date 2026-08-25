@@ -25,6 +25,7 @@ class ReviewWidget(QWidget):
         # TimePeriod.MINUTE_60,
         TimePeriod.DAY,
         TimePeriod.WEEK,
+        TimePeriod.MONTH,
     ]
 
     # 基周期：远程只拉取基周期，周线等上级周期由基周期本地聚合生成（不依赖远程上级周期接口）
