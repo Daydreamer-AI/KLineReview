@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QListWidget, QListWid
 from PyQt5.QtCore import QDate, QFile
 
 import random
+import pandas as pd
 from datetime import date, datetime as dt, timedelta as td
 
 from manager.logging_manager import get_logger
@@ -284,6 +285,17 @@ class ReviewWidget(QWidget):
         """获取远程实际拉取的基周期列表（上级周期由基周期本地聚合，不远程拉取）"""
         return list(self._base_load_periods)
 
+    @staticmethod
+    def _normalize_day_base(df):
+        """日线基周期统一带 time（完整日为 'YYYY-MM-DD 15:00:00'）与 is_complete 列，
+        保证周/月/日之间切换时进行中时间可跨周期传播。"""
+        day_df = df.copy()
+        if 'time' not in day_df.columns:
+            day_df['time'] = pd.to_datetime(day_df['date']).dt.strftime('%Y-%m-%d') + ' 15:00:00'
+        if 'is_complete' not in day_df.columns:
+            day_df['is_complete'] = True
+        return day_df
+
     def set_load_periods(self, periods):
         """设置复盘加载周期列表（预留调整接口）"""
         valid_periods = []
@@ -463,13 +475,14 @@ class ReviewWidget(QWidget):
                 if self.current_load_code == code and cached_df is not None and not cached_df.empty:
                     df = cached_df
             if df is not None and not df.empty:
-                dict_stock_data[period] = df
                 if TimePeriod.is_minute_level(period):
+                    dict_stock_data[period] = df
                     if minute_base_df is None:
                         minute_base_df = df
                 else:
                     if day_base_df is None:
-                        day_base_df = df
+                        day_base_df = self._normalize_day_base(df)
+                    dict_stock_data[period] = day_base_df
         # 1.2 上级周期由基周期按复盘基准时刻 as_of 本地聚合生成，不依赖远程上级周期接口
         # 分钟级目标周期以 5 分钟基周期聚合，日线及以上以日线基周期聚合
         for period in self.get_load_periods():

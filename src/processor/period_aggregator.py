@@ -221,17 +221,14 @@ def aggregate_period(base_df, period, as_of=None):
 
     result = pd.DataFrame(rows)
     result['date'] = pd.to_datetime(result['_label']).dt.strftime('%Y-%m-%d')
-    if TimePeriod.is_minute_level(period):
-        result['time'] = pd.to_datetime(result['_label']).dt.strftime('%Y-%m-%d %H:%M:%S')
+    result['time'] = pd.to_datetime(result['_label']).dt.strftime('%Y-%m-%d %H:%M:%S')
     result = result.drop(columns=['_label'])
 
     result['change_percent'] = result['close'].pct_change() * 100
     result['change_percent'] = result['change_percent'].fillna(0)
 
-    cols = ['date', 'code', 'name', 'open', 'high', 'low', 'close', 'volume', 'amount',
+    cols = ['date', 'time', 'code', 'name', 'open', 'high', 'low', 'close', 'volume', 'amount',
             'change_percent', 'turnover_rate', 'adjustflag', 'is_complete']
-    if TimePeriod.is_minute_level(period):
-        cols.insert(1, 'time')
     result = result[[col for col in cols if col in result.columns]]
 
     sdi.default_indicators_auto_calculate(result)
