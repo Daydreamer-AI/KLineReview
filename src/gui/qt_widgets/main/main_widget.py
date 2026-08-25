@@ -134,7 +134,8 @@ class MainWidget(QWidget):
             print("应用程序正在退出...")
             self.logger.info("开始执行清理操作...")
             try:
-                BaoStockProcessor().cleanup() # 清理所有处理器
+                # BaoStockProcessor().cleanup() # 清理所有处理器
+                pass
             except Exception as e:
                 self.logger.info(f"清理过程中发生错误: {e}")
             finally:
