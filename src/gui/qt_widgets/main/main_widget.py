@@ -75,7 +75,6 @@ class MainWidget(QWidget):
                 success = BaoStockProcessor().initialize()
                 if ak_success and success:
                     self.logger.info("所有处理器初始化成功")
-                    # BaoStockProcessor().start_background_loading()
 
                 else:
                     self.logger.info("处理器初始化失败")

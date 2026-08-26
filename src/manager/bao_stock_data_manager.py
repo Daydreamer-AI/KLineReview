@@ -167,67 +167,6 @@ class BaostockDataManager(QObject):
         """
         self.get_all_lastest_row_data_dict_by_period(TimePeriod.DAY)
         return True
-        total_count = 0
-
-        dict_daily_stock_data = {}
-        
-        # 遍历所有板块
-        board_index = 0
-
-        self.logger.info(f"开始读取本地数据库日线股票数据...")
-        start_time = time.time()  # 记录开始时间
-
-        dict_stock_info = self.get_stock_info_dict()
-        for board_name, board_data in dict_stock_info.items():
-            if board_index > 1:
-                break
-            board_index += 1
-
-            self.logger.info(f"读取 {board_name} 板块...")
-            board_start_time = time.time()  # 记录开始时间
-            
-            # 遍历该板块的每一行数据
-            for index, row in board_data.iterrows():
-                # if index > 100:
-                #     break
-
-                try:
-                    stock_code = row['code']
-                    stock_name = row['name'] if 'name' in row else '未知'
-                    
-                    # 获取日线和周线数据
-                    daily_data = self.get_stock_data_from_db_by_period_with_indicators(stock_code, TimePeriod.DAY)
-        
-                    
-                    # 检查数据是否为None，如果是则创建空的DataFrame
-                    if daily_data is None or daily_data.empty:
-                        continue
-                        
-
-                    # 存储数据
-                    dict_daily_stock_data[stock_code] = daily_data
-                    
-                    total_count += 1
-                    
-                except Exception as e:
-                    self.logger.error(f"处理股票 {stock_code} 时发生错误: {str(e)}")
-                    self.logger.error(traceback.format_exc())
-                    # 继续处理下一个股票
-                    continue
-
-            board_read_elapsed_time = time.time() - board_start_time  # 计算耗时
-            self.logger.info(f"读取完成，共读取{total_count}只股票，耗时: {board_read_elapsed_time:.2f}秒，即{board_read_elapsed_time/60:.2f}分钟")
-
-        
-        all_read_elapsed_time = time.time() - start_time  # 计算耗时
-        self.logger.info(f"读取完成，总耗时: {all_read_elapsed_time:.2f}秒，即{all_read_elapsed_time/60:.2f}分钟")
-
-        # 不再加载完整的日线数据到内存
-        # with self.lock:
-        #     self.dict_stock_data[TimePeriod.DAY] = dict_daily_stock_data
-
-        self.logger.info(f"总共处理了 {total_count} 只股票")
-        return True  
 
     def get_stock_data_from_db_by_period(self, code, period=TimePeriod.DAY, start_date=None, end_date=None):
         '''从数据中获取股票指定周期的k线数据(原始数据库数据，未处理指标)'''

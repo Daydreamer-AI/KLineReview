@@ -1015,3 +1015,15 @@ def get_random_date(start_date: str = "2014-01-01",
     
     # 6. 格式化为字符串并返回
     return random_dt.strftime(fmt)
+
+def get_current_year_dates():
+    """
+    获取当前年份的起始和结束日期
+    
+    Returns:
+        tuple: (start_date, end_date) 格式为 "YYYY-MM-DD"
+    """
+    current_year = datetime.datetime.now().year
+    start_date = f"{current_year}-01-01"
+    end_date = f"{current_year}-12-31"
+    return start_date, end_date

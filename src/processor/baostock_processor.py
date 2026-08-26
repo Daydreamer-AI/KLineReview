@@ -1,9 +1,6 @@
 import baostock as bs
 import pandas as pd
-import numpy as np
-from db_base.stock_info_db_base import StockInfoDBBasePool
-from db_base.stock_db_base import StockDbBase
-from indicators import stock_data_indicators as sdi
+
 import random
 import time
 import datetime
@@ -15,13 +12,8 @@ from manager.logging_manager import get_logger
 import traceback
 import gc
 
-from PyQt5.QtWidgets import QApplication
-
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from thread.base_thread_worker import BaseThreadWorker
-
-import json
 
 from manager.bao_stock_data_manager import BaostockDataManager
 from manager.period_manager import TimePeriod
@@ -60,7 +52,6 @@ class BaoStockProcessor(QObject):
         super().__init__() 
         self.logger = get_logger(__name__)
 
-        self.b_stop_process = False
         self.lock = threading.Lock()  
         self._is_initialized = False # 初始化状态标志
 
@@ -113,61 +104,24 @@ class BaoStockProcessor(QObject):
                 self.logger.info(f"Baostock logout encountered an error (may be during shutdown): {e}")
             finally:
                 self._is_initialized = False
-
-    def start_background_loading(self):
-        """启动后台加载本地Baostock股票数据"""
-        try:
-            # 创建并启动工作线程来执行特定任务
-            self.load_worker = BaseThreadWorker(BaoStockProcessor().load_all_local_stock_data)
-            self.load_worker.finished.connect(self.slot_stock_data_loading_finished)
-            self.load_worker.progress.connect(self.slot_stock_data_loading_progress)
-            self.load_worker.error.connect(self.slot_stock_data_loading_error)
-            self.load_worker.start()
-            
-            self.logger.info("已启动后台加载本地Baostock股票数据")
-        except Exception as e:
-            self.logger.error(f"启动后台加载本地Baostock股票数据失败: {e}")
-
-    def load_all_local_stock_data(self):
-        """
-        遍历所有股票代码并进行处理
-        """
-        return BaostockDataManager().load_1d_local_stock_data()
     
 
     # --------------------------------------------------------------------
 
-    def get_current_year_dates(self):
-        """
-        获取当前年份的起始和结束日期
-        
-        Returns:
-            tuple: (start_date, end_date) 格式为 "YYYY-MM-DD"
-        """
-        current_year = datetime.datetime.now().year
-        start_date = f"{current_year}-01-01"
-        end_date = f"{current_year}-12-31"
-        return start_date, end_date
+    
 
     # 获取当年交易日信息
     def get_current_trade_dates(self):
-
-        #### 获取交易日信息 ####
-        start_date, end_date = self.get_current_year_dates()
+        start_date, end_date = get_current_year_dates()
         rs = bs.query_trade_dates(start_date=start_date, end_date=end_date)
         self.logger.info('query_trade_dates respond error_code:'+rs.error_code)
         self.logger.info('query_trade_dates respond  error_msg:'+rs.error_msg)
 
-        #### 打印结果集 ####
         data_list = []
         while (rs.error_code == '0') & rs.next():
             # 获取一条记录，将记录合并在一起
             data_list.append(rs.get_row_data())
         result = pd.DataFrame(data_list, columns=rs.fields)
-
-        #### 结果集输出到csv文件 ####   
-        # result.to_csv("D:\\trade_datas.csv", encoding="gbk", index=False)
-        # self.logger.info("2025年交易日：", result)
 
         return result
 
@@ -179,7 +133,7 @@ class BaoStockProcessor(QObject):
             trading_status = self.df_trade_dates.loc[self.df_trade_dates['calendar_date'] == day_str, 'is_trading_day'].iloc[0]
             return trading_status == '1'
         else:
-            return False # 或者根据你的需求返回 None 或抛出异常
+            return False
 
     # 判断当天是否是交易日
     def is_trading_day_today(self):
@@ -437,11 +391,6 @@ class BaoStockProcessor(QObject):
             return combined_df, data_to_save
         
         return day_stock_data, data_to_save
-
-
-    # 空值修复，暂无用
-    def fix_null_value(self, code, data_to_save):
-        pass
 
     # 周线全量更新
     def process_weekly_stock_data(self, code, start_date=None, end_date=None, adjustflag='2'):
@@ -824,139 +773,7 @@ class BaoStockProcessor(QObject):
         # 批处理完成后强制垃圾回收
         gc.collect()
 
-    
-    def auto_process_all_stock_data(self):
-        # 一键自动 获取/更新 沪、深主板 日线、周线、15、30、60分钟k线数据
-        from thread.baostock_data_fetch_task import BaostockDataFetchTask
-        baostock_data_fetch_task = BaostockDataFetchTask()
-        baostock_data_fetch_task.task_completed.connect(self.slot_baostock_data_fetch_task_completed)
-        task_id = get_default_task_pool().submit(baostock_data_fetch_task)
-
-    # -----------------沪市主板股票数据获取接口---------------------
-    def start_sh_main_stock_data_background_update(self):
-        """启动后台更新Baostock股票数据"""
-        try:
-            # 创建并启动工作线程来执行特定任务
-            self.load_worker = BaseThreadWorker(BaoStockProcessor().process_sh_main_stock_data)
-            self.load_worker.finished.connect(self.slot_process_sh_main_stock_data_finished)
-            self.load_worker.progress.connect(self.slot_process_sh_main_stock_data_progress)
-            self.load_worker.error.connect(self.slot_process_sh_main_stock_data_error)
-            self.load_worker.start()
-            
-            self.logger.info("已启动后台更新Baostock沪市股票数据")
-        except Exception as e:
-            self.logger.error(f"启动后台更新Baostock沪市股票数据: {e}")
-
-    def process_sh_main_stock_data(self, task=None):
-        self.process_sh_main_stock_daily_data(task)
-        sleep_time = random.uniform(0.5, 1)
-        time.sleep(sleep_time)
-        self.process_sh_main_stock_weekly_data(task)
-        return True
-    
-    def process_sh_main_stock_daily_data(self, task=None):
-        self.process_stock_data(board_name='sh_main', TimePeriod=TimePeriod.DAY, task=task)
-
-    def process_sh_main_stock_weekly_data(self, task=None):
-        self.process_stock_data(board_name='sh_main', TimePeriod=TimePeriod.WEEK, task=task)
-
-
-    # -----------------深市主板股票数据获取接口---------------------
-    def process_sz_main_stock_daily_data(self, task=None):
-        self.process_stock_data(board_name='sz_main', TimePeriod=TimePeriod.DAY, task=task)
-
-    def start_sz_main_stock_data_background_update(self):
-        try:
-            # 创建并启动工作线程来执行特定任务
-            self.load_worker = BaseThreadWorker(BaoStockProcessor().process_sz_main_stock_data)
-            self.load_worker.finished.connect(self.slot_process_sz_main_stock_data_finished)
-            self.load_worker.progress.connect(self.slot_process_sz_main_stock_data_progress)
-            self.load_worker.error.connect(self.slot_process_sz_main_stock_data_error)
-            self.load_worker.start()
-            
-            self.logger.info("已启动后台更新Baostock深市股票数据")
-        except Exception as e:
-            self.logger.error(f"启动后台更新Baostock深市股票数据失败: {e}")
-
-    def process_sz_main_stock_data(self, task=None):
-        self.process_sz_main_stock_daily_data(task)
-        sleep_time = random.uniform(0.5, 1)
-        time.sleep(sleep_time)
-        self.process_sz_main_stock_weekly_data(task)
-        return True
-
-    def process_sz_main_stock_weekly_data(self, task=None):
-        self.process_stock_data(board_name='sz_main', TimePeriod=TimePeriod.WEEK, task=task)
-
-        
-    # -----------------创业板股票数据获取接口---------------------
-    def start_gem_stock_data_background_update(self):
-        try:
-            # 创建并启动工作线程来执行特定任务
-            self.load_worker = BaseThreadWorker(BaoStockProcessor().process_gem_stock_data)
-            self.load_worker.finished.connect(self.slot_process_gem_stock_data_finished)
-            self.load_worker.progress.connect(self.slot_process_gem_stock_data_progress)
-            self.load_worker.error.connect(self.slot_process_gem_stock_data_error)
-            self.load_worker.start()
-            
-            self.logger.info("已启动后台更新Baostock创业板股票数据")
-        except Exception as e:
-            self.logger.error(f"启动后台更新Baostock创业板股票数据失败: {e}")
-    def process_gem_stock_data(self, task=None):
-        self.process_gem_stock_daily_data(task)
-        sleep_time = random.uniform(0.5, 1)
-        time.sleep(sleep_time)
-        self.process_gem_stock_weekly_data(task)
-        return True
-    def process_gem_stock_daily_data(self, task=None):
-        self.process_stock_data(board_name='gem', TimePeriod=TimePeriod.DAY, task=task)
-
-    def process_gem_stock_weekly_data(self, task=None):
-        self.process_stock_data(board_name='gem', TimePeriod=TimePeriod.WEEK, task=task)
-
-    # -----------------科创板股票数据获取接口---------------------
-    def start_star_stock_data_background_update(self):
-        try:
-            # 创建并启动工作线程来执行特定任务
-            self.load_worker = BaseThreadWorker(BaoStockProcessor().process_star_stock_data)
-            self.load_worker.finished.connect(self.slot_process_star_stock_data_finished)
-            self.load_worker.progress.connect(self.slot_process_star_stock_data_progress)
-            self.load_worker.error.connect(self.slot_process_star_stock_data_error)
-            self.load_worker.start()
-            
-            self.logger.info("已启动后台更新Baostock科创板股票数据")
-        except Exception as e:
-            self.logger.error(f"启动后台更新Baostock科创板股票数据失败: {e}")
-
-    def process_star_stock_data(self, task=None):
-        self.process_star_stock_daily_data(task)
-        sleep_time = random.uniform(0.5, 1)
-        time.sleep(sleep_time)
-        self.process_star_stock_weekly_data(task)
-        return True
-    
-    def process_star_stock_daily_data(self, task=None):
-        self.process_stock_data(board_name='star', TimePeriod=TimePeriod.DAY, task=task)
-
-    def process_star_stock_weekly_data(self, task=None):
-        self.process_stock_data(board_name='star', TimePeriod=TimePeriod.WEEK, task=task)
-
-        
-
     # -----------------分钟级别股票数据获取接口---------------------
-    def start_minute_level_stock_data_background_update(self, board_type, level):
-        try:
-            # 创建并启动工作线程来执行特定任务
-            self.load_worker = BaseThreadWorker(BaoStockProcessor().process_minute_level_stock_data_with_board_type, board_type, level)
-            # self.load_worker.finished.connect(self.slot_process_star_stock_data_finished)
-            # self.load_worker.progress.connect(self.slot_process_star_stock_data_progress)
-            # self.load_worker.error.connect(self.slot_process_star_stock_data_error)
-            self.load_worker.start()
-            
-            self.logger.info(f"已启动后台更新Baostock {level}分钟级别{board_type}股票数据")
-        except Exception as e:
-            self.logger.error(f"启动后台更新Baostock {level}分钟级别{board_type}股票数据失败: {e}")
-
     def process_minute_level_stock_data_with_board_type(self, board_type, level, task=None):
         allowed_board_types = ['sh_main', 'sz_main', 'gem', 'star', 'bse']
         if board_type not in allowed_board_types:
@@ -1081,227 +898,6 @@ class BaoStockProcessor(QObject):
 
         return True
 
-    def get_and_save_all_stocks_from_bao(self):
-        # 显示登陆返回信息
-        # self.logger.info('login respond error_code:'+lg.error_code)
-        # self.logger.info('login respond  error_msg:'+lg.error_msg)
-
-        #### 获取证券信息 ####
-        query_date = datetime.datetime.now().strftime("%Y-%m-%d")
-        rs = bs.query_all_stock(query_date)
-        self.logger.info('query_all_stock respond error_code:'+rs.error_code)
-        self.logger.info('query_all_stock respond  error_msg:'+rs.error_msg)
-
-        #### 打印结果集 ####
-        data_list = []
-        while (rs.error_code == '0') & rs.next():
-            # 获取一条记录，将记录合并在一起
-            data_list.append(rs.get_row_data())
-
-        basic_columns = ['code', 'trade_status', 'name', ]
-        result = pd.DataFrame(data_list, columns=basic_columns)
-
-        if result is None or result.empty:
-            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}")
-            return False
-
-        result['version'] = ConfigManager().get('App', 'version', '0.0.1')
-
-        self.logger.info(f"获取所有股票数据完成，共有{len(result)}只股票。\n获取结果如下：\n{result.head(3)}")
-
-        dict_all_stock_info = self.filter_stocks_by_board(result)
-
-        # 打印各板块股票数量
-        for board_name, df_board in dict_all_stock_info.items():
-            self.logger.info(f"{board_name} 股票数量: {len(df_board)}")
-
-            # self.logger.info(df_board.tail(1))
-
-            # 如需查看具体代码，可取消下一行的注释
-            # self.logger.info(f"{board_name} 股票代码:\n {df_board['code'].tolist()}\n")
-            if board_name == 'sh_main':
-                BaostockDataManager().save_stock_info_to_db(df_board, 'sh_main')
-            elif board_name == 'sz_main':
-                BaostockDataManager().save_stock_info_to_db(df_board, 'sz_main')
-            elif board_name == 'gem':
-                BaostockDataManager().save_stock_info_to_db(df_board, 'gem')
-            elif board_name == 'star':
-                BaostockDataManager().save_stock_info_to_db(df_board, 'star')
-            elif board_name == 'bse':
-               BaostockDataManager().save_stock_info_to_db(df_board, 'bse')
-
-        #### 结果集输出到csv文件 ####   
-        # result.to_csv("./data/database/stocks/db/baostock/all_stock.csv", encoding="utf-8", index=False)
-        # self.logger.info(result)
-        BaostockDataManager().save_stock_info_to_db(result, 'stock_basic_info')
-
-    def get_all_stocks_from_db(self):
-        BaostockDataManager().get_all_stocks_from_db()
-
-    def filter_stocks_by_board(self, df):
-        """
-        根据证券代码前缀筛选出不同板块的股票
-        """
-        # 初始化空 DataFrame，用于存储各板块股票
-        sh_main = pd.DataFrame()   # 沪市主板
-        sz_main = pd.DataFrame()   # 深市主板
-        gem = pd.DataFrame()       # 创业板
-        star = pd.DataFrame()      # 科创板
-        bse = pd.DataFrame()       # 北交所
-
-        # 遍历每一行数据
-        for index, row in df.iterrows():
-            code = row['code']
-            
-            if code.startswith('sh.600') or code.startswith('sh.601') or code.startswith('sh.602') or code.startswith('sh.603') or code.startswith('sh.605'):
-                sh_main = pd.concat([sh_main, row.to_frame().T], ignore_index=True)
-            elif code.startswith('sz.000') or code.startswith('sz.001') or code.startswith('sz.002') or code.startswith('sz.003'):
-                sz_main = pd.concat([sz_main, row.to_frame().T], ignore_index=True)
-            elif code.startswith('sz.300') or code.startswith('sz.301'):
-                gem = pd.concat([gem, row.to_frame().T], ignore_index=True)
-            elif code.startswith('sh.688'):
-                star = pd.concat([star, row.to_frame().T], ignore_index=True)
-            elif code.startswith('bj.'):  # 北交所股票前缀
-                bse = pd.concat([bse, row.to_frame().T], ignore_index=True)
-        
-        return {
-            'sh_main': sh_main,
-            'sz_main': sz_main,
-            'gem': gem,
-            'star': star,
-            'bse': bse
-        }
-
-    def auto_test(self):
-        # result, data_to_save = self.update_weekly_stock_data('sh.600000')
-        # if data_to_save is not None and not data_to_save.empty:
-        #     self.logger.info(f"保存周线数据成功，共有{len(data_to_save)}行数据")
-        # else:
-        #     self.logger.info("没有需要保存的周线数据")
-        pass
-    # 增量更新
-    def update_sh_main_daily_data(self):
-        pass
-
-    def create_baostock_table_indexes(self):
-        """
-        为所有股票数据表创建索引以提高查询性能
-        """
-        board_index = 0  # 初始化变量
-        
-        self.logger.info("开始为所有股票数据表创建索引...")
-        total_start_time = time.time()
-
-        dict_stock_info = BaostockDataManager().get_stock_info_dict()
-        total_stocks = sum(len(board_data) for board_data in dict_stock_info.values())
-        processed_count = 0
-        
-        for board_name, board_data in dict_stock_info.items():
-            if board_index > 1:
-                break
-            board_index += 1
-
-            self.logger.info(f"创建 {board_name} 板块股票数据库索引...")
-            board_start_time = time.time()
-            
-            # 遍历该板块的每一行数据
-            for index, row in board_data.iterrows():
-                try:
-                    code = row['code']  # 使用正确的列名
-                    
-                    # 为不同时间级别的数据表创建索引
-                    
-                    time_periods = [TimePeriod.DAY, TimePeriod.WEEK, TimePeriod.MINUTE_15, TimePeriod.MINUTE_30, TimePeriod.MINUTE_60]
-
-                    for period in time_periods:
-                        if BaostockDataManager().check_table_exists(code, period):
-                            db_path = BaostockDataManager().get_db_path(code)
-                            BaostockDataManager().create_baostock_table_index(db_path, period)
-                        # else:
-                        #     self.logger.debug(f"表 {table_name} 不存在，跳过索引创建")
-                            
-                except Exception as e:
-                    self.logger.error(f"为股票 {code} 创建索引时出错: {str(e)}")
-                    continue
-
-                processed_count += 1
-            
-                # 每处理100只股票显示一次进度
-                if processed_count % 100 == 0:
-                    progress = (processed_count / total_stocks) * 100
-                    self.logger.info(f"索引创建进度: {progress:.1f}% ({processed_count}/{total_stocks})")
-
-            board_create_index_elapsed_time = time.time() - board_start_time
-            self.logger.info(f"{board_name} 板块股票数据库索引创建完成，耗时: {board_create_index_elapsed_time:.2f}秒，即{board_create_index_elapsed_time/60:.2f}分钟")
-        
-        total_elapsed_time = time.time() - total_start_time
-        self.logger.info(f"所有板块股票数据库索引创建完成，总耗时: {total_elapsed_time:.2f}秒，即{total_elapsed_time/60:.2f}分钟")
-
-
-    def stop_process(self):
-        self.b_stop_process = True
-
 
     # --------------------------槽函数-------------------------
-    def slot_stock_data_loading_finished(self, success):
-        self.logger.info(f"success的类型：{type(success)}")
-        if success:
-            self.logger.info("后台数据加载成功完成")
-        else:
-            self.logger.error("后台数据加载失败")
 
-        self.sig_stock_data_load_finished.emit(success)
-
-    def slot_stock_data_loading_progress(self, progress):
-        self.logger.info(f"progress的类型：{type(progress)}")
-        self.logger.info(f"加载进度: {progress}")
-        self.sig_stock_data_load_progress.emit(progress)
-
-    def slot_stock_data_loading_error(self, error):
-        self.logger.info(f"error的类型：{type(error)}")
-        self.logger.error(f"后台加载出错: {error}")
-        self.sig_stock_data_load_error.emit(error)
-
-
-    def slot_process_sh_main_stock_data_finished(self, success):
-        self.logger.info(f"沪市主板数据后台更新完成，success: {success}")
-    
-    def slot_process_sh_main_stock_data_progress(self, progress):
-        self.logger.info(f"沪市主板数据后台更新进度: {progress}")
-    
-    def slot_process_sh_main_stock_data_error(self, error):
-        self.logger.info(f"沪市主板数据后台更新出错: {error}") 
-
-    def slot_process_sz_main_stock_data_finished(self, success):
-        self.logger.info(f"深市主板数据后台更新完成，success: {success}")
-    
-    def slot_process_sz_main_stock_data_progress(self, progress):
-        self.logger.info(f"深市主板数据后台更新进度: {progress}")
-    
-    def slot_process_sz_main_stock_data_error(self, error):
-        self.logger.info(f"深市主板数据后台更新出错: {error}")
-
-    def slot_process_gem_stock_data_finished(self, success):
-        self.logger.info(f"创业板数据后台更新完成，success: {success}")
-
-    def slot_process_gem_stock_data_progress(self, progress):
-        self.logger.info(f"创业板数据后台更新进度: {progress}")    
-
-    def slot_process_gem_stock_data_error(self, error):
-        self.logger.info(f"创业板数据后台更新出错: {error}")
-
-    def slot_process_star_stock_data_finished(self, success):
-        self.logger.info(f"科创板数据后台更新完成，success: {success}")
-
-    def slot_process_star_stock_data_progress(self, progress):
-        self.logger.info(f"科创板数据后台更新进度: {progress}")  
-                
-    def slot_process_star_stock_data_error(self, error):
-        self.logger.info(f"科创板数据后台更新出错: {error}")
-
-    def slot_baostock_data_fetch_task_completed(self, task_id, result):
-        self.logger.info(f"task_id: {task_id}, result: {result}")
-
-if __name__ == "__main__":
-    bao_stock_processor = BaoStockProcessor()
-    bao_stock_processor.test()
