@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot, QFile
 
 from manager.logging_manager import get_logger
 
-from gui.qt_widgets.MComponents.review_widget import ReviewWidget
+from gui.qt_widgets.MComponents.review.review_widget import ReviewWidget
 
 from gui.qt_widgets.setting.global_setting_widget import GlobalSettingWidget
 

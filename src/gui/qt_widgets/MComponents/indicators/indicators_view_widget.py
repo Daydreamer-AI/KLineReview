@@ -17,7 +17,7 @@ from gui.qt_widgets.MComponents.indicators.kdj_widget import KdjWidget
 from gui.qt_widgets.MComponents.indicators.rsi_widget import RsiWidget
 from gui.qt_widgets.MComponents.indicators.boll_widget import BollWidget
 
-from gui.qt_widgets.MComponents.mloading_widget import LoadingWidget
+from gui.qt_widgets.MComponents.review.mloading_widget import LoadingWidget
 
 from indicators import stock_data_indicators as sdi
 

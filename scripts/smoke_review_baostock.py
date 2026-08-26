@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import QApplication
 from manager.period_manager import TimePeriod
 from indicators import stock_data_indicators as sdi
 from processor.baostock_processor import BaoStockProcessor
-from gui.qt_widgets.MComponents.review_widget import ReviewWidget
+from gui.qt_widgets.MComponents.review.review_widget import ReviewWidget
 
 
 _APP = None

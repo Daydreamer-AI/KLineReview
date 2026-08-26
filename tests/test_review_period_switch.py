@@ -29,7 +29,7 @@ import pandas as pd
 
 from manager.period_manager import TimePeriod
 from indicators import stock_data_indicators as sdi
-from gui.qt_widgets.MComponents.review_widget import ReviewWidget
+from gui.qt_widgets.MComponents.review.review_widget import ReviewWidget
 
 
 def make_day_df(start='2026-06-01', end='2026-08-24'):
