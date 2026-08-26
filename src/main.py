@@ -9,11 +9,6 @@ from resources import resources_rc
 from gui.qt_widgets.main.main_widget import MainWidget
 from manager.logging_manager import get_logger, setup_logging
 
-# qml
-from PyQt5.QtQml import QQmlApplicationEngine
-from gui.qml.main.main_bridge import MainBridge 
-
-
 # 添加项目根目录到Python路径
 project_root = os.path.dirname(os.path.abspath(__file__))
 if project_root not in sys.path:

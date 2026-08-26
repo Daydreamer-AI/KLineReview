@@ -4,8 +4,6 @@ from PyQt5.QtCore import pyqtSlot, QFile
 
 from manager.logging_manager import get_logger
 
-from gui.qt_widgets.main.home_widget import HomeWidget
-from gui.qt_widgets.market.market_home_widget import MarketHomeWidget
 from gui.qt_widgets.MComponents.review_widget import ReviewWidget
 
 from gui.qt_widgets.setting.global_setting_widget import GlobalSettingWidget
@@ -13,7 +11,6 @@ from gui.qt_widgets.setting.global_setting_widget import GlobalSettingWidget
 from thread.task_pool import get_default_task_pool
 
 from processor.baostock_processor import BaoStockProcessor
-from processor.ak_stock_data_processor import AKStockDataProcessor
 
 from thread.baostock_data_fetch_task import *
 from manager.config_manager import ConfigManager
@@ -52,18 +49,14 @@ class MainWidget(QWidget):
     def init_ui(self):
         self.load_qss()
         # self.frame_tab.hide()
-        self.btn_market.hide()
 
         self.main_button_group = QtWidgets.QButtonGroup(self)
-        self.main_button_group.addButton(self.btn_market, 0)
         self.main_button_group.addButton(self.btn_review, 1)
         self.main_button_group.addButton(self.btn_setting, 2)
 
-        self.market_widget = MarketHomeWidget()
         self.review_page = ReviewWidget()
         self.setting_widget = GlobalSettingWidget()
 
-        self.stackedWidget.addWidget(self.market_widget)
         self.stackedWidget.addWidget(self.review_page)
         self.stackedWidget.addWidget(self.setting_widget)
 
@@ -71,7 +64,6 @@ class MainWidget(QWidget):
         self.btn_review.setChecked(True)
 
     def init_connect(self):
-        self.btn_market.clicked.connect(self.slot_btn_market_clicked)
         self.btn_review.clicked.connect(self.slot_btn_review_clicked)
         self.btn_setting.clicked.connect(self.slot_btn_setting_clicked)
 
@@ -80,8 +72,6 @@ class MainWidget(QWidget):
             self.logger.info("初始化所有处理器")
             try:
                 ak_success = True
-                # ak_success = AKStockDataProcessor().initialize()
-                # self.logger.info("AK股票数据初始化完成")
                 success = BaoStockProcessor().initialize()
                 if ak_success and success:
                     self.logger.info("所有处理器初始化成功")
@@ -149,9 +139,6 @@ class MainWidget(QWidget):
     # --------------槽函数---------------
     def slot_btn_review_clicked(self):
         self.stackedWidget.setCurrentWidget(self.review_page)
-
-    def slot_btn_market_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.market_widget)
 
     def slot_btn_setting_clicked(self):
         self.stackedWidget.setCurrentWidget(self.setting_widget)
