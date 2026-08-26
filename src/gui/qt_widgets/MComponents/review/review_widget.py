@@ -42,7 +42,7 @@ class ReviewWidget(QWidget):
 
     def __init__(self, parent=None):
         super(ReviewWidget, self).__init__(parent) 
-        uic.loadUi('./src/gui/qt_widgets/MComponents/ReviewWidget.ui', self)
+        uic.loadUi('./src/gui/qt_widgets/MComponents/review/ReviewWidget.ui', self)
 
         self.init_para()
         self.init_ui()
