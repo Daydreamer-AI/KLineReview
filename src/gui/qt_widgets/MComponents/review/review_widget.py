@@ -36,8 +36,8 @@ class ReviewWidget(QWidget):
 
     # 基周期：远程只拉取基周期，周线等上级周期由基周期本地聚合生成（不依赖远程上级周期接口）
     _BASE_LOAD_PERIODS = [
-        TimePeriod.DAY,
-        TimePeriod.MINUTE_5,
+        TimePeriod.DAY
+        # , TimePeriod.MINUTE_5,
     ]
 
     def __init__(self, parent=None):

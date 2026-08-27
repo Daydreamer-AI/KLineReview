@@ -1,6 +1,6 @@
 import sys
 import os
-from PyQt5.QtCore import QFile, QCoreApplication, Qt
+from PyQt5.QtCore import QFile, QCoreApplication, Qt, QTranslator
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 
@@ -8,6 +8,11 @@ from resources import resources_rc
 
 from gui.qt_widgets.main.main_widget import MainWidget
 from manager.logging_manager import get_logger, setup_logging
+
+from gui.qt_widgets.common.config import cfg
+from gui.qt_widgets.main.main_window import MainWindow
+
+from gui.qt_widgets.MComponents.qfluentwidgets import FluentTranslator
 
 # 添加项目根目录到Python路径
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -50,27 +55,11 @@ def setup_high_dpi_support():
     # Qt6 强制指定字体 DPI（如果需要兼容 Qt6）
     os.environ["QT_FONT_DPI"] = "96"
 
-def main():
-    # 设置进程标识环境变量
-    os.environ['MPOLICY_PROCESS'] = 'main'
-    
-    setup_high_dpi_support()
-    
-    # 初始化日志系统
-    # 初始化日志系统
-    setup_logging( 
-        log_dir="./data/logs",
-        level="INFO",
-        enable_file_log=True,
-        max_bytes=10 * 1024 * 1024,
-        backup_count=5,
-        unique_log_file=True  # 启用唯一日志文件名
-    )
-    
+def app_run():
     logger = get_logger(__name__)
     logger.info("应用程序启动")
-
     # PyQt5
+    setup_high_dpi_support()
     app = QApplication(sys.argv)  # 创建应用程序对象
     app.setWindowIcon(QIcon(":/app.svg"))
 
@@ -99,9 +88,70 @@ def main():
     except Exception as e:
         logger.error(f"应用程序异常退出: {e}")
 
-    # sys.exit(app.exec_())          # 进入主事件循环[1,7]
-    # logger.info("应用程序正常退出")
     sys.exit(ret)
+
+
+def app_run_2():
+    logger = get_logger(__name__)
+    logger.info("应用程序启动")
+
+    # enable dpi scale
+    if cfg.get(cfg.dpiScale) == "Auto":
+        QApplication.setHighDpiScaleFactorRoundingPolicy(
+            Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+    else:
+        os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"
+        os.environ["QT_SCALE_FACTOR"] = str(cfg.get(cfg.dpiScale))
+
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+
+    # create application
+    app = QApplication(sys.argv)
+    app.setAttribute(Qt.AA_DontCreateNativeWidgetSiblings)
+
+    # internationalization
+    locale = cfg.get(cfg.language).value
+    translator = FluentTranslator(locale)
+    galleryTranslator = QTranslator()
+    galleryTranslator.load(locale, "gallery", ".", ":/gallery/i18n")
+
+    app.installTranslator(translator)
+    app.installTranslator(galleryTranslator)
+
+    # create main window
+    w = MainWindow()
+    w.show()
+
+    ret = -1
+    try:
+        ret = app.exec_()
+        logger.info("应用程序正常退出")
+        
+    except Exception as e:
+        logger.error(f"应用程序异常退出: {e}")
+
+    sys.exit(ret)
+
+def main():
+    # 设置进程标识环境变量
+    os.environ['MPOLICY_PROCESS'] = 'main'
+    
+    # 初始化日志系统
+    # 初始化日志系统
+    setup_logging( 
+        log_dir="./data/logs",
+        level="INFO",
+        enable_file_log=True,
+        max_bytes=10 * 1024 * 1024,
+        backup_count=5,
+        unique_log_file=True  # 启用唯一日志文件名
+    )
+    
+    # app_run()
+    app_run_2()
+
+
 
 if __name__ == "__main__":
     main()
