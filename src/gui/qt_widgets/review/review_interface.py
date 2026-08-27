@@ -10,13 +10,15 @@ from ..common.icon import Icon, FluentIconBase
 # from ..components.sample_card import SampleCardView
 from ..common.style_sheet import StyleSheet
 
+from ..MComponents.review.review_widget import ReviewWidget
+
 
 class ReviewInterface(ScrollArea):
     """ Review interface """
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.view = QWidget(self)
+        self.view = ReviewWidget(self)
         self.vBoxLayout = QVBoxLayout(self.view)
 
         self.__initWidget()
@@ -34,3 +36,12 @@ class ReviewInterface(ScrollArea):
         self.vBoxLayout.setSpacing(40)
         # self.vBoxLayout.addWidget(self.banner)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
+
+    def slot_bao_stock_info_query_started(self, task_id):
+        self.view.slot_bao_stock_info_query_started(task_id)
+
+    def slot_bao_stock_info_query_finished(self, task_id, result):
+        self.view.slot_bao_stock_info_query_finished(task_id, result)
+
+    def slot_bao_stock_info_query_error(self, task_id, error):
+        self.view.slot_bao_stock_info_query_error(task_id, error)

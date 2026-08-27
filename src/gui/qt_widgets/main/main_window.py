@@ -33,44 +33,50 @@ from ..common.signal_bus import signalBus
 from ..common.translator import Translator
 from ..common import resource
 
+from thread.task_pool import get_default_task_pool
+from processor.baostock_processor import BaoStockProcessor
+from thread.baostock_data_fetch_task import *
+from manager.logging_manager import get_logger
+
 
 class MainWindow(FluentWindow):
 
     def __init__(self):
         super().__init__()
-        self.initWindow()
+
+        self.init_para()
+        self.init_ui()
+        self.init_connect()
+
+        self.init_processors()
+        self.init_bao_stock_info()
+
+    def init_para(self):
+        self.logger = get_logger(__name__)
 
         # create system theme listener
         self.themeListener = SystemThemeListener(self)
 
+        # start theme listener
+        self.themeListener.start()
+
+    def init_ui(self):
+        self.initWindow()
+
         # create sub interface
         self.homeInterface = HomeInterface(self)
-        # self.iconInterface = IconInterface(self)
-        # self.basicInputInterface = BasicInputInterface(self)
-        # self.dateTimeInterface = DateTimeInterface(self)
-        # self.dialogInterface = DialogInterface(self)
-        # self.layoutInterface = LayoutInterface(self)
-        # self.menuInterface = MenuInterface(self)
-        # self.materialInterface = MaterialInterface(self)
-        # self.navigationViewInterface = NavigationViewInterface(self)
-        # self.scrollInterface = ScrollInterface(self)
-        # self.statusInfoInterface = StatusInfoInterface(self)
         self.settingInterface = SettingInterface(self)
-        # self.textInterface = TextInterface(self)
-        # self.viewInterface = ViewInterface(self)
         self.reviewInterface = ReviewInterface(self)
 
         # enable acrylic effect
         self.navigationInterface.setAcrylicEnabled(True)
 
-        self.connectSignalToSlot()
-
         # add items to navigation interface
         self.initNavigation()
         self.splashScreen.finish()
 
-        # start theme listener
-        self.themeListener.start()
+    def init_connect(self):
+        self.connectSignalToSlot()
 
     def connectSignalToSlot(self):
         signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
@@ -79,45 +85,24 @@ class MainWindow(FluentWindow):
 
     def initNavigation(self):
 
-    #     # add navigation items
-    #     t = Translator()
+         # add navigation items
         self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
-    #     self.addSubInterface(self.iconInterface, Icon.EMOJI_TAB_SYMBOLS, t.icons)
-    #     self.navigationInterface.addSeparator()
-
-    #     pos = NavigationItemPosition.SCROLL
-    #     self.addSubInterface(self.basicInputInterface, FIF.CHECKBOX,t.basicInput, pos)
-    #     self.addSubInterface(self.dateTimeInterface, FIF.DATE_TIME, t.dateTime, pos)
-    #     self.addSubInterface(self.dialogInterface, FIF.MESSAGE, t.dialogs, pos)
-    #     self.addSubInterface(self.layoutInterface, FIF.LAYOUT, t.layout, pos)
-    #     self.addSubInterface(self.materialInterface, FIF.PALETTE, t.material, pos)
-    #     self.addSubInterface(self.menuInterface, Icon.MENU, t.menus, pos)
-    #     self.addSubInterface(self.navigationViewInterface, FIF.MENU, t.navigation, pos)
-    #     self.addSubInterface(self.scrollInterface, FIF.SCROLL, t.scroll, pos)
-    #     self.addSubInterface(self.statusInfoInterface, FIF.CHAT, t.statusInfo, pos)
-    #     self.addSubInterface(self.textInterface, Icon.TEXT, t.text, pos)
-    #     self.addSubInterface(self.viewInterface, Icon.GRID, t.view, pos)
-
         self.addSubInterface(self.reviewInterface, Icon.REVIEW, self.tr('Review'))
 
-    #     # add custom widget to bottom
-    #     self.navigationInterface.addItem(
-    #         routeKey='price',
-    #         icon=Icon.PRICE,
-    #         text=t.price,
-    #         onClick=self.onSupport,
-    #         selectable=False,
-    #         tooltip=t.price,
-    #         position=NavigationItemPosition.BOTTOM
-    #     )
+        # t = Translator()
+        # self.navigationInterface.addSeparator()
+        # pos = NavigationItemPosition.SCROLL
+        # self.addSubInterface(self.basicInputInterface, FIF.CHECKBOX,t.basicInput, pos)
+
+        # add custom widget to bottom
         self.addSubInterface(
             self.settingInterface, FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
-        self.resize(960, 780)
+        self.resize(1366, 768)
         self.setMinimumWidth(760)
         self.setWindowIcon(QIcon(':/app.svg'))
-        self.setWindowTitle('PyQt-Fluent-Widgets')
+        self.setWindowTitle('KLineReview')
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
@@ -131,6 +116,29 @@ class MainWindow(FluentWindow):
         self.move(w//2 - self.width()//2, h//2 - self.height()//2)
         self.show()
         QApplication.processEvents()
+
+    def init_processors(self):
+        """初始化所有处理器（如Baostock）"""
+        self.logger.info("初始化所有处理器")
+        try:
+            ak_success = True
+            success = BaoStockProcessor().initialize()
+            if ak_success and success:
+                self.logger.info("所有处理器初始化成功")
+
+            else:
+                self.logger.info("处理器初始化失败")
+                quit()
+        except Exception as e:
+            self.logger.info(f"初始化过程中发生错误: {e}")
+            quit()
+
+    def init_bao_stock_info(self):
+        baostock_info_fetch_task = BaostockInfoFetchTask()
+        baostock_info_fetch_task.task_started.connect(self.reviewInterface.slot_bao_stock_info_query_started)
+        baostock_info_fetch_task.task_completed.connect(self.reviewInterface.slot_bao_stock_info_query_finished)
+        baostock_info_fetch_task.task_error.connect(self.reviewInterface.slot_bao_stock_info_query_error)
+        get_default_task_pool().submit(baostock_info_fetch_task)
 
     def onSupport(self):
         language = cfg.get(cfg.language).value
