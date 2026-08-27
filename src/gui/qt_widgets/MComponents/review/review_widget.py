@@ -21,14 +21,14 @@ from common.common_api import *
 class ReviewWidget(QWidget):
     # 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
     _DEFAULT_LOAD_PERIODS = [
-        TimePeriod.MINUTE_5,
-        TimePeriod.MINUTE_10,
-        TimePeriod.MINUTE_15,
-        TimePeriod.MINUTE_30,
-        TimePeriod.MINUTE_45,
-        TimePeriod.MINUTE_60,
-        TimePeriod.MINUTE_90,
-        TimePeriod.MINUTE_120,
+        # TimePeriod.MINUTE_5,
+        # TimePeriod.MINUTE_10,
+        # TimePeriod.MINUTE_15,
+        # TimePeriod.MINUTE_30,
+        # TimePeriod.MINUTE_45,
+        # TimePeriod.MINUTE_60,
+        # TimePeriod.MINUTE_90,
+        # TimePeriod.MINUTE_120,
         TimePeriod.DAY,
         TimePeriod.WEEK,
         TimePeriod.MONTH,
