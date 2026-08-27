@@ -225,7 +225,6 @@ class MenuActionListWidget(QListWidget):
         # adjust the height of viewport
         w, h = MenuAnimationManager.make(self, aniType).availableViewSize(pos)
 
-        # fixes https://github.com/zhiyiYo/PyQt-Fluent-Widgets/issues/844
         # self.viewport().adjustSize()
 
         # adjust the height of list widget

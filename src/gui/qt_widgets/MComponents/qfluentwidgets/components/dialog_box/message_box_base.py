@@ -31,7 +31,6 @@ class MessageBoxBase(MaskDialogBase):
         self.setShadowEffect(60, (0, 10), QColor(0, 0, 0, 50))
         self.setMaskColor(QColor(0, 0, 0, 76))
 
-        # fixes https://github.com/zhiyiYo/PyQt-Fluent-Widgets/issues/19
         self.yesButton.setAttribute(Qt.WA_LayoutUsesWidgetRect)
         self.cancelButton.setAttribute(Qt.WA_LayoutUsesWidgetRect)
         

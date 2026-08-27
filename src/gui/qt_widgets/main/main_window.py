@@ -10,7 +10,7 @@ from gui.qt_widgets.MComponents.qfluentwidgets import FluentIcon as FIF
 
 
 # from .gallery_interface import GalleryInterface
-# from .home_interface import HomeInterface
+from .home_interface import HomeInterface
 # from .basic_input_interface import BasicInputInterface
 # from .date_time_interface import DateTimeInterface
 # from .dialog_interface import DialogInterface
@@ -21,9 +21,11 @@ from gui.qt_widgets.MComponents.qfluentwidgets import FluentIcon as FIF
 # from .navigation_view_interface import NavigationViewInterface
 # from .scroll_interface import ScrollInterface
 # from .status_info_interface import StatusInfoInterface
-# from .setting_interface import SettingInterface
+from ..setting.setting_interface import SettingInterface
 # from .text_interface import TextInterface
 # from .view_interface import ViewInterface
+
+from ..review.review_interface import ReviewInterface
 
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
 from ..common.icon import Icon
@@ -42,7 +44,7 @@ class MainWindow(FluentWindow):
         self.themeListener = SystemThemeListener(self)
 
         # create sub interface
-        # self.homeInterface = HomeInterface(self)
+        self.homeInterface = HomeInterface(self)
         # self.iconInterface = IconInterface(self)
         # self.basicInputInterface = BasicInputInterface(self)
         # self.dateTimeInterface = DateTimeInterface(self)
@@ -53,9 +55,10 @@ class MainWindow(FluentWindow):
         # self.navigationViewInterface = NavigationViewInterface(self)
         # self.scrollInterface = ScrollInterface(self)
         # self.statusInfoInterface = StatusInfoInterface(self)
-        # self.settingInterface = SettingInterface(self)
+        self.settingInterface = SettingInterface(self)
         # self.textInterface = TextInterface(self)
         # self.viewInterface = ViewInterface(self)
+        self.reviewInterface = ReviewInterface(self)
 
         # enable acrylic effect
         self.navigationInterface.setAcrylicEnabled(True)
@@ -70,13 +73,15 @@ class MainWindow(FluentWindow):
         self.themeListener.start()
 
     def connectSignalToSlot(self):
-        pass
+        signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
+        signalBus.switchToSampleCard.connect(self.switchToSample)
+        signalBus.supportSignal.connect(self.onSupport)
 
     def initNavigation(self):
-        pass
+
     #     # add navigation items
     #     t = Translator()
-    #     self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
+        self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
     #     self.addSubInterface(self.iconInterface, Icon.EMOJI_TAB_SYMBOLS, t.icons)
     #     self.navigationInterface.addSeparator()
 
@@ -93,6 +98,8 @@ class MainWindow(FluentWindow):
     #     self.addSubInterface(self.textInterface, Icon.TEXT, t.text, pos)
     #     self.addSubInterface(self.viewInterface, Icon.GRID, t.view, pos)
 
+        self.addSubInterface(self.reviewInterface, Icon.REVIEW, self.tr('Review'))
+
     #     # add custom widget to bottom
     #     self.navigationInterface.addItem(
     #         routeKey='price',
@@ -103,13 +110,13 @@ class MainWindow(FluentWindow):
     #         tooltip=t.price,
     #         position=NavigationItemPosition.BOTTOM
     #     )
-    #     self.addSubInterface(
-    #         self.settingInterface, FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
+        self.addSubInterface(
+            self.settingInterface, FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
         self.resize(960, 780)
         self.setMinimumWidth(760)
-        self.setWindowIcon(QIcon(':/gallery/images/logo.png'))
+        self.setWindowIcon(QIcon(':/app.svg'))
         self.setWindowTitle('PyQt-Fluent-Widgets')
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))

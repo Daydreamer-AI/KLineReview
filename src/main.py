@@ -108,6 +108,7 @@ def app_run_2():
 
     # create application
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(":/app.svg"))
     app.setAttribute(Qt.AA_DontCreateNativeWidgetSiblings)
 
     # internationalization

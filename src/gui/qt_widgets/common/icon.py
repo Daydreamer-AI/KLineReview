@@ -6,11 +6,7 @@ from gui.qt_widgets.MComponents.qfluentwidgets import FluentIconBase, getIconCol
 
 class Icon(FluentIconBase, Enum):
 
-    GRID = "Grid"
-    MENU = "Menu"
-    TEXT = "Text"
-    PRICE = "Price"
-    EMOJI_TAB_SYMBOLS = "EmojiTabSymbols"
+    REVIEW = "Review"
 
     def path(self, theme=Theme.AUTO):
-        return f":/gallery/images/icons/{self.value}_{getIconColor(theme)}.svg"
+        return f":/images/icons/{self.value}_{getIconColor(theme)}.svg"

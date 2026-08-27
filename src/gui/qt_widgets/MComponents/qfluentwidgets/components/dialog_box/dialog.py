@@ -37,7 +37,6 @@ class Ui_MessageBox:
         self.__setQss()
         self.__initLayout()
 
-        # fixes https://github.com/zhiyiYo/PyQt-Fluent-Widgets/issues/19
         self.yesButton.setAttribute(Qt.WA_LayoutUsesWidgetRect)
         self.cancelButton.setAttribute(Qt.WA_LayoutUsesWidgetRect)
 

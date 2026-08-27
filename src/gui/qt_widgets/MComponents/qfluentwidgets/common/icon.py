@@ -649,6 +649,7 @@ class FluentIcon(FluentIconBase, Enum):
     CHEVRON_RIGHT_MED = "ChevronRightMed"
     EMOJI_TAB_SYMBOLS = "EmojiTabSymbols"
     EXPRESSIVE_INPUT_ENTRY = "ExpressiveInputEntry"
+    REVIEW = "Review"
 
     def path(self, theme=Theme.AUTO):
         return f':/qfluentwidgets/images/icons/{self.value}_{getIconColor(theme)}.svg'

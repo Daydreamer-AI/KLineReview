@@ -54,16 +54,16 @@ class Config(QConfig):
     checkUpdateAtStartUp = ConfigItem("Update", "CheckUpdateAtStartUp", True, BoolValidator())
 
 
-YEAR = 2023
-AUTHOR = "zhiyiYo"
-VERSION = __version__
-HELP_URL = "https://qfluentwidgets.com"
-REPO_URL = "https://github.com/zhiyiYo/PyQt-Fluent-Widgets"
-EXAMPLE_URL = "https://github.com/zhiyiYo/PyQt-Fluent-Widgets/tree/master/examples"
-FEEDBACK_URL = "https://github.com/zhiyiYo/PyQt-Fluent-Widgets/issues"
-RELEASE_URL = "https://github.com/zhiyiYo/PyQt-Fluent-Widgets/releases/latest"
-ZH_SUPPORT_URL = "https://qfluentwidgets.com/zh/price/"
-EN_SUPPORT_URL = "https://qfluentwidgets.com/price/"
+YEAR = 2026
+AUTHOR = "牛马不是马"
+VERSION = "1.0.0"
+HELP_URL = "https://github.com/Daydreamer-AI/KLineReview"
+REPO_URL = "https://github.com/Daydreamer-AI/KLineReview"
+EXAMPLE_URL = "https://github.com/Daydreamer-AI/KLineReview"
+FEEDBACK_URL = "https://github.com/Daydreamer-AI/KLineReview"
+RELEASE_URL = "https://github.com/Daydreamer-AI/KLineReview"
+ZH_SUPPORT_URL = "https://github.com/Daydreamer-AI/KLineReview"
+EN_SUPPORT_URL = "https://github.com/Daydreamer-AI/KLineReview"
 
 
 cfg = Config()

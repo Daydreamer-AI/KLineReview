@@ -1,0 +1,12 @@
+ReviewInterface, #scrollWidget {
+    background-color: transparent;
+}
+
+ReviewInterface, #view {
+    background-color: transparent;
+}
+
+QScrollArea {
+    background-color: transparent;
+    border: none;
+}
