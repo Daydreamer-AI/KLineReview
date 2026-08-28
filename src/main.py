@@ -24,6 +24,14 @@ components_path = os.path.join(project_root, 'gui', 'qt_widgets', 'MComponents',
 if components_path not in sys.path:
     sys.path.insert(0, components_path)
 
+# 不要再把 qfluentwidgets 各子目录逐一裸加进 sys.path。
+# 若把 date_time 等子目录裸加进 sys.path，uic 解析 .ui 中提升的 CalendarPicker 时
+# 会把 calendar_picker 当顶层模块加载，导致其内部相对导入 "...common.style_sheet" 报错
+# "attempted relative import with no known parent package"。
+# qfluentwidgets 包已由上方 "from ...qfluentwidgets import FluentTranslator" 按完整包路径加载。
+# 提升控件的裸名映射由共享模块 review/ensure_promoted_widgets.py 集中管理
+# （在 review_widget.py 里调用 ensure_promoted_widgets()）。
+
 def setup_high_dpi_support():
     """
     设置高 DPI 支持，兼容不同 Qt 版本和平台

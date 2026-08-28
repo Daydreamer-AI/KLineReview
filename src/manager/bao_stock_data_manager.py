@@ -91,6 +91,37 @@ class BaostockDataManager(QObject):
         self.dict_stock_code_name = dict_code_name
         return dict_code_name
 
+    def get_code_name_complete_list(self):
+        """获取所有股票代码-名称列表。
+
+        Returns:
+            list: 所有股票代码-名称列表，如：["sh.600000 - 浦发银行", "sh.600001 - 平安银行"]。
+        """
+        list_result = []
+        dict_code_name = self.get_all_stock_code_name_dict()
+        for code, name in dict_code_name.items():
+            list_result.append(f"{code} - {name}")
+        return list_result
+
+    def get_complete_text(self, code, name):
+        return f"{code} - {name}"
+
+    def parse_code_name_by_complete_text(self, complete_text: str):
+        """从完整的股票代码-名称字符串中解析出股票代码。
+
+        Args:
+            complete_text (str): 完整的股票代码-名称字符串，如："600000 - 浦发银行"。
+
+        Returns:
+            list: 股票代码名称list，如：["600000", "浦发银行"]。
+        """
+        if not complete_text:
+            return None
+
+        code_name_list = complete_text.split(' - ')
+        return code_name_list
+
+
 
     # ----------------------stock_info相关接口-----------------------------------------
     def get_all_stocks_from_db(self):

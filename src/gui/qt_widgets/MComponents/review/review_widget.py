@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QListWidget, QListWidgetItem, QButtonGroup
-from PyQt5.QtCore import QDate, QFile
+from PyQt5.QtWidgets import QWidget, QCompleter, QMessageBox, QListWidget, QListWidgetItem, QButtonGroup
+from PyQt5.QtCore import QDate, QFile, Qt
 
 import random
 import pandas as pd
@@ -17,6 +17,13 @@ from manager.period_manager import TimePeriod
 from manager.review_demo_trading_manager import ReviewDemoTradingManager
 
 from common.common_api import *
+
+# 共享的提升控件注册辅助：把 .ui 中提升的 qfluentwidgets 控件按完整包路径加载，
+# 并注册到 sys.modules 的裸名上，使 uic 解析时命中的是包内模块（相对导入正常）。
+from gui.qt_widgets.MComponents.qfluentwidgets.ensure_promoted_qfluent_widgets import ensure_promoted_widgets
+
+ensure_promoted_widgets()
+
 
 class ReviewWidget(QWidget):
     # 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
@@ -53,7 +60,7 @@ class ReviewWidget(QWidget):
     def init_para(self):
         self.logger = get_logger(__name__)
 
-        self.type = 0   # 0: 模块；1：对话框
+        self.form_type = 0   # 0: 模块；1：对话框
         self.dict_progress_data = {}    # 回放进度数据
 
         self.current_load_code = ""
@@ -75,14 +82,30 @@ class ReviewWidget(QWidget):
 
         self.verticalLayout_indicators_view.addWidget(self.indicators_view_widget)
 
-        self.comboBox_period.addItems([TimePeriod.get_chinese_label(period) for period in self.get_load_periods()])
-        self.comboBox_period.setCurrentText(TimePeriod.get_chinese_label(TimePeriod.DAY))
+        self.lineEdit_code.setPlaceholderText(self.tr('Search stock code'))
+        self.lineEdit_code.setClearButtonEnabled(True)
 
-        self.btn_load_data_random.setAutoDefault(False)
-        self.btn_load_data_random.setDefault(False)
+        self.btn_date_select.setDate(QDate.currentDate().addDays(-365))
+
+        self.btn_period_select.addItems([TimePeriod.get_chinese_label(period) for period in self.get_load_periods()])
+        self.btn_period_select.setCurrentText(TimePeriod.get_chinese_label(TimePeriod.DAY))
+
+        # self.btn_load_data_random.setAutoDefault(False)
+        # self.btn_load_data_random.setDefault(False)
+        self.btn_load_data_random.setIcon(QtGui.QIcon(":/icon/general/random_normal.svg"))
 
         self.btn_load_data.setAutoDefault(False)
         self.btn_load_data.setDefault(False)
+
+        self.btn_back_to_front.setIcon(QtGui.QIcon(":/icon/general/fast_backward_to_the_head_normal.svg"))
+        self.btn_back_ten.setIcon(QtGui.QIcon(":/icon/general/fast_backward_normal.svg"))
+        self.btn_back.setIcon(QtGui.QIcon(":/icon/general/backward_normal.svg"))
+
+        self.btn_play.setIcon(QtGui.QIcon(":/icon/general/play_with_border_normal.svg"))
+
+        self.btn_move_on.setIcon(QtGui.QIcon(":/icon/general/forward_normal.svg"))
+        self.btn_move_on_10.setIcon(QtGui.QIcon(":/icon/general/fast_forward_normal.svg"))
+        self.btn_move_to_last.setIcon(QtGui.QIcon(":/icon/general/fast_forward_to_the_end_normal.svg"))
 
         self.playing_enabled(True, True)
 
@@ -104,7 +127,7 @@ class ReviewWidget(QWidget):
         self.stackedWidget_trading_record.addWidget(self.demo_trading_record_widget)
         self.stackedWidget_trading_record.setCurrentWidget(self.listWidget_trading_record)
 
-        self.load_qss()
+        # self.load_qss()
         self.btn_play.setProperty("is_play", False)
         self.btn_play.style().unpolish(self.btn_play)
         self.btn_play.style().polish(self.btn_play)
@@ -116,8 +139,8 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.sig_animation_play_finished.connect(self.slot_animation_play_finished)
 
         self.lineEdit_code.editingFinished.connect(self.slot_lineEdit_code_editingFinished)
-        self.dateEdit.dateChanged.connect(self.slot_dateEdit_dateChanged)
-        self.comboBox_period.currentIndexChanged.connect(self.slot_comboBox_period_currentIndexChanged)
+        self.btn_date_select.dateChanged.connect(self.slot_dateEdit_dateChanged)
+        self.btn_period_select.currentIndexChanged.connect(self.slot_comboBox_period_currentIndexChanged)
 
         self.btn_load_data_random.clicked.connect(self.slot_btn_load_data_random_clicked)
         self.btn_load_data.clicked.connect(self.slot_btn_load_data_clicked)
@@ -165,14 +188,13 @@ class ReviewWidget(QWidget):
             return
         
         # 对话框模式才会预加载
-        self.type = 1
-        
-        self.label_name.setText(df_row["name"])
-        self.lineEdit_code.setText(df_row["code"])
+        self.form_type = 1
+        complete_text = BaostockDataManager.get_complete_text(df_row["code"], df_row["name"])
+        self.lineEdit_code.setText(complete_text)
 
-        # self.dateEdit.blockSignals(True)
-        self.dateEdit.setDate(QDate.fromString(df_row['date'], "yyyy-MM-dd"))
-        # self.dateEdit.blockSignals(False)
+        # self.btn_date_select.blockSignals(True)
+        self.btn_date_select.setDate(QDate.fromString(df_row['date'], "yyyy-MM-dd"))
+        # self.btn_date_select.blockSignals(False)
 
         self.btn_load_data_random.hide()
         self.lineEdit_code.setEnabled(False)
@@ -203,8 +225,11 @@ class ReviewWidget(QWidget):
         self.update_count_and_amount_labels(close, max_count)
 
     def playing_enabled(self, is_playing, b_init=False):
-        self.lineEdit_code.setEnabled(not is_playing and self.type == 0)
-        self.dateEdit.setEnabled(True if b_init else not is_playing)
+        b_ret = (True if b_init else not is_playing) and (self.form_type == 0)
+        # self.logger.info(f"playing_enabled-b_ret: {b_ret}, is_playing: {is_playing}, form_type: {self.form_type}")
+        self.lineEdit_code.setEnabled(b_ret)
+        self.btn_date_select.setEnabled(True if b_init else not is_playing)
+        self.btn_period_select.setEnabled(True if b_init else not is_playing)
 
         self.btn_back_to_front.setEnabled(not is_playing)
         self.btn_back_ten.setEnabled(not is_playing)
@@ -308,16 +333,16 @@ class ReviewWidget(QWidget):
         self._load_periods = valid_periods
 
         # 同步周期选择控件选项（保持当前选择，若不在新列表则回退到第一项）
-        current_label = self.comboBox_period.currentText()
+        current_label = self.btn_period_select.currentText()
         period_labels = [TimePeriod.get_chinese_label(p) for p in valid_periods]
-        self.comboBox_period.blockSignals(True)
-        self.comboBox_period.clear()
-        self.comboBox_period.addItems(period_labels)
+        self.btn_period_select.blockSignals(True)
+        self.btn_period_select.clear()
+        self.btn_period_select.addItems(period_labels)
         if current_label in period_labels:
-            self.comboBox_period.setCurrentText(current_label)
+            self.btn_period_select.setCurrentText(current_label)
         else:
-            self.comboBox_period.setCurrentIndex(0)
-        self.comboBox_period.blockSignals(False)
+            self.btn_period_select.setCurrentIndex(0)
+        self.btn_period_select.blockSignals(False)
 
         self.logger.info(f"复盘加载周期更新为: {[TimePeriod.get_chinese_label(p) for p in valid_periods]}")
 
@@ -337,11 +362,12 @@ class ReviewWidget(QWidget):
             return
 
         # 更新模拟交易状态
-        if self.current_load_code != "" and self.current_load_code != code:
+        demo_trading_status = self.demo_trading_manager.get_trading_status()
+        if self.current_load_code != "" and self.current_load_code != code and (demo_trading_status != 0 and demo_trading_status != 6):
             kline_data = self.indicators_view_widget.get_current_kline_data()
             self.demo_trading_manager.force_update_trading(kline_data)
 
-        selected_period = TimePeriod.from_label(self.comboBox_period.currentText())
+        selected_period = TimePeriod.from_label(self.btn_period_select.currentText())
         self.logger.info(f"开始加载复盘数据: {code}, {date}, 显示周期={TimePeriod.get_chinese_label(selected_period)}")
 
         # 同股票所有配置周期均已注入内存缓存：仅按新日期重新定位动画，不重复拉取
@@ -524,14 +550,15 @@ class ReviewWidget(QWidget):
         indicators_view_widget.set_current_period(display_period)
 
         # 周期选择控件与初始显示周期保持一致
-        self.comboBox_period.blockSignals(True)
-        self.comboBox_period.setCurrentText(TimePeriod.get_chinese_label(display_period))
-        self.comboBox_period.blockSignals(False)
+        self.btn_period_select.blockSignals(True)
+        self.btn_period_select.setCurrentText(TimePeriod.get_chinese_label(display_period))
+        self.btn_period_select.blockSignals(False)
 
         # 4. 动画锚点行取显示周期数据的最后一行（远程数据，含 code/name）
         data_row = dict_stock_data[display_period].iloc[-1]
         if 'name' in data_row:
-            self.label_name.setText(str(data_row['name']))
+            # TODO
+            pass
 
         # 5. 日期越界保护：所选日期超出显示周期数据范围时回退到边界日期
         df_display = dict_stock_data[display_period]
@@ -559,9 +586,9 @@ class ReviewWidget(QWidget):
         # 用实际起始日期回填日期选择控件
         start_date = self.dict_progress_data.get('start_date') if self.dict_progress_data else None
         if start_date:
-            self.dateEdit.blockSignals(True)
-            self.dateEdit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
-            self.dateEdit.blockSignals(False)
+            self.btn_date_select.blockSignals(True)
+            self.btn_date_select.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
+            self.btn_date_select.blockSignals(False)
 
         current_kline_data = self.indicators_view_widget.get_current_kline_data()
         self.update_count_and_amount_labels_by_kline_data(current_kline_data)
@@ -615,11 +642,18 @@ class ReviewWidget(QWidget):
     def slot_bao_stock_info_query_started(self, task_id):
         self.logger.info(f"baostock info query started, task_id: {task_id}")
         self.frame_review.setEnabled(False)
+
     def slot_bao_stock_info_query_finished(self, task_id, result):
         self.logger.info(f"task_id: {task_id}, result: {result}")
 
         if result["result"]:
             self.frame_review.setEnabled(True)
+
+            stands = BaostockDataManager().get_code_name_complete_list()
+            completer = QCompleter(stands, self.lineEdit_code)
+            completer.setCaseSensitivity(Qt.CaseInsensitive)
+            completer.setMaxVisibleItems(10)
+            self.lineEdit_code.setCompleter(completer)
         else:
             QMessageBox.warning(self, "提示", "BaoStock股票信息查询失败！请检查网络连接或稍后再试！")
 
@@ -667,13 +701,6 @@ class ReviewWidget(QWidget):
 
                 self.update_progress_label(self.dict_progress_data['start_date_index'])
 
-                # start_date = self.dict_progress_data['start_date']
-                # self.logger.info(f"实际开始日期--start_date: {start_date}")
-
-                # self.dateEdit.blockSignals(True)
-                # self.dateEdit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
-                # self.dateEdit.blockSignals(False)
-
             else:
                 self.logger.info(f"初始化返回的进度数据为空")
 
@@ -681,14 +708,19 @@ class ReviewWidget(QWidget):
         self.slot_btn_play_clicked()
 
     def slot_lineEdit_code_editingFinished(self):
-        code = self.lineEdit_code.text()
-        # 用本地股票信息库同步校验（不依赖后台日线缓存）
-        name = BaostockDataManager().get_stock_name_by_code(code)
-        if not name:
+        complete_text = self.lineEdit_code.text()
+        
+        list_code_name = BaostockDataManager().parse_code_name_by_complete_text(complete_text)
+        if not list_code_name:
             QMessageBox.warning(self, "提示", "请输入正确的股票代码")
             return
 
-        self.label_name.setText(str(name))
+        code = list_code_name[0]
+        name = list_code_name[-1]
+        self.logger.info(f"收到股票代码: {code}, 股票名称: {name}")
+        if not name:
+            QMessageBox.warning(self, "提示", "请输入正确的股票代码")
+            return
 
         self.lineEdit_code.blockSignals(True)
         self.lineEdit_code.clearFocus()
@@ -700,7 +732,7 @@ class ReviewWidget(QWidget):
         self.logger.info(f"收到日期选择--s_date: {s_date}")
 
     def slot_comboBox_period_currentIndexChanged(self, index):
-        text = self.comboBox_period.currentText()
+        text = self.btn_period_select.currentText()
         self.logger.info(f"收到周期选择: {text}, index: {index}")
 
     def slot_btn_load_data_random_clicked(self):
@@ -720,22 +752,25 @@ class ReviewWidget(QWidget):
         # 前复权远程数据仅约三年：日期限定在三年窗口内并预留指标预热区间
         date = self._get_random_review_date()
 
-        print(f"随机股票代码: {code}, 对应名称: {name}，随机日期: {date}")
-        period = self.comboBox_period.currentText()
+        self.logger.info(f"随机股票代码: {code}, 对应名称: {name}，随机日期: {date}")
+        period = self.btn_period_select.currentText()
         self.logger.info(f"点击随机加载数据: {code}, {date}, {period}")
 
-        self.label_name.setText(str(name))
+        complete_text = BaostockDataManager().get_complete_text(code, name)
         self.lineEdit_code.blockSignals(True)
-        self.lineEdit_code.setText(code)
+        self.lineEdit_code.setText(complete_text)
         self.lineEdit_code.blockSignals(False)
 
         self.load_data(code, date)
         self.btn_buy.setDefault(True)
 
     def slot_btn_load_data_clicked(self):
-        code = self.lineEdit_code.text()
-        date = self.dateEdit.date().toString("yyyy-MM-dd")
-        period = self.comboBox_period.currentText()
+        complete_text = self.lineEdit_code.text()
+        list_code_name = BaostockDataManager().parse_code_name_by_complete_text(complete_text)
+        code = list_code_name[0]
+        name = list_code_name[-1]
+        date = self.btn_date_select.getDate().toString("yyyy-MM-dd")
+        period = self.btn_period_select.currentText()
         self.logger.info(f"点击加载数据: {code}, {date}, {period}")
 
         self.load_data(code, date)
@@ -746,12 +781,13 @@ class ReviewWidget(QWidget):
             self.logger.info("暂停播放")
             self.indicators_view_widget.pause_animation()
             self.btn_play.setProperty("is_play", False)
-            # self.btn_play.setIcon(QtGui.QIcon("./src/gui/qt_widgets/images/pause.png"))
+            self.btn_play.setIcon(QtGui.QIcon(":/icon/general/play_with_border_normal.svg"))
             self.playing_enabled(False)
         else:
             self.logger.info("开始播放")
             self.indicators_view_widget.start_animation()
             self.btn_play.setProperty("is_play", True)
+            self.btn_play.setIcon(QtGui.QIcon(":/icon/general/pause_with_border_normal.svg"))
             self.playing_enabled(True)
 
         self.btn_play.style().unpolish(self.btn_play)
@@ -804,8 +840,10 @@ class ReviewWidget(QWidget):
             self.logger.info("请先加载股票数据")
             return
 
-        str_code = self.lineEdit_code.text()
-        str_name = self.label_name.text()
+        complete_text = self.lineEdit_code.text()
+        list_code_name = BaostockDataManager().parse_code_name_by_complete_text(complete_text)
+        str_code = list_code_name[0]
+        str_name = list_code_name[-1]
         str_price = self.lineEdit_price.text()
         str_count = self.lineEdit_count.text()
 

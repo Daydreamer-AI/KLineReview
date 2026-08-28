@@ -123,7 +123,7 @@ class IndicatorsViewWidget(QWidget):
         self.kline_widget.set_period_text("日线")
         self.kline_widget.set_indicator_name("均线")
 
-        self.load_qss()
+        # self.load_qss()
 
     def init_connect(self):
         self.period_button_group.buttonClicked.connect(self.slot_period_button_clicked)
