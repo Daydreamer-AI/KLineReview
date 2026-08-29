@@ -153,9 +153,25 @@ class MainWindow(FluentWindow):
             self.splashScreen.resize(self.size())
 
     def closeEvent(self, e):
-        self.themeListener.terminate()
-        self.themeListener.deleteLater()
-        super().closeEvent(e)
+        title = self.tr('Prompt')
+        content = self.tr(
+            "Are you sure you want to exit?")
+        w = MessageBox(title, content, self.window())
+        w.setContentCopyable(True)
+        if w.exec():
+            # 可以在这里添加清理操作
+            task_pool = get_default_task_pool()
+            task_pool.shutdown(wait=True, cancel_running=True)
+            print("应用程序正在退出...")
+            self.logger.info("开始执行清理操作...")
+            self.themeListener.terminate()
+            self.themeListener.deleteLater()
+            super().closeEvent(e)
+            
+        else:
+            super().ignore()
+
+        
 
     def _onThemeChangedFinished(self):
         super()._onThemeChangedFinished()
