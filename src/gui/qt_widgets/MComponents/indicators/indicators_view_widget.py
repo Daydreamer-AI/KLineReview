@@ -552,9 +552,9 @@ class IndicatorsViewWidget(QWidget):
         '''
             动态添加指标图
         '''
-        # if self.df_data is None or self.df_data.empty:
-        #     # self.logger.warning(f"数据为空，无法添加指标图：{indicator_name}")
-        #     return None
+        if self.df_data is None or self.df_data.empty:
+            self.logger.warning(f"数据为空，无法添加指标图：{indicator_name}")
+            return None
         
         # 先检查是否支持该指标
         supported_indicators = [IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME), IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT), IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD), IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ), IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI), IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL)]
@@ -1306,42 +1306,54 @@ class IndicatorsViewWidget(QWidget):
     def slot_btn_indicator_volume_clicked(self):
         is_checked = self.btn_indicator_volume.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME))
+            if widget is None:
+                self.btn_indicator_volume.setChecked(False)
         else:
             self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME))
 
     def slot_btn_indicator_amount_clicked(self):
         is_checked = self.btn_indicator_amount.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT))
+            if widget is None:
+                self.btn_indicator_amount.setChecked(False)
         else:
             self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT))
 
     def slot_btn_indicator_macd_clicked(self):
         is_checked = self.btn_indicator_macd.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD))
+            if widget is None:
+                self.btn_indicator_macd.setChecked(False)
         else:
             self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD))
 
     def slot_btn_indicator_kdj_clicked(self):
         is_checked = self.btn_indicator_kdj.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ))
+            if widget is None:
+                self.btn_indicator_kdj.setChecked(False)
         else:
             self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ))
 
     def slot_btn_indicator_rsi_clicked(self):
         is_checked = self.btn_indicator_rsi.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI))
+            if widget is None:
+                self.btn_indicator_rsi.setChecked(False)
         else:
             self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI))
 
     def slot_btn_indicator_boll_clicked(self):
         is_checked = self.btn_indicator_boll.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL))
+            if widget is None:
+                self.btn_indicator_boll.setChecked(False)
         else:
             self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL))
 
