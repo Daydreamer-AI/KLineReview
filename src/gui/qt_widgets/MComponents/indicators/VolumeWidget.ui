@@ -114,7 +114,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_close">
+       <widget class="TransparentToolButton" name="btn_close">
         <property name="minimumSize">
          <size>
           <width>16</width>
@@ -133,7 +133,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_setting">
+       <widget class="TransparentToolButton" name="btn_setting">
         <property name="minimumSize">
          <size>
           <width>16</width>
@@ -156,6 +156,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TransparentToolButton</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

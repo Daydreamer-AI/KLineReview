@@ -48,6 +48,11 @@ class KLineWidget(BaseIndicatorWidget):
         self.label_ma30.hide()
         self.label_ma60.hide()
 
+        self.btn_restore.setIcon(QtGui.QIcon(":/icon/general/reset_normal.svg"))
+        self.btn_zoom_in.setIcon(QtGui.QIcon(":/icon/general/zoom_in_normal.svg"))
+        self.btn_zoom_out.setIcon(QtGui.QIcon(":/icon/general/zoom_out_normal.svg"))
+        self.btn_setting.setIcon(QtGui.QIcon(":/icon/general/setting_normal.svg"))
+
         self.btn_restore.clicked.connect(self.slot_btn_restore_clicked)
         self.btn_zoom_in.clicked.connect(self.slot_btn_zoom_in_clicked)
         self.btn_zoom_out.clicked.connect(self.slot_btn_zoom_out_clicked)

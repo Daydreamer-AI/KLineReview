@@ -22,6 +22,9 @@ class BollWidget(BaseIndicatorWidget):
     def custom_init(self):
         self.btn_close.hide()
 
+        self.btn_close.setIcon(QtGui.QIcon(":/icon/general/close_without_background_normal.svg"))
+        self.btn_setting.setIcon(QtGui.QIcon(":/icon/general/setting_normal.svg"))
+
         self.btn_setting.clicked.connect(self.slot_btn_setting_clicked)
 
     def init_para(self, data):

@@ -25,6 +25,9 @@ class AmountWidget(BaseIndicatorWidget):
         self.label_ma10.hide()
         self.label_ma20.hide()
 
+        self.btn_close.setIcon(QtGui.QIcon(":/icon/general/close_without_background_normal.svg"))
+        self.btn_setting.setIcon(QtGui.QIcon(":/icon/general/setting_normal.svg"))
+
         self.btn_close.hide()
 
         self.btn_setting.clicked.connect(self.slot_btn_setting_clicked)
