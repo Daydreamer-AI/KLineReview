@@ -27,7 +27,7 @@ from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QRectF
 from PyQt5.QtGui import QFont, QColor
 
 # 主控件（与 danmaku_widget.py 同目录）
-from danmaku_widget_yb import (
+from danmaku_widget import (
     DanmakuReviewWidget,
     DanmakuItem,
     ResultHistoryWidget,
