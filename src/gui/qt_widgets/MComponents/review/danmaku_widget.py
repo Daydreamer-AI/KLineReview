@@ -28,9 +28,6 @@ from PyQt5.QtGui import (
     QPainter, QColor, QFont, QFontMetrics, QPen, QBrush, QPainterPath, QIcon,
 )
 
-from gui.qt_widgets.MComponents.qfluentwidgets.window.fluent_window import FluentWidget
-
-
 
 # ----------------------------------------------------------------------
 # 数据模型（Model）
@@ -158,7 +155,7 @@ class DiceButton(QPushButton):
 # ----------------------------------------------------------------------
 # 主控件
 # ----------------------------------------------------------------------
-class DanmakuReviewWidget(FluentWidget):
+class DanmakuReviewWidget(QWidget):
     """
     弹幕抽奖控件。
     - 数据通过 set_data() 外部传入
@@ -228,7 +225,7 @@ class DanmakuReviewWidget(FluentWidget):
         self._root = QVBoxLayout(self)
         self._root.setContentsMargins(0, 0, 0, 0)
 
-        self._center_container = FluentWidget(self)
+        self._center_container = QWidget(self)
         layout = QVBoxLayout(self._center_container)
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(18)
@@ -520,7 +517,7 @@ class DanmakuReviewWidget(FluentWidget):
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        p.fillRect(self.rect(), QColor(20, 22, 28))
+        p.fillRect(self.rect(), Qt.transparent)
 
         danmaku_rect = self._effective_danmaku_rect()
         p.setClipRect(danmaku_rect.toRect())
@@ -602,7 +599,7 @@ class DanmakuReviewWidget(FluentWidget):
 # ----------------------------------------------------------------------
 # 历史记录独立展示控件（配套）
 # ----------------------------------------------------------------------
-class ResultHistoryWidget(FluentWidget):
+class ResultHistoryWidget(QWidget):
     """抽奖结果历史列表控件"""
 
     item_clicked = pyqtSignal(object)
@@ -645,7 +642,7 @@ class ResultHistoryWidget(FluentWidget):
 # ----------------------------------------------------------------------
 # 组合主窗口（弹幕 + 历史，演示用）
 # ----------------------------------------------------------------------
-class DanmakuReviewWindow(FluentWidget):
+class DanmakuReviewWindow(QWidget):
     """完整窗口：弹幕抽奖区 + 底部历史记录区"""
 
     def __init__(self, parent=None):
@@ -680,26 +677,52 @@ class DanmakuReviewWindow(FluentWidget):
 # 演示 / 验证（直接运行）
 # ----------------------------------------------------------------------
 def _make_sample_items():
+    # 使用字典格式，可以精确指定每一项的样式属性
     samples = [
-        ("600519 贵州茅台", "#FFD700"),
-        ("000858 五粮液", "#FF6B6B"),
-        ("300750 宁德时代", "#4ECDC4"),
-        ("601318 中国平安", "#A29BFE"),
-        ("000333 美的集团", "#FFEAA7"),
-        ("002594 比亚迪", "#55EFC4"),
-        ("600036 招商银行", "#74B9FF"),
-        ("601988 中国银行", "#FAB1A0"),
-        ("300059 东方财富", "#DFE6E9"),
-        ("600030 中信证券", "#FDCB6E"),
+        {"text": "600519 贵州茅台", "color": "#FFD700", "font_size": 32, "bold": True, "opacity": 1.0},
+        {"text": "000858 五粮液", "color": "#FF6B6B", "font_size": 28, "bold": True},
+        {"text": "300750 宁德时代", "color": "#4ECDC4", "font_size": 24},
+        {"text": "601318 中国平安", "color": "#A29BFE"},
+        {"text": "000333 美的集团", "color": "#FFEAA7", "opacity": 0.8},
+        {"text": "002594 比亚迪", "color": "#55EFC4", "font_size": 20, "bold": False},
+        {"text": "600036 招商银行", "color": "#74B9FF"},
+        {"text": "601988 中国银行", "color": "#FAB1A0", "font_size": 28, "opacity": 0.9},
+        {"text": "300059 东方财富", "color": "#DFE6E9", "bold": True},
+        {"text": "600030 中信证券", "color": "#FDCB6E", "font_size": 24, "opacity": 0.85},
     ]
+    return _make_sample_items_by_list(samples)
+
+def _make_sample_items_by_list(list_samples):
+    """
+    支持字典格式的弹幕数据解析。
+    如果字典中缺少某个属性，则使用随机默认值兜底。
+    """
     items = []
-    for text, color in samples:
+    for sample in list_samples:
+        # 兼容旧版元组格式 (text, color)
+        if isinstance(sample, (tuple, list)):
+            text, color = sample
+            font_size = random.choice([20, 24, 28, 32])
+            bold = random.choice([True, False])
+            opacity = random.uniform(0.7, 1.0)
+        # 处理新版字典格式
+        elif isinstance(sample, dict):
+            text = sample.get("text", "Unknown")
+            color = sample.get("color", "#FFFFFF")
+            
+            # 如果字典中没有指定，则随机生成
+            font_size = sample.get("font_size", random.choice([20, 24, 28, 32]))
+            bold = sample.get("bold", random.choice([True, False]))
+            opacity = sample.get("opacity", random.uniform(0.7, 1.0))
+        else:
+            continue  # 跳过不支持的数据类型
+            
         items.append(DanmakuItem(
             text=text,
             color=color,
-            font_size=random.choice([20, 24, 28, 32]),
-            bold=random.choice([True, False]),
-            opacity=random.uniform(0.7, 1.0),
+            font_size=font_size,
+            bold=bold,
+            opacity=opacity,
             stroke_color="#000000",
             stroke_width=1,
         ))
@@ -715,7 +738,7 @@ if __name__ == "__main__":
     w.danmaku.set_stop_mode(DanmakuReviewWidget.STOP_AUTO)
     w.danmaku.set_result_hide_mode(DanmakuReviewWidget.RESULT_HIDE_AUTO, duration_ms=4000)
     w.danmaku.global_opacity = 0.9
-    w.danmaku.set_track_count(12)
+    w.danmaku.set_track_count(6)
     w.show()
 
     # 演示：3 秒后"内定"一次结果（下一次点击直接命中）

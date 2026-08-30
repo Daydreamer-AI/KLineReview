@@ -1,29 +1,39 @@
 # coding:utf-8
-from PyQt5.QtCore import Qt, QRectF
-from PyQt5.QtGui import QPixmap, QPainter, QColor, QBrush, QPainterPath, QLinearGradient
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 from gui.qt_widgets.MComponents.qfluentwidgets import ScrollArea, isDarkTheme, FluentIcon
-from ..common.config import cfg, HELP_URL, REPO_URL, EXAMPLE_URL, FEEDBACK_URL
-from ..common.icon import Icon, FluentIconBase
-# from ..components.link_card import LinkCardView
-# from ..components.sample_card import SampleCardView
+from gui.qt_widgets.MComponents.review.danmaku_widget import DanmakuReviewWidget, _make_sample_items, _make_sample_items_by_list
+from manager.bao_stock_data_manager import BaostockDataManager
+
 from ..common.style_sheet import StyleSheet
+from ..common.signal_bus import signalBus
+
+import random
 
 class HomeInterface(ScrollArea):
     """ Home interface """
-
+    result_selected = pyqtSignal(object)
+    manual_select_clicked = pyqtSignal()
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        # self.banner = BannerWidget(self)
-        self.view = QWidget(self)
+        self.view = DanmakuReviewWidget(self)
         self.vBoxLayout = QVBoxLayout(self.view)
 
         self.__initWidget()
-        # self.loadSamples()
+        self.__init_connect()
+        # self.load_sample_data()
 
     def __initWidget(self):
         self.view.setObjectName('view')
+        # self.view.set_main_icon("dice_icon.svg")
+        # self.view.danmaku.set_sub_text("手动选择")
+        self.view.set_stop_mode(DanmakuReviewWidget.STOP_AUTO)
+        self.view.set_result_hide_mode(DanmakuReviewWidget.RESULT_HIDE_AUTO, duration_ms=3000)
+        self.view.global_opacity = 1
+        self.view.set_track_count(8)
+
         self.setObjectName('homeInterface')
         StyleSheet.HOME_INTERFACE.apply(self)
 
@@ -33,378 +43,49 @@ class HomeInterface(ScrollArea):
 
         self.vBoxLayout.setContentsMargins(0, 0, 0, 36)
         self.vBoxLayout.setSpacing(40)
-        # self.vBoxLayout.addWidget(self.banner)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
 
-    def loadSamples(self):
-        """ load samples """
-        # basic input samples
-        basicInputView = SampleCardView(
-            self.tr("Basic input samples"), self.view)
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/Button.png",
-            title="Button",
-            content=self.tr(
-                "A control that responds to user input and emit clicked signal."),
-            routeKey="basicInputInterface",
-            index=0
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/Checkbox.png",
-            title="CheckBox",
-            content=self.tr("A control that a user can select or clear."),
-            routeKey="basicInputInterface",
-            index=8
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/ComboBox.png",
-            title="ComboBox",
-            content=self.tr(
-                "A drop-down list of items a user can select from."),
-            routeKey="basicInputInterface",
-            index=10
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/DropDownButton.png",
-            title="DropDownButton",
-            content=self.tr(
-                "A button that displays a flyout of choices when clicked."),
-            routeKey="basicInputInterface",
-            index=12
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/HyperlinkButton.png",
-            title="HyperlinkButton",
-            content=self.tr(
-                "A button that appears as hyperlink text, and can navigate to a URI or handle a Click event."),
-            routeKey="basicInputInterface",
-            index=18
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/RadioButton.png",
-            title="RadioButton",
-            content=self.tr(
-                "A control that allows a user to select a single option from a group of options."),
-            routeKey="basicInputInterface",
-            index=19
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/Slider.png",
-            title="Slider",
-            content=self.tr(
-                "A control that lets the user select from a range of values by moving a Thumb control along a track."),
-            routeKey="basicInputInterface",
-            index=20
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/SplitButton.png",
-            title="SplitButton",
-            content=self.tr(
-                "A two-part button that displays a flyout when its secondary part is clicked."),
-            routeKey="basicInputInterface",
-            index=21
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/ToggleSwitch.png",
-            title="SwitchButton",
-            content=self.tr(
-                "A switch that can be toggled between 2 states."),
-            routeKey="basicInputInterface",
-            index=25
-        )
-        basicInputView.addSampleCard(
-            icon=":/gallery/images/controls/ToggleButton.png",
-            title="ToggleButton",
-            content=self.tr(
-                "A button that can be switched between two states like a CheckBox."),
-            routeKey="basicInputInterface",
-            index=26
-        )
-        self.vBoxLayout.addWidget(basicInputView)
+    def __init_connect(self):
+        self.view.result_selected.connect(self.slot_danmaku_result_selected)
+        self.view.manual_select_clicked.connect(self.manual_select_clicked)
 
-        # date time samples
-        dateTimeView = SampleCardView(self.tr('Date & time samples'), self.view)
-        dateTimeView.addSampleCard(
-            icon=":/gallery/images/controls/CalendarDatePicker.png",
-            title="CalendarPicker",
-            content=self.tr("A control that lets a user pick a date value using a calendar."),
-            routeKey="dateTimeInterface",
-            index=0
-        )
-        dateTimeView.addSampleCard(
-            icon=":/gallery/images/controls/DatePicker.png",
-            title="DatePicker",
-            content=self.tr("A control that lets a user pick a date value."),
-            routeKey="dateTimeInterface",
-            index=2
-        )
-        dateTimeView.addSampleCard(
-            icon=":/gallery/images/controls/TimePicker.png",
-            title="TimePicker",
-            content=self.tr(
-                "A configurable control that lets a user pick a time value."),
-            routeKey="dateTimeInterface",
-            index=4
-        )
-        self.vBoxLayout.addWidget(dateTimeView)
+    def load_sample_data(self):
+        self.view.set_data(_make_sample_items())
+    def slot_bao_stock_info_query_started(self, task_id):
+        pass
 
-        # dialog samples
-        dialogView = SampleCardView(self.tr('Dialog samples'), self.view)
-        dialogView.addSampleCard(
-            icon=":/gallery/images/controls/Flyout.png",
-            title="Dialog",
-            content=self.tr("A frameless message dialog."),
-            routeKey="dialogInterface",
-            index=0
-        )
-        dialogView.addSampleCard(
-            icon=":/gallery/images/controls/ContentDialog.png",
-            title="MessageBox",
-            content=self.tr("A message dialog with mask."),
-            routeKey="dialogInterface",
-            index=1
-        )
-        dialogView.addSampleCard(
-            icon=":/gallery/images/controls/ColorPicker.png",
-            title="ColorDialog",
-            content=self.tr("A dialog that allows user to select color."),
-            routeKey="dialogInterface",
-            index=2
-        )
-        dialogView.addSampleCard(
-            icon=":/gallery/images/controls/Flyout.png",
-            title="Flyout",
-            content=self.tr("Shows contextual information and enables user interaction."),
-            routeKey="dialogInterface",
-            index=3
-        )
-        dialogView.addSampleCard(
-            icon=":/gallery/images/controls/TeachingTip.png",
-            title="TeachingTip",
-            content=self.tr("A content-rich flyout for guiding users and enabling teaching moments."),
-            routeKey="dialogInterface",
-            index=5
-        )
-        self.vBoxLayout.addWidget(dialogView)
+    def slot_bao_stock_info_query_finished(self, task_id, result):
+        if result["result"]:
 
-        # layout samples
-        layoutView = SampleCardView(self.tr('Layout samples'), self.view)
-        layoutView.addSampleCard(
-            icon=":/gallery/images/controls/Grid.png",
-            title="FlowLayout",
-            content=self.tr(
-                "A layout arranges components in a left-to-right flow, wrapping to the next row when the current row is full."),
-            routeKey="layoutInterface",
-            index=0
-        )
-        self.vBoxLayout.addWidget(layoutView)
+            dict_code_name = BaostockDataManager().get_all_stock_code_name_dict()
 
-        # material samples
-        materialView = SampleCardView(self.tr('Material samples'), self.view)
-        materialView.addSampleCard(
-            icon=":/gallery/images/controls/Acrylic.png",
-            title="AcrylicLabel",
-            content=self.tr(
-                "A translucent material recommended for panel background."),
-            routeKey="materialInterface",
-            index=0
-        )
-        self.vBoxLayout.addWidget(materialView)
+            # print(f"dict_code_name长度：{dict_code_name}")
 
-        # menu samples
-        menuView = SampleCardView(self.tr('Menu & toolbars samples'), self.view)
-        menuView.addSampleCard(
-            icon=":/gallery/images/controls/MenuFlyout.png",
-            title="RoundMenu",
-            content=self.tr(
-                "Shows a contextual list of simple commands or options."),
-            routeKey="menuInterface",
-            index=0
-        )
-        menuView.addSampleCard(
-            icon=":/gallery/images/controls/CommandBar.png",
-            title="CommandBar",
-            content=self.tr(
-                "Shows a contextual list of simple commands or options."),
-            routeKey="menuInterface",
-            index=2
-        )
-        menuView.addSampleCard(
-            icon=":/gallery/images/controls/CommandBarFlyout.png",
-            title="CommandBarFlyout",
-            content=self.tr(
-                "A mini-toolbar displaying proactive commands, and an optional menu of commands."),
-            routeKey="menuInterface",
-            index=3
-        )
-        self.vBoxLayout.addWidget(menuView)
+            list_danmaku_data = []
+            for code, name in dict_code_name.items():
+                text = random.choice([code, name])
+                dict_item = {
+                    "text": text
+                    , "color": QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
+                    # "font_size": random.randint(16, 20),
+                    # "bold": random.choice([True, False]),
+                    # "opacity": random.uniform(0.3, 1.0),
+                }
 
-        # navigation
-        navigationView = SampleCardView(self.tr('Navigation'), self.view)
-        navigationView.addSampleCard(
-            icon=":/gallery/images/controls/BreadcrumbBar.png",
-            title="BreadcrumbBar",
-            content=self.tr(
-                "Shows the trail of navigation taken to the current location."),
-            routeKey="navigationViewInterface",
-            index=0
-        )
-        navigationView.addSampleCard(
-            icon=":/gallery/images/controls/Pivot.png",
-            title="Pivot",
-            content=self.tr(
-                "Presents information from different sources in a tabbed view."),
-            routeKey="navigationViewInterface",
-            index=1
-        )
-        navigationView.addSampleCard(
-            icon=":/gallery/images/controls/TabView.png",
-            title="TabView",
-            content=self.tr(
-                "Presents information from different sources in a tabbed view."),
-            routeKey="navigationViewInterface",
-            index=3
-        )
-        self.vBoxLayout.addWidget(navigationView)
+                list_danmaku_data.append(dict_item)
 
-        # scroll samples
-        scrollView = SampleCardView(self.tr('Scrolling samples'), self.view)
-        scrollView.addSampleCard(
-            icon=":/gallery/images/controls/ScrollViewer.png",
-            title="ScrollArea",
-            content=self.tr(
-                "A container control that lets the user pan and zoom its content smoothly."),
-            routeKey="scrollInterface",
-            index=0
-        )
-        scrollView.addSampleCard(
-            icon=":/gallery/images/controls/PipsPager.png",
-            title="PipsPager",
-            content=self.tr(
-                "A control to let the user navigate through a paginated collection when the page numbers do not need to be visually known."),
-            routeKey="scrollInterface",
-            index=3
-        )
-        self.vBoxLayout.addWidget(scrollView)
+            self.view.set_data(_make_sample_items_by_list(list_danmaku_data))
+            # self.view.update()
+        else:
+            print(f"查询股票信息失败！")
 
-        # state info samples
-        stateInfoView = SampleCardView(self.tr('Status & info samples'), self.view)
-        stateInfoView.addSampleCard(
-            icon=":/gallery/images/controls/ProgressRing.png",
-            title="StateToolTip",
-            content=self.tr(
-                "Shows the apps progress on a task, or that the app is performing ongoing work that does block user interaction."),
-            routeKey="statusInfoInterface",
-            index=0
-        )
-        stateInfoView.addSampleCard(
-            icon=":/gallery/images/controls/InfoBadge.png",
-            title="InfoBadge",
-            content=self.tr(
-                "An non-intrusive Ul to display notifications or bring focus to an area."),
-            routeKey="statusInfoInterface",
-            index=3
-        )
-        stateInfoView.addSampleCard(
-            icon=":/gallery/images/controls/InfoBar.png",
-            title="InfoBar",
-            content=self.tr(
-                "An inline message to display app-wide status change information."),
-            routeKey="statusInfoInterface",
-            index=4
-        )
-        stateInfoView.addSampleCard(
-            icon=":/gallery/images/controls/ProgressBar.png",
-            title="ProgressBar",
-            content=self.tr(
-                "Shows the apps progress on a task, or that the app is performing ongoing work that doesn't block user interaction."),
-            routeKey="statusInfoInterface",
-            index=8
-        )
-        stateInfoView.addSampleCard(
-            icon=":/gallery/images/controls/ProgressRing.png",
-            title="ProgressRing",
-            content=self.tr(
-                "Shows the apps progress on a task, or that the app is performing ongoing work that doesn't block user interaction."),
-            routeKey="statusInfoInterface",
-            index=10
-        )
-        stateInfoView.addSampleCard(
-            icon=":/gallery/images/controls/ToolTip.png",
-            title="ToolTip",
-            content=self.tr(
-                "Displays information for an element in a pop-up window."),
-            routeKey="statusInfoInterface",
-            index=1
-        )
-        self.vBoxLayout.addWidget(stateInfoView)
+    def slot_bao_stock_info_query_error(self, task_id, error):
+        pass
 
-        # text samples
-        textView = SampleCardView(self.tr('Text samples'), self.view)
-        textView.addSampleCard(
-            icon=":/gallery/images/controls/TextBox.png",
-            title="LineEdit",
-            content=self.tr("A single-line plain text field."),
-            routeKey="textInterface",
-            index=0
-        )
-        textView.addSampleCard(
-            icon=":/gallery/images/controls/PasswordBox.png",
-            title="PasswordLineEdit",
-            content=self.tr("A control for entering passwords."),
-            routeKey="textInterface",
-            index=2
-        )
-        textView.addSampleCard(
-            icon=":/gallery/images/controls/NumberBox.png",
-            title="SpinBox",
-            content=self.tr(
-                "A text control used for numeric input and evaluation of algebraic equations."),
-            routeKey="textInterface",
-            index=3
-        )
-        textView.addSampleCard(
-            icon=":/gallery/images/controls/RichEditBox.png",
-            title="TextEdit",
-            content=self.tr(
-                "A rich text editing control that supports formatted text, hyperlinks, and other rich content."),
-            routeKey="textInterface",
-            index=8
-        )
-        self.vBoxLayout.addWidget(textView)
+    def slot_danmaku_result_selected(self, item):
+        print(f"选中的弹幕：{item.text}")
+        self.result_selected.emit(item)
 
-        # view samples
-        collectionView = SampleCardView(self.tr('View samples'), self.view)
-        collectionView.addSampleCard(
-            icon=":/gallery/images/controls/ListView.png",
-            title="ListView",
-            content=self.tr(
-                "A control that presents a collection of items in a vertical list."),
-            routeKey="viewInterface",
-            index=0
-        )
-        collectionView.addSampleCard(
-            icon=":/gallery/images/controls/DataGrid.png",
-            title="TableView",
-            content=self.tr(
-                "The DataGrid control provides a flexible way to display a collection of data in rows and columns."),
-            routeKey="viewInterface",
-            index=1
-        )
-        collectionView.addSampleCard(
-            icon=":/gallery/images/controls/TreeView.png",
-            title="TreeView",
-            content=self.tr(
-                "The TreeView control is a hierarchical list pattern with expanding and collapsing nodes that contain nested items."),
-            routeKey="viewInterface",
-            index=2
-        )
-        collectionView.addSampleCard(
-            icon=":/gallery/images/controls/FlipView.png",
-            title="FlipView",
-            content=self.tr(
-                "Presents a collection of items that the user can flip through,one item at a time."),
-            routeKey="viewInterface",
-            index=4
-        )
-        self.vBoxLayout.addWidget(collectionView)
+    def slot_manual_select_clicked(self):
+        print(f"手动选择弹幕, self: {self}")
+        signalBus.switchToInterface.emit(self)

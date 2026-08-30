@@ -77,11 +77,19 @@ class MainWindow(FluentWindow):
 
     def init_connect(self):
         self.connectSignalToSlot()
+        self.homeInterface.manual_select_clicked.connect(lambda: self.switchTo(self.reviewInterface))
+        self.homeInterface.result_selected.connect(
+            lambda item: (
+                self.logger.info(f"选中 {item.text}")
+                
+            )
+        )
 
     def connectSignalToSlot(self):
         signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
         signalBus.switchToSampleCard.connect(self.switchToSample)
         signalBus.supportSignal.connect(self.onSupport)
+        
 
     def initNavigation(self):
 
@@ -135,6 +143,11 @@ class MainWindow(FluentWindow):
 
     def init_bao_stock_info(self):
         baostock_info_fetch_task = BaostockInfoFetchTask()
+
+        baostock_info_fetch_task.task_started.connect(self.homeInterface.slot_bao_stock_info_query_started)
+        baostock_info_fetch_task.task_completed.connect(self.homeInterface.slot_bao_stock_info_query_finished)
+        baostock_info_fetch_task.task_error.connect(self.homeInterface.slot_bao_stock_info_query_error)
+
         baostock_info_fetch_task.task_started.connect(self.reviewInterface.slot_bao_stock_info_query_started)
         baostock_info_fetch_task.task_completed.connect(self.reviewInterface.slot_bao_stock_info_query_finished)
         baostock_info_fetch_task.task_error.connect(self.reviewInterface.slot_bao_stock_info_query_error)

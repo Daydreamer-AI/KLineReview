@@ -46,6 +46,7 @@ class BaostockDataManager(QObject):
         # self.dict_stock_data = {}   # {'TimePeriod': {'code': DataFrame}}，示例：{'TimePeriod.Day': {'sh.600000': pd.DataFrame()}}
         self.dict_lastest_1d_stock_data = {}  # {code : pd.DataFrame}, 仅缓存最后一行数据用于快速加载股票list列表
         self.dict_stock_code_name = None      # {code : name}，按需构建的“个股代码-名称”映射缓存
+        self.dict_name_code = None            # {name : code}，按需构建的“个股名称-代码”映射缓存
 
         self.stock_info_db_base = StockInfoDBBasePool().get_manager(1)
         self.stock_db_base = StockDbBase("./data/database/stocks/db/baostock")
@@ -90,6 +91,30 @@ class BaostockDataManager(QObject):
 
         self.dict_stock_code_name = dict_code_name
         return dict_code_name
+
+    def get_name_code_dict(self, code_column_name='code', name_column_name='name'):
+            """从本地股票信息库同步构建 {code: name} 映射（不依赖后台日线缓存）。
+    
+            供复盘随机选股及后续需要“个股代码-名称”的功能使用；结果按需缓存。
+            """
+            if self.dict_name_code is not None:
+                return self.dict_name_code
+    
+            with self.lock:
+                dict_stocks_info = self.dict_stocks_info
+    
+            dict_name_code = {}
+            for board_name, board_data in dict_stocks_info.items():
+                if board_data is None or board_data.empty:
+                    continue
+                for index, row in board_data.iterrows():
+                    code = row.get(code_column_name)
+                    name = row.get(name_column_name, '未知')
+                    if name and name not in dict_name_code:
+                        dict_name_code[name] = code
+    
+            self.dict_name_code = dict_name_code
+            return dict_name_code
 
     def get_code_name_complete_list(self):
         """获取所有股票代码-名称列表。
