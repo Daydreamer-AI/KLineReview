@@ -449,6 +449,7 @@ class DanmakuReviewWidget(QWidget):
     # 结果展示（遮罩高亮）
     # ==================================================================
     def _show_result(self, item):
+        self.set_buttons_visible(False)
         self._result_text = item.text
         self._result = item
         self._result_visible = True
@@ -459,6 +460,7 @@ class DanmakuReviewWidget(QWidget):
             self._result_hide_timer.start(self._result_hide_ms)
 
     def hide_result(self):
+        self.set_buttons_visible(True)
         self._result_visible = False
         self._result_text = ""
         self._result_hide_timer.stop()
@@ -710,7 +712,7 @@ if __name__ == "__main__":
     w.danmaku.set_stop_mode(DanmakuReviewWidget.STOP_AUTO)
     w.danmaku.set_result_hide_mode(DanmakuReviewWidget.RESULT_HIDE_AUTO, duration_ms=4000)
     w.danmaku.global_opacity = 0.9
-    w.danmaku.set_track_count(6)
+    w.danmaku.set_track_count(12)
     w.show()
 
     # 演示：3 秒后"内定"一次结果（下一次点击直接命中）
