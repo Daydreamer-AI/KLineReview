@@ -663,9 +663,7 @@ class ReviewWidget(QWidget):
     def slot_current_animation_index_changed(self, index):
         # self.logger.info(f"收到k线图进度: {index}")
 
-        self.horizontalSlider_progress.blockSignals(True)
-        self.horizontalSlider_progress.setSliderPosition(index)
-        self.horizontalSlider_progress.blockSignals(False)
+        self.horizontalSlider_progress.setValue(index)
 
         self.update_progress_label(index)
 
@@ -692,12 +690,10 @@ class ReviewWidget(QWidget):
             self.logger.info("回放动画初始化成功")
             self.dict_progress_data = dict_progress_data
             if self.dict_progress_data is not None and self.dict_progress_data != {}:
-                self.horizontalSlider_progress.setMinimum(self.dict_progress_data['min_index'])
-                self.horizontalSlider_progress.setMaximum(self.dict_progress_data['max_index'])
 
-                self.horizontalSlider_progress.blockSignals(True)
-                self.horizontalSlider_progress.setSliderPosition(self.dict_progress_data['start_date_index'])
-                self.horizontalSlider_progress.blockSignals(False)
+                self.horizontalSlider_progress.setRange(self.dict_progress_data['min_index'], self.dict_progress_data['max_index'])
+
+                self.horizontalSlider_progress.setValue(self.dict_progress_data['start_date_index'])
 
                 self.update_progress_label(self.dict_progress_data['start_date_index'])
 
