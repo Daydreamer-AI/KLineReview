@@ -28,6 +28,9 @@ from PyQt5.QtGui import (
     QPainter, QColor, QFont, QFontMetrics, QPen, QBrush, QPainterPath, QIcon,
 )
 
+from gui.qt_widgets.MComponents.qfluentwidgets.window.fluent_window import FluentWidget
+
+
 
 # ----------------------------------------------------------------------
 # 数据模型（Model）
@@ -155,7 +158,7 @@ class DiceButton(QPushButton):
 # ----------------------------------------------------------------------
 # 主控件
 # ----------------------------------------------------------------------
-class DanmakuReviewWidget(QWidget):
+class DanmakuReviewWidget(FluentWidget):
     """
     弹幕抽奖控件。
     - 数据通过 set_data() 外部传入
@@ -225,7 +228,7 @@ class DanmakuReviewWidget(QWidget):
         self._root = QVBoxLayout(self)
         self._root.setContentsMargins(0, 0, 0, 0)
 
-        self._center_container = QWidget(self)
+        self._center_container = FluentWidget(self)
         layout = QVBoxLayout(self._center_container)
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(18)
@@ -599,7 +602,7 @@ class DanmakuReviewWidget(QWidget):
 # ----------------------------------------------------------------------
 # 历史记录独立展示控件（配套）
 # ----------------------------------------------------------------------
-class ResultHistoryWidget(QWidget):
+class ResultHistoryWidget(FluentWidget):
     """抽奖结果历史列表控件"""
 
     item_clicked = pyqtSignal(object)
@@ -642,7 +645,7 @@ class ResultHistoryWidget(QWidget):
 # ----------------------------------------------------------------------
 # 组合主窗口（弹幕 + 历史，演示用）
 # ----------------------------------------------------------------------
-class DanmakuReviewWindow(QWidget):
+class DanmakuReviewWindow(FluentWidget):
     """完整窗口：弹幕抽奖区 + 底部历史记录区"""
 
     def __init__(self, parent=None):
