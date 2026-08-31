@@ -18,6 +18,8 @@ from manager.review_demo_trading_manager import ReviewDemoTradingManager
 
 from common.common_api import *
 
+from gui.qt_widgets.common.icon import Icon
+
 # 共享的提升控件注册辅助：把 .ui 中提升的 qfluentwidgets 控件按完整包路径加载，
 # 并注册到 sys.modules 的裸名上，使 uic 解析时命中的是包内模块（相对导入正常）。
 from gui.qt_widgets.MComponents.qfluentwidgets.ensure_promoted_qfluent_widgets import ensure_promoted_widgets
@@ -92,20 +94,20 @@ class ReviewWidget(QWidget):
 
         # self.btn_load_data_random.setAutoDefault(False)
         # self.btn_load_data_random.setDefault(False)
-        self.btn_load_data_random.setIcon(QtGui.QIcon(":/icon/general/random_normal.svg"))
+        self.btn_load_data_random.setIcon(Icon.DICE)
 
         self.btn_load_data.setAutoDefault(False)
         self.btn_load_data.setDefault(False)
 
-        self.btn_back_to_front.setIcon(QtGui.QIcon(":/icon/general/fast_backward_to_the_head_normal.svg"))
-        self.btn_back_ten.setIcon(QtGui.QIcon(":/icon/general/fast_backward_normal.svg"))
-        self.btn_back.setIcon(QtGui.QIcon(":/icon/general/backward_normal.svg"))
+        self.btn_back_to_front.setIcon(Icon.FAST_BACKWARD_TO_HEAD)
+        self.btn_back_ten.setIcon(Icon.FAST_BACKWARD)
+        self.btn_back.setIcon(Icon.BACKWARD)
 
-        self.btn_play.setIcon(QtGui.QIcon(":/icon/general/play_with_border_normal.svg"))
+        self.btn_play.setIcon(Icon.PLAY)
 
-        self.btn_move_on.setIcon(QtGui.QIcon(":/icon/general/forward_normal.svg"))
-        self.btn_move_on_10.setIcon(QtGui.QIcon(":/icon/general/fast_forward_normal.svg"))
-        self.btn_move_to_last.setIcon(QtGui.QIcon(":/icon/general/fast_forward_to_the_end_normal.svg"))
+        self.btn_move_on.setIcon(Icon.FORWARD)
+        self.btn_move_on_10.setIcon(Icon.FAST_FORWARD)
+        self.btn_move_to_last.setIcon(Icon.FAST_FORWARD_TO_END)
 
         self.playing_enabled(True, True)
 
@@ -777,13 +779,13 @@ class ReviewWidget(QWidget):
             self.logger.info("暂停播放")
             self.indicators_view_widget.pause_animation()
             self.btn_play.setProperty("is_play", False)
-            self.btn_play.setIcon(QtGui.QIcon(":/icon/general/play_with_border_normal.svg"))
+            self.btn_play.setIcon(Icon.PLAY)
             self.playing_enabled(False)
         else:
             self.logger.info("开始播放")
             self.indicators_view_widget.start_animation()
             self.btn_play.setProperty("is_play", True)
-            self.btn_play.setIcon(QtGui.QIcon(":/icon/general/pause_with_border_normal.svg"))
+            self.btn_play.setIcon(Icon.PAUSE)
             self.playing_enabled(True)
 
         self.btn_play.style().unpolish(self.btn_play)

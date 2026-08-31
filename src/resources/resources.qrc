@@ -189,5 +189,15 @@
         <file>qss/dark/setting_interface.qss</file>
         <file>images/icons/Review_black.svg</file>
         <file>images/icons/Review_white.svg</file>
+        <file>images/icons/backward_black.svg</file>
+        <file>images/icons/dice_black.svg</file>
+        <file>images/icons/dice_white.svg</file>
+        <file>images/icons/fast_backward_black.svg</file>
+        <file>images/icons/fast_backward_to_the_head_black.svg</file>
+        <file>images/icons/fast_forward_black.svg</file>
+        <file>images/icons/fast_forward_to_the_end_black.svg</file>
+        <file>images/icons/pause_with_border_black.svg</file>
+        <file>images/icons/play_with_border_black.svg</file>
+        <file>images/icons/forward_black.svg</file>
     </qresource>
 </RCC>

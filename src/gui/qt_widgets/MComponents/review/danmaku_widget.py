@@ -22,11 +22,13 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import (
     Qt, QTimer, QPropertyAnimation, QParallelAnimationGroup, QPointF, QRectF,
-    QObject, pyqtProperty, pyqtSignal, QElapsedTimer,
+    QObject, pyqtProperty, pyqtSignal, QElapsedTimer,QSize
 )
 from PyQt5.QtGui import (
     QPainter, QColor, QFont, QFontMetrics, QPen, QBrush, QPainterPath, QIcon,
 )
+
+from ..qfluentwidgets.components.widgets.button import TransparentPushButton, TransparentToolButton
 
 
 # ----------------------------------------------------------------------
@@ -82,7 +84,7 @@ class _LiveDanmaku:
 # ----------------------------------------------------------------------
 # 中心主按钮（带动画）
 # ----------------------------------------------------------------------
-class DiceButton(QPushButton):
+class DiceButton(TransparentToolButton):
     """图标按钮，点击时播放筛子摇动动画（旋转 + 缩放）"""
 
     def __init__(self, parent=None):
@@ -91,6 +93,7 @@ class DiceButton(QPushButton):
         self._scale = 1.0
         self.setCursor(Qt.PointingHandCursor)
         self.setFixedSize(96, 96)
+        self.setIconSize(QSize(96, 96))
 
     def _get_rotation(self):
         return self._rotation
@@ -113,16 +116,16 @@ class DiceButton(QPushButton):
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        p.setBrush(QBrush(QColor(40, 44, 52)))
+        # p.setBrush(QBrush(QColor(40, 44, 52)))
         p.setPen(Qt.NoPen)
-        p.drawEllipse(self.rect().adjusted(4, 4, -4, -4))
+        # p.drawEllipse(self.rect().adjusted(4, 4, -4, -4))
         p.translate(self.width() / 2, self.height() / 2)
         p.rotate(self._rotation)
         p.scale(self._scale, self._scale)
         icon = self.icon()
         if not icon.isNull():
-            pix = icon.pixmap(56, 56)
-            p.drawPixmap(int(-pix.width() / 2), int(-pix.height() / 2), pix)
+            pix = icon.pixmap(self.iconSize())
+            p.drawPixmap(QPointF(pix.width() / 2, pix.height() / 2), pix)
         else:
             p.setPen(QPen(QColor("#FFD700")))
             p.setFont(QFont("Arial", 32, QFont.Bold))
@@ -234,14 +237,14 @@ class DanmakuReviewWidget(QWidget):
         layout.addWidget(self.main_btn, alignment=Qt.AlignCenter)
         self.main_btn.clicked.connect(self.on_main_clicked)
 
-        self.sub_btn = QPushButton("手动选择", self._center_container)
+        self.sub_btn = TransparentPushButton(self.tr("Manual choice"), self._center_container)
         self.sub_btn.setCursor(Qt.PointingHandCursor)
         self.sub_btn.setFlat(True)
-        self.sub_btn.setStyleSheet(
-            "QPushButton{color:#AAAAAA;font-size:14px;background:transparent;"
-            "border:none;text-decoration:underline;padding:4px 8px;}"
-            "QPushButton:hover{color:#FFFFFF;}"
-        )
+        # self.sub_btn.setStyleSheet(
+        #     "QPushButton{color:#AAAAAA;font-size:14px;background:transparent;"
+        #     "border:none;text-decoration:underline;padding:4px 8px;}"
+        #     "QPushButton:hover{color:#FFFFFF;}"
+        # )
         layout.addWidget(self.sub_btn, alignment=Qt.AlignCenter)
         self.sub_btn.clicked.connect(self.manual_select_clicked.emit)
 
@@ -421,7 +424,7 @@ class DanmakuReviewWidget(QWidget):
             return
         self._is_rolling = True
         self.set_speed_factor(4.0)
-        self.main_btn.play_animation(duration=1200, on_finished=self._on_anim_finished)
+        self.main_btn.play_animation(duration=3000, on_finished=self._on_anim_finished)
 
     def _on_anim_finished(self):
         self.animation_finished.emit()

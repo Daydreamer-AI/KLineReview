@@ -180,10 +180,6 @@ class MainWindow(FluentWindow):
             self.themeListener.terminate()
             self.themeListener.deleteLater()
             super().closeEvent(e)
-            
-        else:
-            super().ignore()
-
         
 
     def _onThemeChangedFinished(self):

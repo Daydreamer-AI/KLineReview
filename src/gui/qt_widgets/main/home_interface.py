@@ -9,6 +9,7 @@ from manager.bao_stock_data_manager import BaostockDataManager
 
 from ..common.style_sheet import StyleSheet
 from ..common.signal_bus import signalBus
+from ..common.icon import Icon
 
 import random
 
@@ -33,6 +34,7 @@ class HomeInterface(ScrollArea):
         self.view.set_result_hide_mode(DanmakuReviewWidget.RESULT_HIDE_AUTO, duration_ms=3000)
         self.view.global_opacity = 1
         self.view.set_track_count(8)
+        self.view.set_main_icon(Icon.DICE)
 
         self.setObjectName('homeInterface')
         StyleSheet.HOME_INTERFACE.apply(self)
@@ -75,7 +77,7 @@ class HomeInterface(ScrollArea):
                 list_danmaku_data.append(dict_item)
 
             self.view.set_data(_make_sample_items_by_list(list_danmaku_data))
-            # self.view.update()
+
         else:
             print(f"查询股票信息失败！")
 
