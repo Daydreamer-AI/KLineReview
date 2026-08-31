@@ -85,21 +85,19 @@ class _LiveDanmaku:
 # 中心主按钮（带动画）
 # ----------------------------------------------------------------------
 class DiceButton(TransparentToolButton):
-    """图标按钮，点击时播放筛子摇动动画（旋转 + 缩放 + 抖动）"""
+    """图标按钮，点击时播放骰子摇动动画（旋转 + 缩放 + 位置抖动）"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._rotation = 0.0
         self._scale = 1.0
-        self._offset_x = 0.0
-        self._offset_y = 0.0
-        self.anim_group = None
-        
+        self._offset_x = 0.0  # X 轴偏移
+        self._offset_y = 0.0  # Y 轴偏移
         self.setCursor(Qt.PointingHandCursor)
-        self.setFixedSize(320, 320)
-        self.setIconSize(QSize(160, 160))
+        self.setFixedSize(400, 400)
+        # icon 缩小，给缩放和抖动留出余量
+        self.setIconSize(QSize(200, 200))
 
-    # ========== 旋转属性 ==========
     def _get_rotation(self):
         return self._rotation
 
@@ -107,9 +105,6 @@ class DiceButton(TransparentToolButton):
         self._rotation = v
         self.update()
 
-    btn_rotation = pyqtProperty(float, _get_rotation, _set_rotation)
-
-    # ========== 缩放属性 ==========
     def _get_scale(self):
         return self._scale
 
@@ -117,9 +112,7 @@ class DiceButton(TransparentToolButton):
         self._scale = v
         self.update()
 
-    btn_scale = pyqtProperty(float, _get_scale, _set_scale)
-
-    # ========== 偏移属性（新增，用于抖动效果）==========
+    # 偏移量的 getter/setter
     def _get_offset_x(self):
         return self._offset_x
 
@@ -134,6 +127,9 @@ class DiceButton(TransparentToolButton):
         self._offset_y = v
         self.update()
 
+    btn_rotation = pyqtProperty(float, _get_rotation, _set_rotation)
+    btn_scale = pyqtProperty(float, _get_scale, _set_scale)
+    # 注册为 Qt 属性，供动画引擎驱动
     btn_offset_x = pyqtProperty(float, _get_offset_x, _set_offset_x)
     btn_offset_y = pyqtProperty(float, _get_offset_y, _set_offset_y)
 
@@ -142,19 +138,12 @@ class DiceButton(TransparentToolButton):
         p.setRenderHint(QPainter.Antialiasing)
         p.setPen(Qt.NoPen)
 
-        # 绘制背景
-        # p.setBrush(QBrush(QColor("EFFE4F")))
+        # p.setBrush(QBrush(QColor("BDBDBD")))
         # p.drawRect(self.rect())
         
         p.save()
-        
-        # 平移到中心
         p.translate(self.width() / 2, self.height() / 2)
-        
-        # 应用位置偏移（抖动效果）
         p.translate(self._offset_x, self._offset_y)
-        
-        # 应用旋转和缩放
         p.rotate(self._rotation)
         p.scale(self._scale, self._scale)
         
@@ -162,92 +151,77 @@ class DiceButton(TransparentToolButton):
         size = self.iconSize()
         if not icon.isNull():
             rect = QRect(-size.width() // 2, -size.height() // 2, 
-                        size.width(), size.height())
+                         size.width(), size.height())
             icon.paint(p, rect)
         else:
             p.setPen(QPen(QColor("#FFD700")))
             p.setFont(QFont("Arial", 32, QFont.Bold))
-            p.drawText(QRectF(-30, -30, 60, 60), Qt.AlignCenter, "\uD83C\uDFB2")
+            p.drawText(QRect(-30, -30, 60, 60), Qt.AlignCenter, "\uD83C\uDFB2")
         
         p.restore()
 
-    def play_animation(self, duration=1500, on_finished=None):
-        """
-        播放激烈的摇骰子动画
-        
-        Args:
-            duration: 动画时长（毫秒），建议 1200-2000
-            on_finished: 动画结束回调
-        """
-        # 停止并清理旧动画
-        if self.anim_group:
-            self.anim_group.stop()
-            self.anim_group.deleteLater()
-        
-        # 重置状态
-        self._rotation = 0.0
-        self._scale = 1.0
-        self._offset_x = 0.0
-        self._offset_y = 0.0
-        self.update()
-        
+    def play_animation(self, duration=1200, on_finished=None):
         self.anim_group = QParallelAnimationGroup(self)
-        
-        # ===== 1. 旋转动画：4圈快速旋转 =====
+
+        # ===== 旋转：4圈快速旋转，逐渐减速 =====
         rot = QPropertyAnimation(self, b"btn_rotation")
         rot.setDuration(duration)
-        rot.setStartValue(0.0)
-        rot.setEndValue(1440.0)  # 4圈 = 1440度
-        rot.setEasingCurve(QEasingCurve.OutQuart)  # 快速启动，缓慢停止
+        rot.setStartValue(0)
+        rot.setEndValue(1440)  # 4圈 = 1440°
+        rot.setEasingCurve(QEasingCurve.OutQuart)  # 快起慢停
         self.anim_group.addAnimation(rot)
-        
-        # ===== 2. 缩放动画：剧烈弹跳 =====
+
+        # ===== 缩放：剧烈弹跳 =====
         scl = QPropertyAnimation(self, b"btn_scale")
         scl.setDuration(duration)
         scl.setKeyValueAt(0.0, 1.0)
-        scl.setKeyValueAt(0.10, 1.6)   # 快速放大
-        scl.setKeyValueAt(0.25, 0.5)   # 剧烈收缩
-        scl.setKeyValueAt(0.40, 1.45)  # 再次放大
-        scl.setKeyValueAt(0.55, 0.65)  # 收缩
-        scl.setKeyValueAt(0.70, 1.25)  # 放大
-        scl.setKeyValueAt(0.85, 0.85)  # 轻微收缩
-        scl.setKeyValueAt(1.0, 1.0)    # 恢复
-        scl.setEasingCurve(QEasingCurve.OutBounce)  # 弹跳缓动
+        scl.setKeyValueAt(0.12, 1.55)   # 猛放大
+        scl.setKeyValueAt(0.28, 0.55)   # 猛缩小（"砸向桌面"）
+        scl.setKeyValueAt(0.42, 1.40)   # 弹起
+        scl.setKeyValueAt(0.56, 0.65)   # 再落下
+        scl.setKeyValueAt(0.70, 1.20)   # 小幅弹起
+        scl.setKeyValueAt(0.85, 0.90)   # 微缩
+        scl.setKeyValueAt(1.0, 1.0)     # 归位
+        scl.setEasingCurve(QEasingCurve.OutBounce)  # 落地弹跳感
         self.anim_group.addAnimation(scl)
-        
-        # ===== 3. 位置抖动动画：模拟骰子跳动 =====
-        # X 方向抖动（幅度较小）
-        offset_x_anim = QPropertyAnimation(self, b"btn_offset_x")
-        offset_x_anim.setDuration(duration)
-        offset_x_anim.setKeyValueAt(0.0, 0.0)
-        steps = 10
-        for i in range(1, steps):
-            t = i / steps
-            decay = (1.0 - t) ** 1.5  # 非线性衰减，后期抖动更快减弱
-            val = random.uniform(-18, 18) * decay
-            offset_x_anim.setKeyValueAt(t, val)
-        offset_x_anim.setKeyValueAt(1.0, 0.0)
-        offset_x_anim.setEasingCurve(QEasingCurve.OutQuad)
-        self.anim_group.addAnimation(offset_x_anim)
-        
-        # Y 方向抖动（幅度较大，模拟上下跳动）
-        offset_y_anim = QPropertyAnimation(self, b"btn_offset_y")
-        offset_y_anim.setDuration(duration)
-        offset_y_anim.setKeyValueAt(0.0, 0.0)
-        for i in range(1, steps):
-            t = i / steps
-            decay = (1.0 - t) ** 1.5
-            val = random.uniform(-25, 25) * decay
-            offset_y_anim.setKeyValueAt(t, val)
-        offset_y_anim.setKeyValueAt(1.0, 0.0)
-        offset_y_anim.setEasingCurve(QEasingCurve.OutQuad)
-        self.anim_group.addAnimation(offset_y_anim)
-        
-        # 连接完成信号
+
+        # ===== X 轴随机抖动 =====
+        off_x = QPropertyAnimation(self, b"btn_offset_x")
+        off_x.setDuration(duration)
+        off_x.setKeyValueAt(0.00, 0)
+        off_x.setKeyValueAt(0.10, random.uniform(-18, 18))
+        off_x.setKeyValueAt(0.20, random.uniform(-15, 15))
+        off_x.setKeyValueAt(0.30, random.uniform(-12, 12))
+        off_x.setKeyValueAt(0.42, random.uniform(-10, 10))
+        off_x.setKeyValueAt(0.55, random.uniform(-6, 6))
+        off_x.setKeyValueAt(0.68, random.uniform(-4, 4))
+        off_x.setKeyValueAt(0.80, random.uniform(-2, 2))
+        off_x.setKeyValueAt(0.90, random.uniform(-1, 1))
+        off_x.setKeyValueAt(1.0, 0)
+        off_x.setEasingCurve(QEasingCurve.OutQuad)  # 抖动逐渐衰减
+        self.anim_group.addAnimation(off_x)
+
+        # ===== Y 轴随机抖动 =====
+        off_y = QPropertyAnimation(self, b"btn_offset_y")
+        off_y.setDuration(duration)
+        off_y.setKeyValueAt(0.00, 0)
+        off_y.setKeyValueAt(0.10, random.uniform(-18, 18))
+        off_y.setKeyValueAt(0.20, random.uniform(-15, 15))
+        off_y.setKeyValueAt(0.30, random.uniform(-12, 12))
+        off_y.setKeyValueAt(0.42, random.uniform(-10, 10))
+        off_y.setKeyValueAt(0.55, random.uniform(-6, 6))
+        off_y.setKeyValueAt(0.68, random.uniform(-4, 4))
+        off_y.setKeyValueAt(0.80, random.uniform(-2, 2))
+        off_y.setKeyValueAt(0.90, random.uniform(-1, 1))
+        off_y.setKeyValueAt(1.0, 0)
+        off_y.setEasingCurve(QEasingCurve.OutQuad)  # 抖动逐渐衰减
+        self.anim_group.addAnimation(off_y)
+
         if on_finished:
             self.anim_group.finished.connect(on_finished)
         
         self.anim_group.start()
+
 
 # ----------------------------------------------------------------------
 # 主控件
