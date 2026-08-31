@@ -238,6 +238,7 @@ class DanmakuReviewWidget(QWidget):
     """
 
     result_selected = pyqtSignal(object)
+    main_button_clicked = pyqtSignal()
     manual_select_clicked = pyqtSignal()
     animation_finished = pyqtSignal()
 
@@ -492,6 +493,7 @@ class DanmakuReviewWidget(QWidget):
         if self._is_rolling or not self._items:
             return
         self._is_rolling = True
+        self.main_button_clicked.emit()
         self.set_speed_factor(4.0)
         self.main_btn.play_animation(duration=3000, on_finished=self._on_anim_finished)
 
@@ -515,7 +517,7 @@ class DanmakuReviewWidget(QWidget):
             chosen = random.choice(self._items)
         self._result = chosen
         self._show_result(chosen)
-        self.result_selected.emit(chosen)
+        # self.result_selected.emit(chosen)
 
     # ==================================================================
     # 结果展示（遮罩高亮）
@@ -532,6 +534,7 @@ class DanmakuReviewWidget(QWidget):
             self._result_hide_timer.start(self._result_hide_ms)
 
     def hide_result(self):
+        self.result_selected.emit(self._result)
         self.set_buttons_visible(True)
         self._result_visible = False
         self._result_text = ""

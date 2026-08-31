@@ -7,6 +7,8 @@ from gui.qt_widgets.MComponents.qfluentwidgets import ScrollArea, isDarkTheme, F
 from gui.qt_widgets.MComponents.review.danmaku_widget import DanmakuReviewWidget, _make_sample_items, _make_sample_items_by_list
 from manager.bao_stock_data_manager import BaostockDataManager
 
+from manager.logging_manager import get_logger
+
 from ..common.style_sheet import StyleSheet
 from ..common.signal_bus import signalBus
 from ..common.icon import Icon
@@ -15,10 +17,13 @@ import random
 
 class HomeInterface(ScrollArea):
     """ Home interface """
-    result_selected = pyqtSignal(object)
-    manual_select_clicked = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
+
+        self.logger = get_logger(__name__)
+        self.dict_code_index = {}
+
         self.view = DanmakuReviewWidget(self)
         self.vBoxLayout = QVBoxLayout(self.view)
 
@@ -48,11 +53,20 @@ class HomeInterface(ScrollArea):
         self.vBoxLayout.setAlignment(Qt.AlignTop)
 
     def __init_connect(self):
-        self.view.result_selected.connect(self.slot_danmaku_result_selected)
-        self.view.manual_select_clicked.connect(self.manual_select_clicked)
+        pass
 
     def load_sample_data(self):
         self.view.set_data(_make_sample_items())
+
+    def set_fixed_result(self, dict_data):
+        code = dict_data['code']
+        name = dict_data['name']
+        date = dict_data['date']
+        period = dict_data['period']
+        self.logger.info(f"设置内定数据：{code}, {name}, {date}, {period}")
+        if code in self.dict_code_index:
+            self.view.set_fixed_result(self.dict_code_index[code])
+        
     def slot_bao_stock_info_query_started(self, task_id):
         pass
 
@@ -61,8 +75,9 @@ class HomeInterface(ScrollArea):
 
             dict_code_name = BaostockDataManager().get_all_stock_code_name_dict()
 
-            # print(f"dict_code_name长度：{dict_code_name}")
-
+            # self.logger.info(f"dict_code_name长度：{dict_code_name}")
+            self.dict_code_index.clear()
+            index = 0
             list_danmaku_data = []
             for code, name in dict_code_name.items():
                 text = random.choice([code, name])
@@ -76,18 +91,13 @@ class HomeInterface(ScrollArea):
 
                 list_danmaku_data.append(dict_item)
 
+                self.dict_code_index[code] = index
+                index += 1
+
             self.view.set_data(_make_sample_items_by_list(list_danmaku_data))
 
         else:
-            print(f"查询股票信息失败！")
+            self.logger.info(f"查询股票信息失败！")
 
     def slot_bao_stock_info_query_error(self, task_id, error):
         pass
-
-    def slot_danmaku_result_selected(self, item):
-        print(f"选中的弹幕：{item.text}")
-        self.result_selected.emit(item)
-
-    def slot_manual_select_clicked(self):
-        print(f"手动选择弹幕, self: {self}")
-        signalBus.switchToInterface.emit(self)

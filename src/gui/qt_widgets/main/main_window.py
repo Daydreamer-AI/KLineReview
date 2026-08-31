@@ -77,13 +77,17 @@ class MainWindow(FluentWindow):
 
     def init_connect(self):
         self.connectSignalToSlot()
-        self.homeInterface.manual_select_clicked.connect(lambda: self.switchTo(self.reviewInterface))
-        self.homeInterface.result_selected.connect(
+
+        self.homeInterface.view.main_button_clicked.connect(self.reviewInterface.view.slot_home_main_button_clicked)
+        self.homeInterface.view.manual_select_clicked.connect(lambda: self.switchTo(self.reviewInterface))
+        self.homeInterface.view.result_selected.connect(
             lambda item: (
-                self.logger.info(f"选中 {item.text}")
-                
+                self.logger.info(f"选中 {item.text}"),
+                self.switchTo(self.reviewInterface)
             )
         )
+
+        self.reviewInterface.view.random_data_generated.connect(lambda dict: self.homeInterface.set_fixed_result(dict))
 
     def connectSignalToSlot(self):
         signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)

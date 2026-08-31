@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, uic, QtGui
 from PyQt5.QtWidgets import QWidget, QCompleter, QMessageBox, QListWidget, QListWidgetItem, QButtonGroup
-from PyQt5.QtCore import QDate, QFile, Qt
+from PyQt5.QtCore import QDate, QFile, Qt, pyqtSignal
 
 import random
 import pandas as pd
@@ -28,6 +28,9 @@ ensure_promoted_widgets()
 
 
 class ReviewWidget(QWidget):
+
+    random_data_generated = pyqtSignal(object)
+
     # 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
     _DEFAULT_LOAD_PERIODS = [
         # TimePeriod.MINUTE_5,
@@ -754,6 +757,15 @@ class ReviewWidget(QWidget):
         period = self.btn_period_select.currentText()
         self.logger.info(f"点击随机加载数据: {code}, {date}, {period}")
 
+        dict_random_data = {
+            "code": code,
+            "name": name,
+            "date": date,
+            "period": period
+
+        }
+        self.random_data_generated.emit(dict_random_data)
+
         complete_text = BaostockDataManager().get_complete_text(code, name)
         self.lineEdit_code.blockSignals(True)
         self.lineEdit_code.setText(complete_text)
@@ -947,5 +959,9 @@ class ReviewWidget(QWidget):
 
     def slot_demo_trading_record_widget_sig_btn_return_clicked(self):
         self.stackedWidget_trading_record.setCurrentWidget(self.listWidget_trading_record)
+
+    def slot_home_main_button_clicked(self):
+        self.logger.info("主界面按钮点击响应，加载随机数据")
+        self.slot_btn_load_data_random_clicked()
 
 
