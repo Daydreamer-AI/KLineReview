@@ -66,14 +66,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_volume">
+       <widget class="BodyLabel" name="label_volume">
         <property name="text">
          <string>成交量</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_total_volume">
+       <widget class="BodyLabel" name="label_total_volume">
         <property name="text">
          <string>总量：</string>
         </property>
@@ -161,6 +161,11 @@
    <class>TransparentToolButton</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>label</header>
   </customwidget>
  </customwidgets>
  <resources/>

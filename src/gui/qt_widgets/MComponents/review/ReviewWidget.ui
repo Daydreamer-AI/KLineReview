@@ -71,7 +71,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QLabel" name="label_date_title">
+             <widget class="BodyLabel" name="label_date_title">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -109,7 +109,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_6">
+             <widget class="BodyLabel" name="label_6">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -435,7 +435,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="label_3">
+         <widget class="BodyLabel" name="label_3">
           <property name="text">
            <string>进度：</string>
           </property>
@@ -461,7 +461,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_progress">
+         <widget class="BodyLabel" name="label_progress">
           <property name="text">
            <string>50/100</string>
           </property>
@@ -472,14 +472,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
-         <widget class="QLabel" name="label_4">
+         <widget class="BodyLabel" name="label_4">
           <property name="text">
            <string>总资产：</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_total_assets">
+         <widget class="BodyLabel" name="label_total_assets">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -516,14 +516,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label_8">
+         <widget class="BodyLabel" name="label_8">
           <property name="text">
            <string>可用余额：</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_available_balance">
+         <widget class="BodyLabel" name="label_available_balance">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -546,25 +546,12 @@
           </property>
          </widget>
         </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
        </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
-         <widget class="QLabel" name="label_price">
+         <widget class="BodyLabel" name="label_price">
           <property name="text">
            <string>价格：</string>
           </property>
@@ -598,7 +585,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_count">
+         <widget class="BodyLabel" name="label_count">
           <property name="text">
            <string>股数：</string>
           </property>
@@ -635,7 +622,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_9">
+         <widget class="BodyLabel" name="label_9">
           <property name="text">
            <string>金额：</string>
           </property>
@@ -676,7 +663,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
-         <widget class="QLabel" name="label_7">
+         <widget class="BodyLabel" name="label_7">
           <property name="text">
            <string>比例：</string>
           </property>
@@ -928,7 +915,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="BodyLabel" name="label">
            <property name="text">
             <string>模拟交易</string>
            </property>
@@ -1008,6 +995,11 @@
    <class>ToggleButton</class>
    <extends>QPushButton</extends>
    <header location="global">button</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>label</header>
   </customwidget>
  </customwidgets>
  <resources>

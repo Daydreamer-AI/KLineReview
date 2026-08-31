@@ -19,14 +19,14 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QLabel" name="label_name">
+        <widget class="BodyLabel" name="label_name">
          <property name="text">
           <string>名称</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_code">
+        <widget class="BodyLabel" name="label_code">
          <property name="text">
           <string>代码</string>
          </property>
@@ -35,7 +35,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="label_status">
+      <widget class="BodyLabel" name="label_status">
        <property name="text">
         <string>状态</string>
        </property>
@@ -45,7 +45,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_trading_yield">
+      <widget class="BodyLabel" name="label_trading_yield">
        <property name="text">
         <string>收益率</string>
        </property>
@@ -58,6 +58,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

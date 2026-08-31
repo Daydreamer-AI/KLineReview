@@ -17,6 +17,14 @@ class Icon(FluentIconBase, Enum):
     FAST_FORWARD = "fast_forward"
     FAST_FORWARD_TO_END = "fast_forward_to_the_end"
 
+    RESET = "reset"
+    ZOOM_IN = "zoom_in"
+    ZOOM_OUT = "zoom_out"
+    SETTING = "setting"
+    CLOSE = "close"
+
+    RETURN = "return"
+
 
     def path(self, theme=Theme.AUTO):
         return f":/images/icons/{self.value}_{getIconColor(theme)}.svg"

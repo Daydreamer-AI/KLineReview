@@ -199,5 +199,25 @@
         <file>images/icons/pause_with_border_black.svg</file>
         <file>images/icons/play_with_border_black.svg</file>
         <file>images/icons/forward_black.svg</file>
+        <file>images/icons/fast_forward_to_the_end_white.svg</file>
+        <file>images/icons/fast_backward_to_the_head_white.svg</file>
+        <file>images/icons/pause_with_border_white.svg</file>
+        <file>images/icons/play_with_border_white.svg</file>
+        <file>images/icons/fast_forward_white.svg</file>
+        <file>images/icons/forward_white.svg</file>
+        <file>images/icons/fast_backward_white.svg</file>
+        <file>images/icons/backward_white.svg</file>
+        <file>images/icons/reset_white.svg</file>
+        <file>images/icons/reset_black.svg</file>
+        <file>images/icons/zoom_out_white.svg</file>
+        <file>images/icons/zoom_out_black.svg</file>
+        <file>images/icons/zoom_in_white.svg</file>
+        <file>images/icons/zoom_in_black.svg</file>
+        <file>images/icons/setting_white.svg</file>
+        <file>images/icons/setting_black.svg</file>
+        <file>images/icons/close_black.svg</file>
+        <file>images/icons/close_white.svg</file>
+        <file>images/icons/return_white.svg</file>
+        <file>images/icons/return_black.svg</file>
     </qresource>
 </RCC>

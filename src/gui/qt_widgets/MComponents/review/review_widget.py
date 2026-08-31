@@ -19,6 +19,7 @@ from manager.review_demo_trading_manager import ReviewDemoTradingManager
 from common.common_api import *
 
 from gui.qt_widgets.common.icon import Icon
+from gui.qt_widgets.MComponents.qfluentwidgets.components.widgets import ListWidget
 
 # 共享的提升控件注册辅助：把 .ui 中提升的 qfluentwidgets 控件按完整包路径加载，
 # 并注册到 sys.modules 的裸名上，使 uic 解析时命中的是包内模块（相对导入正常）。
@@ -117,7 +118,7 @@ class ReviewWidget(QWidget):
         self.label_total_assets.setText(str(self.demo_trading_manager.get_total_assets()))
         self.label_available_balance.setText(str(self.demo_trading_manager.get_available_balance()))
 
-        self.listWidget_trading_record = QListWidget(self)
+        self.listWidget_trading_record = ListWidget(self)
         self.demo_trading_record_widget = DemoTradingRecordWidget(self)
 
         self.amout_button_group = QButtonGroup(self)

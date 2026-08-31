@@ -66,14 +66,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_amount">
+       <widget class="BodyLabel" name="label_amount">
         <property name="text">
          <string>成交额</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_total_amount">
+       <widget class="BodyLabel" name="label_total_amount">
         <property name="text">
          <string>总金额：</string>
         </property>
@@ -161,6 +161,11 @@
    <class>TransparentToolButton</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">label</header>
   </customwidget>
  </customwidgets>
  <resources/>

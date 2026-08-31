@@ -14,6 +14,8 @@ from gui.qt_widgets.MComponents.indicators.setting.kdj_setting_dialog import Kdj
 from manager.indicators_config_manager import *
 from indicators.stock_data_indicators import *
 
+from gui.qt_widgets.common.icon import Icon
+
 class KdjWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):
         super(KdjWidget, self).__init__(data, type, parent)
@@ -23,8 +25,8 @@ class KdjWidget(BaseIndicatorWidget):
     def custom_init(self):
         self.btn_close.hide()
 
-        self.btn_close.setIcon(QtGui.QIcon(":/icon/general/close_without_background_normal.svg"))
-        self.btn_setting.setIcon(QtGui.QIcon(":/icon/general/setting_normal.svg"))
+        self.btn_close.setIcon(Icon.CLOSE)
+        self.btn_setting.setIcon(Icon.SETTING)
 
         self.btn_setting.clicked.connect(self.slot_btn_setting_clicked)
 

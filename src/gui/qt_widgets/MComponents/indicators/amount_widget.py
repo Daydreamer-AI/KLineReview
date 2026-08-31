@@ -13,6 +13,8 @@ from gui.qt_widgets.MComponents.indicators.setting.amount_setting_dialog import 
 
 from manager.indicators_config_manager import *
 
+from gui.qt_widgets.common.icon import Icon
+
 class AmountWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):
         super(AmountWidget, self).__init__(data, type, parent)
@@ -25,8 +27,8 @@ class AmountWidget(BaseIndicatorWidget):
         self.label_ma10.hide()
         self.label_ma20.hide()
 
-        self.btn_close.setIcon(QtGui.QIcon(":/icon/general/close_without_background_normal.svg"))
-        self.btn_setting.setIcon(QtGui.QIcon(":/icon/general/setting_normal.svg"))
+        self.btn_close.setIcon(Icon.CLOSE)
+        self.btn_setting.setIcon(Icon.SETTING)
 
         self.btn_close.hide()
 

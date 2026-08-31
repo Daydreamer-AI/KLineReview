@@ -71,14 +71,14 @@
          <number>12</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_ma_period">
+         <widget class="BodyLabel" name="label_ma_period">
           <property name="text">
            <string>周期</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_stock_name">
+         <widget class="BodyLabel" name="label_stock_name">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
@@ -99,7 +99,7 @@
          <number>12</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_indicator">
+         <widget class="BodyLabel" name="label_indicator">
           <property name="text">
            <string>指标</string>
           </property>
@@ -175,7 +175,7 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_restoration_method">
+         <widget class="BodyLabel" name="label_restoration_method">
           <property name="text">
            <string>前复权</string>
           </property>
@@ -281,6 +281,11 @@
    <class>TransparentToolButton</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>label</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -66,14 +66,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_rsi_title">
+       <widget class="BodyLabel" name="label_rsi_title">
         <property name="text">
          <string>RSI</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_param">
+       <widget class="BodyLabel" name="label_param">
         <property name="text">
          <string>(6,12,24)</string>
         </property>
@@ -168,6 +168,11 @@
    <class>TransparentToolButton</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>label</header>
   </customwidget>
  </customwidgets>
  <resources/>

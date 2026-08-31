@@ -463,6 +463,9 @@ class DanmakuReviewWidget(QWidget):
     def set_buttons_visible(self, visible):
         self._center_container.setVisible(visible)
 
+    def set_buttons_enabled(self, enabled):
+        self.main_btn.setEnabled(enabled)
+
     def show_main_button(self):
         self.main_btn.show()
 

@@ -68,7 +68,7 @@ class HomeInterface(ScrollArea):
             self.view.set_fixed_result(self.dict_code_index[code])
         
     def slot_bao_stock_info_query_started(self, task_id):
-        pass
+        self.view.set_buttons_enabled(False)
 
     def slot_bao_stock_info_query_finished(self, task_id, result):
         if result["result"]:
@@ -95,6 +95,8 @@ class HomeInterface(ScrollArea):
                 index += 1
 
             self.view.set_data(_make_sample_items_by_list(list_danmaku_data))
+
+            self.view.set_buttons_enabled(True)
 
         else:
             self.logger.info(f"查询股票信息失败！")

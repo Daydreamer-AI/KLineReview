@@ -4,6 +4,8 @@ from PyQt5.QtCore import pyqtSignal
 
 from pathlib import Path
 
+from gui.qt_widgets.common.icon import Icon
+
 class DemoTradingRecordWidget(QWidget):
     sig_btn_return_clicked = pyqtSignal()
     def __init__(self, parent=None):
@@ -30,6 +32,9 @@ class DemoTradingRecordWidget(QWidget):
 
     def init_ui(self):
         self.setup_ui()
+
+        self.btn_return.setIcon(Icon.RETURN)
+
         self.reset_trading_record()
 
     def init_connect(self):

@@ -16,6 +16,8 @@ from manager.indicators_config_manager import *
 from gui.qt_widgets.MComponents.indicators.kline_overview_widget import KLineOverviewWidget
 from indicators.stock_data_indicators import *
 
+from gui.qt_widgets.common.icon import Icon
+
 class KLineWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):
         # 调用父类初始化，这会自动调用init_para, init_ui, init_connect
@@ -48,10 +50,10 @@ class KLineWidget(BaseIndicatorWidget):
         self.label_ma30.hide()
         self.label_ma60.hide()
 
-        self.btn_restore.setIcon(QtGui.QIcon(":/icon/general/reset_normal.svg"))
-        self.btn_zoom_in.setIcon(QtGui.QIcon(":/icon/general/zoom_in_normal.svg"))
-        self.btn_zoom_out.setIcon(QtGui.QIcon(":/icon/general/zoom_out_normal.svg"))
-        self.btn_setting.setIcon(QtGui.QIcon(":/icon/general/setting_normal.svg"))
+        self.btn_restore.setIcon(Icon.RESET)
+        self.btn_zoom_in.setIcon(Icon.ZOOM_IN)
+        self.btn_zoom_out.setIcon(Icon.ZOOM_OUT)
+        self.btn_setting.setIcon(Icon.SETTING)
 
         self.btn_restore.clicked.connect(self.slot_btn_restore_clicked)
         self.btn_zoom_in.clicked.connect(self.slot_btn_zoom_in_clicked)
