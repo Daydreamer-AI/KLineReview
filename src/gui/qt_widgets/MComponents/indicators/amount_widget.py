@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtWidgets import QDialog
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QLocale
 
 import pyqtgraph as pg
 import numpy as np
@@ -100,7 +100,7 @@ class AmountWidget(BaseIndicatorWidget):
         self.plot_widget.setXRange(-1, len(self.df_data) + 1, padding=0)
         max_amount = np.max(self.df_data['amount'])
         # self.logger.info(f"最大成交额-max_amount: {max_amount}")
-        self.plot_widget.setYRange(0, max_amount / 100000000 * 1.1, padding=0)       # 单位：亿
+        self.plot_widget.setYRange(0, max_amount * 1.1, padding=0)
 
     def get_chart_name(self):
         return "成交额"
@@ -130,7 +130,7 @@ class AmountWidget(BaseIndicatorWidget):
         # 根据当前可视范围内的数据的最大、最小值调整Y轴坐标值范围
         # 成交额图只需要考虑amount列的最大值，最小值始终为0
         max_amount = visible_data['amount'].max()
-        max_amount = max_amount / 100000000     # 单位：亿
+        max_amount = max_amount
         
         # 添加一些padding以确保柱状图不会触及顶部边界
         padding = max_amount * 0.05  # 5%的padding
@@ -147,8 +147,11 @@ class AmountWidget(BaseIndicatorWidget):
         if self.type != sender.type:
             # self.logger.info(f"不响应其他窗口的鼠标移动事件")
             return
-        amount = self.df_data.iloc[closest_index]['amount'] / 100000000
-        self.label_total_amount.setText(f"总金额：{amount:.2f}亿")
+        amount = self.df_data.iloc[closest_index]['amount']
+
+        template = self.tr("Amount: %s")
+        formatted_amount = QLocale().toString(float(amount), 'f', 2)
+        self.label_total_amount.setText(template % formatted_amount)
 
         change_percent = self.df_data.iloc[closest_index]['change_percent']
         if change_percent > 0:

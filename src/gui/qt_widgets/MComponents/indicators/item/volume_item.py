@@ -42,7 +42,7 @@ class VolumeItem(pg.GraphicsObject):
         for i in range(len(self.data['volume'])):
             open_price = self.data['open'].iloc[i]
             close_price = self.data['close'].iloc[i]
-            volume = self.data['volume'].iloc[i] / 10000     # 单位：万
+            volume = self.data['volume'].iloc[i]
             
             if close_price < open_price:
                 #下跌－ 绿色填充

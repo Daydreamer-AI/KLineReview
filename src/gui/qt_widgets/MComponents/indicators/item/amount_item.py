@@ -41,7 +41,7 @@ class AmountItem(pg.GraphicsObject):
         for i in range(len(self.data['amount'])):
             open_price = self.data['open'].iloc[i]
             close_price = self.data['close'].iloc[i]
-            amount = self.data['amount'].iloc[i]  / 100000000    # 单位：亿
+            amount = self.data['amount'].iloc[i]
             
             if close_price < open_price:
                 #下跌－ 绿色填充

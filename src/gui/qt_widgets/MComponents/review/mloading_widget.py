@@ -222,9 +222,12 @@ class LoadingWidget(QWidget):
     """
     完整的Loading控件 - 包含遮罩和加载动画
     """
-    def __init__(self, parent=None, message="加载中...", animation_type="rotating", 
+    def __init__(self, parent=None, message=None, animation_type="rotating", 
                  show_mask=True, mask_opacity=0.7):
         super().__init__(parent)
+
+        if message is None:
+            message = self.tr("Loading...")
         
         self.message = message
         self.animation_type = animation_type
@@ -232,7 +235,7 @@ class LoadingWidget(QWidget):
         self.mask_opacity = mask_opacity
         
         self.init_ui()
-    
+
     def init_ui(self):
         """初始化UI"""
         # 创建主布局

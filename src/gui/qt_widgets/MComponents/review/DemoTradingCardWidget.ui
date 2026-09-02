@@ -21,14 +21,14 @@
        <item>
         <widget class="BodyLabel" name="label_name">
          <property name="text">
-          <string>名称</string>
+          <string>Code</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="BodyLabel" name="label_code">
          <property name="text">
-          <string>代码</string>
+          <string>Name</string>
          </property>
         </widget>
        </item>
@@ -37,7 +37,7 @@
      <item>
       <widget class="BodyLabel" name="label_status">
        <property name="text">
-        <string>状态</string>
+        <string>Status</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -47,7 +47,7 @@
      <item>
       <widget class="BodyLabel" name="label_trading_yield">
        <property name="text">
-        <string>收益率</string>
+        <string>Return Rate</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

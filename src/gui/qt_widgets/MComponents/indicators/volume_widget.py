@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtWidgets import QDialog
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QLocale
 
 import pyqtgraph as pg
 import numpy as np
@@ -81,7 +81,7 @@ class VolumeWidget(BaseIndicatorWidget):
         self.plot_widget.setXRange(-1, len(self.df_data) + 1, padding=0)
         max_vol = np.max(self.df_data['volume'])
         # self.logger.info(f"最大成交量-max_vol: {max_vol}")
-        self.plot_widget.setYRange(0, max_vol / 10000 * 1.1, padding=0)
+        self.plot_widget.setYRange(0, max_vol * 1.1, padding=0)
     
     def get_chart_name(self):
         return "成交量"
@@ -111,7 +111,7 @@ class VolumeWidget(BaseIndicatorWidget):
         # 根据当前可视范围内的数据的最大、最小值调整Y轴坐标值范围
         # 成交量图只需要考虑volume列的最大值，最小值始终为0
         max_volume = visible_data['volume'].max()
-        max_volume = max_volume / 10000     # 单位：万
+        max_volume = max_volume
         
         # 添加一些padding以确保柱状图不会触及顶部边界
         padding = max_volume * 0.05  # 5%的padding
@@ -120,50 +120,6 @@ class VolumeWidget(BaseIndicatorWidget):
         
         # 重新设置Y轴刻度
         self.plot_widget.setYRange(y_min, y_max, padding=0)
-
-    # def slot_mouse_moved(self, pos, widget_source=None):
-    #     if widget_source is not None:
-    #         self.logger.info(f"正在处理{self.get_chart_name()}鼠标移动响应，来源：{widget_source.get_chart_name()}")
-    #     else:
-    #         self.logger.info(f"widget_source is not None")
-
-    #     if self.plot_widget.sceneBoundingRect().contains(pos):
-    #         mouse_point = self.plot_widget.getViewBox().mapSceneToView(pos)
-    #         x_val = mouse_point.x()
-    #         y_val = mouse_point.y()
-
-    #         # self.logger.info(f"鼠标位置：x={x_val}, y={y_val}")
-
-    #         bar_centers = list(range(len(self.df_data)))
-            
-    #         closest_index = None
-    #         min_distance = float('inf')
-            
-    #         for i, center in enumerate(bar_centers):
-    #             distance = abs(center - x_val)
-    #             if distance <= 0.25 / 2:
-    #                 if distance < min_distance:
-    #                     min_distance = distance
-    #                     closest_index = i
-            
-    #         if closest_index is not None:
-    #             view_range = self.plot_widget.getViewBox().viewRange()
-    #             closest_x = bar_centers[closest_index]
-
-    #             widget_source_plot_widget = widget_source.get_plot_widget()
-    #             if widget_source_plot_widget is not None and widget_source_plot_widget == self.plot_widget:
-    #                 self.h_line.setPos(y_val)
-    #                 self.h_line.show()
-
-    #             self.v_line.setPos(closest_x)
-    #             self.v_line.show()
-                
-
-    #         # else:
-    #         #     self.hide_all_labels()
-    #     else:
-    #         self.logger.info(f"鼠标位置超出图表范围")
-    #         self.hide_all_labels()
 
     def slot_global_update_labels(self, sender, closest_index):
         if self.df_data is None or self.df_data.empty:
@@ -174,8 +130,11 @@ class VolumeWidget(BaseIndicatorWidget):
             return
         
 
-        volume = self.df_data.iloc[closest_index]['volume'] / 10000
-        self.label_total_volume.setText(f"总量：{volume:.2f}万")
+        volume = self.df_data.iloc[closest_index]['volume']
+
+        template = self.tr("Volume: %s")
+        formatted_volume = QLocale().toString(float(volume), 'f', 2)
+        self.label_total_volume.setText(template % formatted_volume)
 
         change_percent = self.df_data.iloc[closest_index]['change_percent']
         if change_percent > 0:

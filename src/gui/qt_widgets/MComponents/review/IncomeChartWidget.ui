@@ -79,7 +79,7 @@
         <item>
          <widget class="BodyLabel" name="label_title_total_yield">
           <property name="text">
-           <string>总收益率</string>
+           <string>Return Rate</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -106,7 +106,7 @@
         <item>
          <widget class="BodyLabel" name="label_title_win_rate">
           <property name="text">
-           <string>胜率</string>
+           <string>Winning percentage</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
