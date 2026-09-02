@@ -1,7 +1,7 @@
 # coding: utf-8
 from PyQt5.QtCore import QUrl, QSize, QTimer
 from PyQt5.QtGui import QIcon, QDesktopServices, QColor
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QMessageBox
 
 from gui.qt_widgets.MComponents.qfluentwidgets import(NavigationAvatarWidget, NavigationItemPosition, MessageBox, FluentWindow,
                             SplashScreen, SystemThemeListener, isDarkTheme)
@@ -175,15 +175,20 @@ class MainWindow(FluentWindow):
             "Are you sure you want to exit?")
         w = MessageBox(title, content, self.window())
         w.setContentCopyable(True)
-        if w.exec():
+
+        i_ret = w.exec()
+        if i_ret:
             # 可以在这里添加清理操作
             task_pool = get_default_task_pool()
             task_pool.shutdown(wait=True, cancel_running=True)
-            print("应用程序正在退出...")
+            self.logger.info("应用程序正在退出...")
             self.logger.info("开始执行清理操作...")
             self.themeListener.terminate()
             self.themeListener.deleteLater()
             super().closeEvent(e)
+        else:
+            self.logger.info("取消退出")
+            e.ignore()
         
 
     def _onThemeChangedFinished(self):
