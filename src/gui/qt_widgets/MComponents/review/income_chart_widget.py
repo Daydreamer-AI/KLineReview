@@ -5,6 +5,9 @@ from PyQt5.QtCore import Qt
 
 import pyqtgraph as pg
 
+from gui.qt_widgets.common.config import cfg
+from gui.qt_widgets.MComponents.qfluentwidgets import(Theme, isDarkTheme, theme)
+
 class IncomeChartWidget(QWidget):
     def __init__(self, parent=None):
         super(IncomeChartWidget, self).__init__(parent)
@@ -37,6 +40,10 @@ class IncomeChartWidget(QWidget):
 
     def init_connect(self):
         self.plot_widget.scene().sigMouseMoved.connect(self.slot_mouse_moved)
+        cfg.themeChanged.connect(self.set_theme)
+
+    def set_theme(self, theme):
+        self.plot_widget.setBackground(cfg.get_plot_widget_background_color(theme))
 
     def setup_ui(self):
         ui_file = Path(__file__).parent / "IncomeChartWidget.ui"
@@ -51,7 +58,7 @@ class IncomeChartWidget(QWidget):
         uic.loadUi(str(ui_file), self)
 
     def setup_plot_style(self):
-        self.plot_widget.setBackground('w')
+        self.plot_widget.setBackground(cfg.get_plot_widget_background_color(theme()))
         self.plot_widget.showGrid(x=False, y=True, alpha=0.3)
         self.plot_widget.addLegend()
         self.plot_widget.setMouseEnabled(x=True, y=False)

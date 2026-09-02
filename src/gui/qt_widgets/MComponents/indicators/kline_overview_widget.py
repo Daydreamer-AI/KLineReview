@@ -26,7 +26,7 @@ class KLineOverviewWidget(QWidget):
         pass
 
     def load_qss(self):
-        self.setStyleSheet("QFrame{border: 2px solid #2982ff; background-color: #a0ffffff;} QLabel{border: None; background-color: transparent; font-size: 16px}")
+        self.setStyleSheet("QFrame{border: 2px solid #2982ff; background: transparent;} QLabel{border: None; background-color: transparent; font-size: 16px}")
         self.label_amplitude.setStyleSheet("color: #00a9b2; font-size: 18px")
         self.label_volume.setStyleSheet("color: #00a9b2; font-size: 18px")
         self.label_amount.setStyleSheet("color: #00a9b2; font-size: 18px")

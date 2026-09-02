@@ -53,6 +53,19 @@ class Config(QConfig):
     # software update
     checkUpdateAtStartUp = ConfigItem("Update", "CheckUpdateAtStartUp", True, BoolValidator())
 
+    def get_theme_color(self):
+        '''获取主题色'''
+        return self.get(self.themeColor)
+
+    plot_widget_background = {
+            Theme.AUTO: 'w',
+            Theme.LIGHT: 'w',
+            Theme.DARK: '#20201E',
+        }
+
+    def get_plot_widget_background_color(self, theme):
+        return self.plot_widget_background[theme]
+
 
 YEAR = 2026
 AUTHOR = "牛马不是马"

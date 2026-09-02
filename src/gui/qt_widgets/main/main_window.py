@@ -4,7 +4,7 @@ from PyQt5.QtGui import QIcon, QDesktopServices, QColor
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
 from gui.qt_widgets.MComponents.qfluentwidgets import(NavigationAvatarWidget, NavigationItemPosition, MessageBox, FluentWindow,
-                            SplashScreen, SystemThemeListener, isDarkTheme)
+                            SplashScreen, SystemThemeListener, isDarkTheme, theme)
 
 from gui.qt_widgets.MComponents.qfluentwidgets import FluentIcon as FIF
 
@@ -192,6 +192,7 @@ class MainWindow(FluentWindow):
         
 
     def _onThemeChangedFinished(self):
+        self.logger.info(f"主题成功切换为: {cfg.theme}, type: {type(cfg.theme)}, theme(): {theme()}")
         super()._onThemeChangedFinished()
 
         # retry

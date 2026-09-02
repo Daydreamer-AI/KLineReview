@@ -95,7 +95,7 @@ class MacdWidget(BaseIndicatorWidget):
     def additional_draw(self):
         """添加零轴线"""
         # 添加零轴线
-        zero_line = pg.InfiniteLine(pos=0, angle=0, pen=pg.mkPen('g', width=1, style=QtCore.Qt.DashLine))
+        zero_line = pg.InfiniteLine(pos=0, angle=0, pen=pg.mkPen('gray', width=1, style=QtCore.Qt.DashLine))
         self.plot_widget.addItem(zero_line)
 
     def slot_btn_setting_clicked(self):

@@ -19,6 +19,7 @@ from manager.review_demo_trading_manager import ReviewDemoTradingManager
 from common.common_api import *
 
 from gui.qt_widgets.common.icon import Icon
+from gui.qt_widgets.common.config import cfg
 from gui.qt_widgets.MComponents.qfluentwidgets.components.widgets import ListWidget
 
 # 共享的提升控件注册辅助：把 .ui 中提升的 qfluentwidgets 控件按完整包路径加载，
@@ -964,5 +965,8 @@ class ReviewWidget(QWidget):
     def slot_home_main_button_clicked(self):
         self.logger.info("主界面按钮点击响应，加载随机数据")
         self.slot_btn_load_data_random_clicked()
+
+    def slot_theme_changed_finished(self):
+        self.logger.info(f"主题已切换为: {cfg.theme}")
 
 
