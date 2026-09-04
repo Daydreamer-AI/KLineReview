@@ -100,77 +100,42 @@ class TimePeriod(Enum):
         return f"stock_data_{self.value}"
     
 
-    def compare_to(self, other):
-        """
-        比较当前周期与另一个周期的大小
-        返回值: 
-        - 负数: self < other
-        - 0: self == other
-        - 正数: self > other
-        """
-        if not isinstance(other, TimePeriod):
-            raise TypeError("参数必须是TimePeriod枚举类型")
-        
-        # 定义周期优先级顺序
-        period_order = _PERIOD_ORDER
-        
+    # ================= 比较运算符 =================
+
+    def _get_order_index(self):
+        """获取当前周期在优先级列表中的索引"""
         try:
-            self_index = period_order.index(self.value)
-            other_index = period_order.index(other.value)
-            return self_index - other_index
-        except ValueError as e:
-            raise ValueError(f"无法找到周期值在排序列表中的位置: {e}")
-    
-    def __hash__(self):
-        """使枚举成员可哈希"""
-        return hash(self.value)
+            return _PERIOD_ORDER.index(self.value)
+        except ValueError:
+            raise ValueError(f"无法找到周期值 '{self.value}' 在排序列表中的位置")
 
     def __lt__(self, other):
-        """小于比较"""
         if not isinstance(other, TimePeriod):
             return NotImplemented
-        return self.compare_to(other) < 0
+        return self._get_order_index() < other._get_order_index()
     
     def __le__(self, other):
-        """小于等于比较"""
         if not isinstance(other, TimePeriod):
             return NotImplemented
-        return self.compare_to(other) <= 0
+        return self._get_order_index() <= other._get_order_index()
     
     def __gt__(self, other):
-        """大于比较"""
         if not isinstance(other, TimePeriod):
             return NotImplemented
-        return self.compare_to(other) > 0
+        return self._get_order_index() > other._get_order_index()
     
     def __ge__(self, other):
-        """大于等于比较"""
         if not isinstance(other, TimePeriod):
             return NotImplemented
-        return self.compare_to(other) >= 0
-    
-    def __eq__(self, other):
-        """等于比较"""
-        if not isinstance(other, TimePeriod):
-            return NotImplemented
-        return self.value == other.value
-    
-    def __ne__(self, other):
-        """不等于比较"""
-        if not isinstance(other, TimePeriod):
-            return NotImplemented
-        return self.value != other.value
-    
+        return self._get_order_index() >= other._get_order_index()
+
     def is_shorter_than(self, other):
-        """判断当前周期是否比另一个周期短"""
         return self < other
     
     def is_longer_than(self, other):
-        """判断当前周期是否比另一个周期长"""
         return self > other
     
     def is_same_as(self, other):
-        """判断当前周期是否与另一个周期相同"""
         return self == other
     
 class ReviewPeriodProcessData(object):
