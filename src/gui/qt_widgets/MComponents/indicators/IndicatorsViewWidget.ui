@@ -78,7 +78,7 @@
              </size>
             </property>
             <property name="text">
-             <string>分时</string>
+             <string>Time</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -103,7 +103,7 @@
              </size>
             </property>
             <property name="text">
-             <string>日线</string>
+             <string>1D</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -131,7 +131,7 @@
              </size>
             </property>
             <property name="text">
-             <string>周线</string>
+             <string>1W</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -156,7 +156,7 @@
              </size>
             </property>
             <property name="text">
-             <string>月线</string>
+             <string>1M</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -181,7 +181,7 @@
              </size>
             </property>
             <property name="text">
-             <string>1分</string>
+             <string>1m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -206,7 +206,7 @@
              </size>
             </property>
             <property name="text">
-             <string>5分</string>
+             <string>5m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -231,7 +231,7 @@
              </size>
             </property>
             <property name="text">
-             <string>10分</string>
+             <string>10m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -256,7 +256,7 @@
              </size>
             </property>
             <property name="text">
-             <string>15分</string>
+             <string>15m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -281,7 +281,7 @@
              </size>
             </property>
             <property name="text">
-             <string>30分</string>
+             <string>30m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -306,7 +306,7 @@
              </size>
             </property>
             <property name="text">
-             <string>45分</string>
+             <string>45m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -331,7 +331,7 @@
              </size>
             </property>
             <property name="text">
-             <string>60分</string>
+             <string>60m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -356,7 +356,7 @@
              </size>
             </property>
             <property name="text">
-             <string>90分</string>
+             <string>90m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -381,7 +381,7 @@
              </size>
             </property>
             <property name="text">
-             <string>120分</string>
+             <string>120m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -428,7 +428,7 @@
           </size>
          </property>
          <property name="text">
-          <string>回放</string>
+          <string>review</string>
          </property>
          <property name="checkable">
           <bool>false</bool>
@@ -493,7 +493,7 @@
          </size>
         </property>
         <property name="text">
-         <string>成交量</string>
+         <string>Volume</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -515,7 +515,7 @@
          </size>
         </property>
         <property name="text">
-         <string>成交额</string>
+         <string>Turnover</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -638,7 +638,7 @@
          </size>
         </property>
         <property name="text">
-         <string>均线</string>
+         <string>MA</string>
         </property>
         <property name="checkable">
          <bool>true</bool>

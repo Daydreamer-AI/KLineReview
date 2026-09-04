@@ -72,7 +72,7 @@
       <item>
        <widget class="BodyLabel" name="label">
         <property name="text">
-         <string>交易记录</string>
+         <string>Trading Records</string>
         </property>
        </widget>
       </item>
@@ -109,7 +109,7 @@
       <item row="0" column="0">
        <widget class="BodyLabel" name="label_title_name">
         <property name="text">
-         <string>股票名称：</string>
+         <string>Name: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -126,7 +126,7 @@
       <item row="1" column="0">
        <widget class="BodyLabel" name="label_title_code">
         <property name="text">
-         <string>股票代码：</string>
+         <string>Code: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -143,7 +143,7 @@
       <item row="2" column="0">
        <widget class="BodyLabel" name="label_title_order_buy_time">
         <property name="text">
-         <string>买入挂单时间：</string>
+         <string>Buy Order Time: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -160,7 +160,7 @@
       <item row="3" column="0">
        <widget class="BodyLabel" name="label_title_order_buy_cancel_time">
         <property name="text">
-         <string>买入撤单时间：</string>
+         <string>Buy Cancel Time: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -177,7 +177,7 @@
       <item row="4" column="0">
        <widget class="BodyLabel" name="label_title_buy_time">
         <property name="text">
-         <string>买入成交时间：</string>
+         <string>Buy Fill Time: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -194,7 +194,7 @@
       <item row="5" column="0">
        <widget class="BodyLabel" name="label_title_buy_price">
         <property name="text">
-         <string>买入成交价格：</string>
+         <string>Buy Fill Price: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -211,7 +211,7 @@
       <item row="6" column="0">
        <widget class="BodyLabel" name="label_title_buy_count">
         <property name="text">
-         <string>买入成交股数：</string>
+         <string>Buy Fill Shares: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -228,7 +228,7 @@
       <item row="7" column="0">
        <widget class="BodyLabel" name="label_title_buy_amount">
         <property name="text">
-         <string>买入成交金额：</string>
+         <string>Buy Fill Amount: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -245,7 +245,7 @@
       <item row="8" column="0">
        <widget class="BodyLabel" name="label_title_order_sell_time">
         <property name="text">
-         <string>卖出挂单时间：</string>
+         <string>Sell Order Time: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -262,7 +262,7 @@
       <item row="9" column="0">
        <widget class="BodyLabel" name="label_title_order_sell_cancel_time">
         <property name="text">
-         <string>卖出撤单时间：</string>
+         <string>Sell Cancel Time: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -279,7 +279,7 @@
       <item row="10" column="0">
        <widget class="BodyLabel" name="label_title_sell_time">
         <property name="text">
-         <string>卖出成交时间：</string>
+         <string>Sell Fill Time: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -296,7 +296,7 @@
       <item row="11" column="0">
        <widget class="BodyLabel" name="label_title_sell_price">
         <property name="text">
-         <string>卖出成交价格：</string>
+         <string>Sell Fill Price: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -313,7 +313,7 @@
       <item row="12" column="0">
        <widget class="BodyLabel" name="label_title_sell_count">
         <property name="text">
-         <string>卖出成交股数：</string>
+         <string>Sell Fill Shares: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -330,7 +330,7 @@
       <item row="13" column="0">
        <widget class="BodyLabel" name="label_title_sell_amount">
         <property name="text">
-         <string>卖出成交金额：</string>
+         <string>Sell Fill Amount: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -347,7 +347,7 @@
       <item row="14" column="0">
        <widget class="BodyLabel" name="label_title_status">
         <property name="text">
-         <string>状态：</string>
+         <string>Status: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -357,14 +357,14 @@
       <item row="14" column="1">
        <widget class="BodyLabel" name="label_status">
         <property name="text">
-         <string>交易完成</string>
+         <string>Done</string>
         </property>
        </widget>
       </item>
       <item row="15" column="0">
        <widget class="BodyLabel" name="label_title_trading_income">
         <property name="text">
-         <string>收益：</string>
+         <string>P&amp;L: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -381,7 +381,7 @@
       <item row="16" column="0">
        <widget class="BodyLabel" name="label_title_trading_yield">
         <property name="text">
-         <string>收益率：</string>
+         <string>Return %: </string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

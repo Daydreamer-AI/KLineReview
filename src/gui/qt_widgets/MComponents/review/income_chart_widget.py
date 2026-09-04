@@ -227,11 +227,11 @@ class IncomeChartWidget(QWidget):
             self.plot_widget.plot(x=x_data, y=y_data, pen=pen, symbol='o', symbolSize=6, symbolBrush='b')
             
             # 设置坐标轴标签
-            self.plot_widget.setLabel('left', '总收益率', units='%')
+            self.plot_widget.setLabel('left', self.tr('Return'), units='%')
             # self.plot_widget.setLabel('bottom', '交易序号')
             
             # 添加标题
-            self.plot_widget.setTitle('总收益率曲线')
+            self.plot_widget.setTitle(self.tr('Yield Curve'))
             
             # 动态设置Y轴范围，包含负值
             y_min = min(y_data)
@@ -315,10 +315,14 @@ class IncomeChartWidget(QWidget):
                     # 构建详细信息文本，使用HTML格式设置样式
                     info_text = (
                         '<div style="background-color: white; border: 2px solid black; padding: 5px; border-radius: 5px;">'
-                        f'<span style="color: black; font-weight: bold;">交易序号:</span> <span style="color: blue;">{closest_info["trade_index"] if closest_info["trade_index"] >= 0 else "起始点"}</span><br>'
-                        f'<span style="color: black; font-weight: bold;">单次收益率:</span> <span style="color: {"#1BCB34" if closest_info["single_yield"] < 0 else "#E5403C"}; font-weight: bold;">{closest_info["single_yield"]:.2f}%</span><br>'
-                        f'<span style="color: black; font-weight: bold;">累计总收益率:</span> <span style="color: {"#1BCB34" if closest_info["cumulative_yield"] < 0 else "#E5403C"}; font-weight: bold;">{closest_info["cumulative_yield"]:.2f}%</span><br>'
-                        f'<span style="color: black; font-weight: bold;">当前胜率:</span> <span style="color: purple; font-weight: bold;">{closest_info["win_rate"]:.2f}%</span>'
+                        f'<span style="color: black; font-weight: bold;">{self.tr("Trade No.")}:</span> '
+                        f'<span style="color: blue;">{closest_info["trade_index"] if closest_info["trade_index"] >= 0 else self.tr("Start")}</span><br>'
+                        f'<span style="color: black; font-weight: bold;">{self.tr("Single Return")}:</span> '
+                        f'<span style="color: {"#1BCB34" if closest_info["single_yield"] < 0 else "#E5403C"}; font-weight: bold;">{closest_info["single_yield"]:.2f}%</span><br>'
+                        f'<span style="color: black; font-weight: bold;">{self.tr("Cumulative Return")}:</span> '
+                        f'<span style="color: {"#1BCB34" if closest_info["cumulative_yield"] < 0 else "#E5403C"}; font-weight: bold;">{closest_info["cumulative_yield"]:.2f}%</span><br>'
+                        f'<span style="color: black; font-weight: bold;">{self.tr("Win Rate")}:</span> '
+                        f'<span style="color: purple; font-weight: bold;">{closest_info["win_rate"]:.2f}%</span>'
                         '</div>'
                     )
                     

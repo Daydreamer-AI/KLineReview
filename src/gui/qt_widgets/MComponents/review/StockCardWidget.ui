@@ -74,14 +74,14 @@
       <item>
        <widget class="BodyLabel" name="label_stock_name">
         <property name="text">
-         <string>股票名称</string>
+         <string>Name</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="BodyLabel" name="label_stock_code">
         <property name="text">
-         <string>股票代码</string>
+         <string>Code</string>
         </property>
        </widget>
       </item>
@@ -137,7 +137,7 @@
       <item>
        <widget class="BodyLabel" name="label_price">
         <property name="text">
-         <string>价格</string>
+         <string>Price</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -153,7 +153,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>涨跌幅</string>
+         <string>Change %</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

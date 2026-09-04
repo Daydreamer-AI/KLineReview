@@ -120,8 +120,8 @@ class IndicatorsViewWidget(QWidget):
         self.btn_indicator_ma.setChecked(True)
         self.kline_widget.show_ma()
         self.kline_widget.set_period(TimePeriod.DAY)
-        self.kline_widget.set_period_text("日线")
-        self.kline_widget.set_indicator_name("均线")
+        self.kline_widget.set_period_text(self.tr("1D"))
+        self.kline_widget.set_indicator_name(self.tr("MA"))
 
         # self.load_qss()
 

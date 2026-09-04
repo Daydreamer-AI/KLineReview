@@ -68,14 +68,14 @@
       <item>
        <widget class="BodyLabel" name="label_amount">
         <property name="text">
-         <string>成交额</string>
+         <string>Turnover</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="BodyLabel" name="label_total_amount">
         <property name="text">
-         <string>总金额：</string>
+         <string>Amount: </string>
         </property>
        </widget>
       </item>

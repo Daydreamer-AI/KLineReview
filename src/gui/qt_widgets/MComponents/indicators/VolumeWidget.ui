@@ -68,14 +68,14 @@
       <item>
        <widget class="BodyLabel" name="label_volume">
         <property name="text">
-         <string>成交量</string>
+         <string>Volume</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="BodyLabel" name="label_total_volume">
         <property name="text">
-         <string>总量：</string>
+         <string>Total: </string>
         </property>
        </widget>
       </item>

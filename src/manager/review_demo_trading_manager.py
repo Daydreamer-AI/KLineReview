@@ -2,6 +2,11 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from manager.logging_manager import get_logger
 
+from PyQt5.QtCore import QCoreApplication
+
+def translate(text):
+    return QCoreApplication.translate(__name__, text)
+
 class DemoTradingRecord(object):
     
     def __init__(self):
@@ -31,19 +36,19 @@ class DemoTradingRecord(object):
 
     def get_status_text(self):
         if self.status == 0:
-            return "未交易"
+            return QCoreApplication.translate(__name__, "No Trade")
         elif self.status == 1:
-            return "买入挂单"
+            return QCoreApplication.translate(__name__, "Buy Pending")
         elif self.status == 2:
-            return "买入撤单"
+            return QCoreApplication.translate(__name__, "Buy Canceled")
         elif self.status == 3:
-            return "卖出挂单"
+            return QCoreApplication.translate(__name__, "Sell Pending")
         elif self.status == 4:
-            return "卖出撤单"
+            return QCoreApplication.translate(__name__, "Sell Canceled")
         elif self.status == 5:
-            return "持有中"
+            return QCoreApplication.translate(__name__, "Holding")
         elif self.status == 6:
-            return "交易完成"
+            return QCoreApplication.translate(__name__, "Closed")
 
 
 

@@ -5,7 +5,7 @@ class TimePeriod(Enum):
     # 定义周期优先级顺序（使用字符串值避免初始化问题）
     _period_order = [
         '1m', '3m', '5m', '7m', '10m', '15m', '25m', '30m', '45m', '60m', '90m', '120m',
-        '1d', '2d', '3d', '1w', '2w', '1M', '2M', '3M', '1Q', '6M', '12M', '1Y'
+        '1D', '2D', '3D', '1W', '2W', '1M', '2M', '3M', '1Q', '6M', '12M', '1Y'
     ]
 
     MINUTE_1 = '1m'
@@ -18,14 +18,14 @@ class TimePeriod(Enum):
     MINUTE_60 = '60m'
     MINUTE_90 = '90m'
     MINUTE_120 = '120m'
-    DAY = '1d'
-    WEEK = '1w'
+    DAY = '1D'
+    WEEK = '1W'
     MONTH = '1M'     
     QUARTER = '1Q'  
     YEAR = '1Y'
-    DAY_2 = '2d'
-    DAY_3 = '3d'
-    WEEK_2 = '2w'
+    DAY_2 = '2D'
+    DAY_3 = '3D'
+    WEEK_2 = '2W'
     MONTH_2 = '2M'
     MONTH_3 = '3M'
     MONTH_6 = '6M'
@@ -174,7 +174,7 @@ class TimePeriod(Enum):
         # 定义周期优先级顺序
         period_order = [
             '1m', '3m', '5m', '7m', '10m', '15m', '25m', '30m', '45m', '60m', '90m', '120m',
-            '1d', '2d', '3d', '1w', '2w', '1M', '2M', '3M', '1Q', '6M', '12M', '1Y'
+            '1D', '2D', '3D', '1W', '2W', '1M', '2M', '3M', '1Q', '6M', '12M', '1Y'
         ]
         
         try:

@@ -79,7 +79,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>日期：</string>
+               <string>Start: </string>
               </property>
              </widget>
             </item>
@@ -117,7 +117,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>周期：</string>
+               <string>Period: </string>
               </property>
              </widget>
             </item>
@@ -195,7 +195,7 @@
              </size>
             </property>
             <property name="text">
-             <string>加载</string>
+             <string>Load</string>
             </property>
            </widget>
           </item>
@@ -437,7 +437,7 @@
         <item>
          <widget class="BodyLabel" name="label_3">
           <property name="text">
-           <string>进度：</string>
+           <string>Process: </string>
           </property>
          </widget>
         </item>
@@ -474,7 +474,7 @@
         <item>
          <widget class="BodyLabel" name="label_4">
           <property name="text">
-           <string>总资产：</string>
+           <string>Assets: </string>
           </property>
          </widget>
         </item>
@@ -518,7 +518,7 @@
         <item>
          <widget class="BodyLabel" name="label_8">
           <property name="text">
-           <string>可用余额：</string>
+           <string>Banlance: </string>
           </property>
          </widget>
         </item>
@@ -553,12 +553,12 @@
         <item>
          <widget class="BodyLabel" name="label_price">
           <property name="text">
-           <string>价格：</string>
+           <string>Price: </string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_price">
+         <widget class="LineEdit" name="lineEdit_price">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -587,12 +587,12 @@
         <item>
          <widget class="BodyLabel" name="label_count">
           <property name="text">
-           <string>股数：</string>
+           <string>Count: </string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_count">
+         <widget class="LineEdit" name="lineEdit_count">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -624,12 +624,12 @@
         <item>
          <widget class="BodyLabel" name="label_9">
           <property name="text">
-           <string>金额：</string>
+           <string>Amout: </string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_amount">
+         <widget class="LineEdit" name="lineEdit_amount">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -846,7 +846,7 @@
            </size>
           </property>
           <property name="text">
-           <string>买入</string>
+           <string>Buy</string>
           </property>
          </widget>
         </item>
@@ -865,7 +865,7 @@
            </size>
           </property>
           <property name="text">
-           <string>卖出</string>
+           <string>Sell</string>
           </property>
          </widget>
         </item>
@@ -884,7 +884,7 @@
            </size>
           </property>
           <property name="text">
-           <string>撤单</string>
+           <string>Cancel order</string>
           </property>
          </widget>
         </item>
@@ -917,7 +917,7 @@
          <item>
           <widget class="BodyLabel" name="label">
            <property name="text">
-            <string>模拟交易</string>
+            <string>Simulated Trading</string>
            </property>
           </widget>
          </item>
@@ -1000,6 +1000,11 @@
    <class>BodyLabel</class>
    <extends>QLabel</extends>
    <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>line_edit</header>
   </customwidget>
  </customwidgets>
  <resources>
