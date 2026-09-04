@@ -9,7 +9,7 @@ from resources import resources_rc
 from gui.qt_widgets.main.main_widget import MainWidget
 from manager.logging_manager import get_logger, setup_logging
 
-from gui.qt_widgets.common.config import cfg
+from common.config import cfg
 from gui.qt_widgets.main.main_window import MainWindow
 
 from gui.qt_widgets.MComponents.qfluentwidgets import FluentTranslator

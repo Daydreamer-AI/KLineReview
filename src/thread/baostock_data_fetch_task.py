@@ -50,7 +50,7 @@ class BaostockDataFetchTask2(BaseTask):
 
         if TimePeriod.is_minute_level(self.period):
             df_data = BaoStockProcessor().process_minute_level_stock_data(
-                self.code, TimePeriod.get_number_label(self.period), self.start_date, self.end_date, self.adjustflag)
+                self.code, self.period, self.start_date, self.end_date, self.adjustflag)
         else:
             if self.period == TimePeriod.DAY:
                 df_data = BaoStockProcessor().process_daily_stock_data(self.code, self.start_date, self.end_date, self.adjustflag)

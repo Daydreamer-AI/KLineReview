@@ -12,7 +12,7 @@ from gui.qt_widgets.MComponents.indicators.item.volume_item import VolumeItem
 from manager.indicators_config_manager import *
 from gui.qt_widgets.MComponents.indicators.setting.volume_setting_dialog import VolumeSettingDialog
 
-from gui.qt_widgets.common.icon import Icon
+from common.icon import Icon
 
 class VolumeWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):

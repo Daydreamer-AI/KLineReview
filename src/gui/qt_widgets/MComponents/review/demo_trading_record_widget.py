@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from pathlib import Path
 
-from gui.qt_widgets.common.icon import Icon
+from common.icon import Icon
 
 class DemoTradingRecordWidget(QWidget):
     sig_btn_return_clicked = pyqtSignal()

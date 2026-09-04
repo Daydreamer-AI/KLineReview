@@ -14,7 +14,7 @@ from gui.qt_widgets.MComponents.indicators.setting.rsi_setting_dialog import Rsi
 from manager.indicators_config_manager import *
 from indicators.stock_data_indicators import *
 
-from gui.qt_widgets.common.icon import Icon
+from common.icon import Icon
 
 class RsiWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):

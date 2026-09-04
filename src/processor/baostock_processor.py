@@ -528,36 +528,28 @@ class BaoStockProcessor(QObject):
         return week_stock_data, data_to_save
     
     # 分钟级数据获取接口
-    def process_and_save_minute_level_stock_data(self, code, level='30'):
+    def process_and_save_minute_level_stock_data(self, code, period=TimePeriod.MINUTE_30):
         result = pd.DataFrame()
 
-        allowed_levels = ['1', '3', '5', '10', '15', '30', '45', '60', '90', '120']
-        if level not in allowed_levels:
-            self.logger.info(f"Invalid level: {level}")
-            return result
 
-        time_period = TimePeriod.from_minute_number_label(level)
+        time_period = period
 
         if not BaostockDataManager().check_stock_db_exists(code) or not BaostockDataManager().check_table_exists(code, time_period):
             # self.logger.info(f"分钟级 {code}.db 不存在，即将从Baostock获取")
-            result = self.process_minute_level_stock_data(code, level)
+            result = self.process_minute_level_stock_data(code, period)
 
             if result is not None and not result.empty:
                 BaostockDataManager().save_stock_data_to_db(code, result, 'replace', time_period)
         else:
             # self.logger.info(f"分钟级 {code}.db 存在，即将从本地数据库更新")
-            result, data_to_save = self.update_minute_level_stock_data(code, level)
+            result, data_to_save = self.update_minute_level_stock_data(code, period)
             if data_to_save is not None and not data_to_save.empty:
                 BaostockDataManager().save_stock_data_to_db(code, data_to_save, "append", time_period)
 
         return result
 
-    def process_minute_level_stock_data(self, code, level = '1', start_date=None, end_date=None, adjustflag='2'):
+    def process_minute_level_stock_data(self, code, period=TimePeriod.MINUTE_30, start_date=None, end_date=None, adjustflag='2'):
         result = pd.DataFrame()
-        allowed_levels = ['1', '3', '5', '10', '15', '30', '45', '60', '90', '120']
-        if level not in allowed_levels:
-            self.logger.info(f"Invalid level: {level}")
-            return result
         
         # 1分钟只能获取近3个月数据，其他分钟级别只能获取近1年的数据
         if start_date == None or end_date == None:
@@ -565,7 +557,7 @@ class BaoStockProcessor(QObject):
             end_date = datetime.datetime.now().strftime("%Y-%m-%d")
             # end_date = (datetime.datetime.now() - datetime.timedelta(days=3)).strftime("%Y-%m-%d")
 
-            if level == '1':
+            if period == TimePeriod.MINUTE_1:
                 start_date = (datetime.datetime.now() - datetime.timedelta(days=3*30)).strftime("%Y-%m-%d")
             else:
                 current_year = datetime.datetime.now().year
@@ -575,6 +567,8 @@ class BaoStockProcessor(QObject):
         
         # sleep_time = random.uniform(0.1, 0.2)
         # time.sleep(sleep_time)
+
+        level = TimePeriod.get_number_label(period)
 
         with self.lock:
             rs = bs.query_history_k_data_plus(code,
@@ -611,18 +605,14 @@ class BaoStockProcessor(QObject):
 
         return result
     
-    def update_minute_level_stock_data(self, code, level='30'):
+    def update_minute_level_stock_data(self, code, period=TimePeriod.MINUTE_30):
         result = pd.DataFrame()
         data_to_save = pd.DataFrame()
         if not BaostockDataManager().check_stock_db_exists(code):
             self.logger.info("{stock_code}.db 不存在", code)
             return result, data_to_save
         
-        allowed_levels = ['1', '3', '5', '10', '15', '30', '45', '60', '90', '120']
-        if level not in allowed_levels:
-            return result, data_to_save
-        
-        time_period = TimePeriod.from_minute_number_label(level)
+        time_period = period
 
         # 步骤一：得到当前数据库中的股票数据
         minute_stock_data = BaostockDataManager().get_stock_data_from_db_by_period(code, time_period)
@@ -645,7 +635,7 @@ class BaoStockProcessor(QObject):
         last_date = None
         if minute_stock_data.empty or minute_stock_data is None:
             # self.logger.info("数据库表为空，默认获取近1年股票数据")
-            if level == '1':
+            if period == TimePeriod.MINUTE_1:
                 last_date = (datetime.datetime.now() - datetime.timedelta(days=3*30)).strftime("%Y-%m-%d")
             else:
                 # last_date = (datetime.datetime.now() - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
@@ -684,7 +674,7 @@ class BaoStockProcessor(QObject):
                 return minute_stock_data, data_to_save
 
         
-        df_new_stock_data = self.process_minute_level_stock_data(code, level, start_date, end_date)
+        df_new_stock_data = self.process_minute_level_stock_data(code, period, start_date, end_date)
 
         df_new_stock_data = df_new_stock_data.dropna()
         
@@ -727,7 +717,7 @@ class BaoStockProcessor(QObject):
 
         i = 1
         board_name_chinese = self.get_chinese_board_name(board_name)
-        time_period_name_chinese = TimePeriod.get_chinese_label(TimePeriod)
+        time_period_name_chinese = TimePeriod.get_label(TimePeriod)
         self.logger.info(f"开始处理 {board_name_chinese} {time_period_name_chinese} 股票数据...")
         start_time = time.time()  # 记录开始时间
 
@@ -774,22 +764,16 @@ class BaoStockProcessor(QObject):
         gc.collect()
 
     # -----------------分钟级别股票数据获取接口---------------------
-    def process_minute_level_stock_data_with_board_type(self, board_type, level, task=None):
+    def process_minute_level_stock_data_with_board_type(self, board_type, period=TimePeriod.MINUTE_30, task=None):
         allowed_board_types = ['sh_main', 'sz_main', 'gem', 'star', 'bse']
         if board_type not in allowed_board_types:
             # raise ValueError(f"Invalid board_type: {board_type}. Allowed values are: {allowed_board_types}")
             self.logger.error(f"Invalid board_type: {board_type}. Allowed values are: {allowed_board_types}")
             return
         
-        allowed_levels = ['1', '3', '5', '10', '15', '30', '45', '60', '90', '120']
-        if level not in allowed_levels:
-            # raise ValueError(f"Invalid level: {level}. Allowed values are: {allowed_levels}")
-            self.logger.error(f"Invalid level: {level}. Allowed values are: {allowed_levels}")
-            return
-        
         i = 1
 
-        self.logger.info(f"开始处理{board_type}股票{level}分钟级别数据...")
+        self.logger.info(f"开始处理{board_type}股票{TimePeriod.get_label(period)}分钟级别数据...")
         start_time = time.time()  # 记录开始时间
 
         dict_stock_info = BaostockDataManager().get_stock_info_dict()
@@ -806,10 +790,10 @@ class BaoStockProcessor(QObject):
             stock_name = row['name'] if 'name' in row else '未知'
             # self.logger.info(f"获取第 {i} 只{board_type}股票 {value} {level}分钟级别数据")
             
-            result = self.process_and_save_minute_level_stock_data(value, level)
+            result = self.process_and_save_minute_level_stock_data(value, period)
 
             # 测试
-            # result = self.process_minute_level_stock_data(value, level)
+            # result = self.process_minute_level_stock_data(value, period)
 
             if result is None or result.empty:
                 # self.logger.info(f"股票 {value} 数据获取失败")
@@ -821,16 +805,16 @@ class BaoStockProcessor(QObject):
             #     break
             
             if i % 100 == 0:  # 每100只股票打印一次日志
-                self.logger.info(f"已处理 {i} 只{board_type}股票【{level}分钟级别】数据")
+                self.logger.info(f"已处理 {i} 只{board_type}股票【{TimePeriod.get_label(period)}分钟级别】数据")
 
             i += 1
 
             del result  # 及时删除避免内存泄漏
 
         process_elapsed_time = time.time() - start_time  # 计算耗时
-        self.logger.info(f"获取{board_type}股票{level}分钟级别数据完成，共处理{i}只股票，耗时: {process_elapsed_time:.2f}秒，即{process_elapsed_time/60:.2f}分钟")
+        self.logger.info(f"获取{board_type}股票{TimePeriod.get_label(period)}分钟级别数据完成，共处理{i}只股票，耗时: {process_elapsed_time:.2f}秒，即{process_elapsed_time/60:.2f}分钟")
 
-        self.logger.info(f"{board_type}股票{level}分钟级别数据获取完成")
+        self.logger.info(f"{board_type}股票{TimePeriod.get_label(period)}分钟级别数据获取完成")
 
         # 批处理完成后强制垃圾回收
         gc.collect()

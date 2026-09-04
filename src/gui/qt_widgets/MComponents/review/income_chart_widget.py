@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 
 import pyqtgraph as pg
 
-from gui.qt_widgets.common.config import cfg
+from common.config import cfg
 from gui.qt_widgets.MComponents.qfluentwidgets import(Theme, isDarkTheme, theme)
 
 class IncomeChartWidget(QWidget):

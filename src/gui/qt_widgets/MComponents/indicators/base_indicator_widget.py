@@ -7,7 +7,7 @@ import numpy as np
 
 from manager.period_manager import TimePeriod
 
-from gui.qt_widgets.common.config import cfg
+from common.config import cfg
 from gui.qt_widgets.MComponents.qfluentwidgets import(Theme, isDarkTheme, theme)
 
 # 需要发送到外部控件（如BaseIndicatorWidget的父控件或其他子类）时，使用全局信号

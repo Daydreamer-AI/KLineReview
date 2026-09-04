@@ -13,7 +13,7 @@ from gui.qt_widgets.MComponents.indicators.setting.macd_setting_dialog import Ma
 from indicators.stock_data_indicators import *
 from manager.indicators_config_manager import *
 
-from gui.qt_widgets.common.icon import Icon
+from common.icon import Icon
 
 class MacdWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):

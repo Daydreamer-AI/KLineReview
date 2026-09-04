@@ -27,11 +27,11 @@ from ..setting.setting_interface import SettingInterface
 
 from ..review.review_interface import ReviewInterface
 
-from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
-from ..common.icon import Icon
-from ..common.signal_bus import signalBus
-from ..common.translator import Translator
-from ..common import resource
+from common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
+from common.icon import Icon
+from common.signal_bus import signalBus
+from common.translator import Translator
+from common import resource
 
 from thread.task_pool import get_default_task_pool
 from processor.baostock_processor import BaoStockProcessor

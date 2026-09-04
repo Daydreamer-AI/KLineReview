@@ -16,7 +16,7 @@ from manager.indicators_config_manager import *
 from gui.qt_widgets.MComponents.indicators.kline_overview_widget import KLineOverviewWidget
 from indicators.stock_data_indicators import *
 
-from gui.qt_widgets.common.icon import Icon
+from common.icon import Icon
 
 class KLineWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):

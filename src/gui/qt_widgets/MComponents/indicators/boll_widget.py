@@ -13,7 +13,7 @@ from gui.qt_widgets.MComponents.indicators.setting.boll_setting_dialog import Bo
 from manager.indicators_config_manager import *
 from indicators.stock_data_indicators import *
 
-from gui.qt_widgets.common.icon import Icon
+from common.icon import Icon
 
 class BollWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):

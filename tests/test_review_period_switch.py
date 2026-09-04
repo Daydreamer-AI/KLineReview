@@ -175,8 +175,8 @@ class TestLoadAndMatrix(ReviewSwitchTestBase):
             (1, TimePeriod.MINUTE_5, '2026-08-21 15:00:00'),
         ]:
             dr = self._switch(view, btn_id, period)
-            self.assertTrue(dr, TimePeriod.get_chinese_label(period))
-            self.assertEqual(self._cur(view), expect, TimePeriod.get_chinese_label(period))
+            self.assertTrue(dr, TimePeriod.get_label(period))
+            self.assertEqual(self._cur(view), expect, TimePeriod.get_label(period))
 
 
 class TestMinuteInternal(ReviewSwitchTestBase):
@@ -193,7 +193,7 @@ class TestMinuteInternal(ReviewSwitchTestBase):
             (1, TimePeriod.MINUTE_5, '2026-08-21 10:05:00'),
         ]:
             self._switch(view, btn_id, period)
-            self.assertEqual(self._cur(view), expect, TimePeriod.get_chinese_label(period))
+            self.assertEqual(self._cur(view), expect, TimePeriod.get_label(period))
 
 
 class TestPartialAndAutoComplete(ReviewSwitchTestBase):

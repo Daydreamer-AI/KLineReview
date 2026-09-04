@@ -4,11 +4,11 @@ from PyQt5.QtGui import QPixmap, QPainter, QColor, QBrush, QPainterPath, QLinear
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 
 from gui.qt_widgets.MComponents.qfluentwidgets import ScrollArea, isDarkTheme, FluentIcon
-from ..common.config import cfg, HELP_URL, REPO_URL, EXAMPLE_URL, FEEDBACK_URL
-from ..common.icon import Icon, FluentIconBase
+from common.config import cfg, HELP_URL, REPO_URL, EXAMPLE_URL, FEEDBACK_URL
+from common.icon import Icon, FluentIconBase
 # from ..components.link_card import LinkCardView
 # from ..components.sample_card import SampleCardView
-from ..common.style_sheet import StyleSheet
+from common.style_sheet import StyleSheet
 
 from ..MComponents.review.review_widget import ReviewWidget
 

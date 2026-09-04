@@ -42,7 +42,7 @@ class IndicatrosEnum(Enum):
 
 
     @classmethod
-    def get_chinese_label(cls, indicator_name):
+    def get_label(cls, indicator_name):
         """根据枚举值获取对应的中文标签"""
         # 延迟初始化映射字典
         if not hasattr(cls, '_chinese_label_mapping'):

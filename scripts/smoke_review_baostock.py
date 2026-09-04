@@ -59,7 +59,7 @@ def fetch_real_data(code, review_date):
     proc.init_baostock_login()
     try:
         day_df = proc.process_daily_stock_data(code, None, None, '2')
-        m5 = proc.process_minute_level_stock_data(code, '5', None, None, '2')
+        m5 = proc.process_minute_level_stock_data(code, TimePeriod.MINUTE_5, None, None, '2')
     finally:
         if hasattr(proc, 'logout'):
             try:

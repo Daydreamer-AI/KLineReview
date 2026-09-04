@@ -9,9 +9,9 @@ from manager.bao_stock_data_manager import BaostockDataManager
 
 from manager.logging_manager import get_logger
 
-from ..common.style_sheet import StyleSheet
-from ..common.signal_bus import signalBus
-from ..common.icon import Icon
+from common.style_sheet import StyleSheet
+from common.signal_bus import signalBus
+from common.icon import Icon
 
 import random
 

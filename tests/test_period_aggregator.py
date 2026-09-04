@@ -106,7 +106,7 @@ class TestMinuteAggregation(unittest.TestCase):
         ]:
             out = aggregate_period(self.base, period, as_of='2026-08-24 15:00:00')
             per_day = out[out['date'] == '2026-08-24']
-            self.assertEqual(len(per_day), expected, TimePeriod.get_chinese_label(period))
+            self.assertEqual(len(per_day), expected, TimePeriod.get_label(period))
 
     def test_120m_cross_lunch(self):
         """跨午休不分组错误：上午 24 根 5m → 一根 11:30，下午 → 一根 15:00。"""
@@ -163,7 +163,7 @@ class TestMultiPeriods(unittest.TestCase):
             out = aggregate_period(self.day, period, as_of='2026-08-24')
             last = out.iloc[-1]
             self.assertEqual(last['volume'], self._group_volume(period, last['date']),
-                             TimePeriod.get_chinese_label(period))
+                             TimePeriod.get_label(period))
 
     def test_2week_starts_monday(self):
         self.assertEqual(
