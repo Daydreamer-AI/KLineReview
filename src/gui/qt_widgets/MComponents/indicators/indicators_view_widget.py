@@ -101,23 +101,6 @@ class IndicatorsViewWidget(QWidget):
         self.period_button_group.addButton(self.btn_45m, 10)
         self.period_button_group.addButton(self.btn_90m, 11)
 
-        self.logger.info(f"TimePeriod.DAY.label类型：{type(TimePeriod.DAY.label)}, TimePeriod.from_label(label) 类型：{type(TimePeriod.from_label(TimePeriod.DAY.label) )}")
-
-        self.btn_time.setText(TimePeriod.TIME.label)
-        self.btn_1m.setText(TimePeriod.MINUTE_1.label)
-        self.btn_5m.setText(TimePeriod.MINUTE_5.label)
-        self.btn_10m.setText(TimePeriod.MINUTE_10.label)
-        self.btn_15m.setText(TimePeriod.MINUTE_15.label)
-        self.btn_30m.setText(TimePeriod.MINUTE_30.label)
-        self.btn_45m.setText(TimePeriod.MINUTE_45.label)
-        self.btn_60m.setText(TimePeriod.MINUTE_60.label)
-        self.btn_90m.setText(TimePeriod.MINUTE_90.label)
-        self.btn_120m.setText(TimePeriod.MINUTE_120.label)
-
-        self.btn_1d.setText(TimePeriod.DAY.label)
-        self.btn_1w.setText(TimePeriod.WEEK.label)
-        self.btn_M.setText(TimePeriod.MONTH.label)
-
         self.btn_time.setEnabled(False)
         self.btn_1m.setEnabled(False)
         # 5/10/15/30/60/120 分钟默认禁用；复盘加载完成后由 set_period_buttons_enabled 按注入周期控制
@@ -135,8 +118,6 @@ class IndicatorsViewWidget(QWidget):
         self.btn_M.setEnabled(False)
 
         self.btn_1d.setChecked(True)
-
-        # self.init_stock_card_list()
 
         self.kline_widget = KLineWidget(self.df_data, self.type, self)
         self.verticalLayout.addWidget(self.kline_widget, 3)
@@ -349,11 +330,11 @@ class IndicatorsViewWidget(QWidget):
         valid_dict = {}
         for period, df in dict_stock_data.items():
             if df is None or df.empty:
-                self.logger.warning(f"{code}的{TimePeriod.get_label(period)}数据为空，跳过")
+                self.logger.warning(f"{code}的{TimePeriod.get_chinese_label(period)}数据为空，跳过")
                 continue
             missing_cols = [col for col in required_cols if col not in df.columns]
             if missing_cols:
-                self.logger.warning(f"{code}的{TimePeriod.get_label(period)}数据缺少列：{missing_cols}，可能导致绘图异常")
+                self.logger.warning(f"{code}的{TimePeriod.get_chinese_label(period)}数据缺少列：{missing_cols}，可能导致绘图异常")
             valid_dict[period] = df
 
         if not valid_dict:
@@ -362,7 +343,7 @@ class IndicatorsViewWidget(QWidget):
 
         self.dict_stock_data.update(valid_dict)
         self._base_stock_data.update({period: df.copy() for period, df in valid_dict.items()})
-        periods_text = [TimePeriod.get_label(period) for period in valid_dict.keys()]
+        periods_text = [TimePeriod.get_chinese_label(period) for period in valid_dict.keys()]
         self.logger.info(f"已注入{code}的{len(valid_dict)}个周期数据：{periods_text}")
 
     def show_default_indicator(self):
@@ -700,7 +681,7 @@ class IndicatorsViewWidget(QWidget):
                 self.set_period(period)
                 self.kline_widget.set_period_text(btn.text())
                 return True
-        self.logger.warning(f"未找到周期 {TimePeriod.get_label(period)} 对应的周期按钮")
+        self.logger.warning(f"未找到周期 {TimePeriod.get_chinese_label(period)} 对应的周期按钮")
         return False
 
     def set_period_buttons_enabled(self, periods=None):
@@ -804,9 +785,9 @@ class IndicatorsViewWidget(QWidget):
     def get_target_index_auto(self, last_period, target_period):
         # 核心逻辑：
         # 第一次切换目标周期时，根据当前self.dict_period_process_data存储的最小周期的当前索引，确定目标周期的索引
-        min_period_chinese_text = TimePeriod.get_label(self.min_period)
-        last_period_chinese_text = TimePeriod.get_label(last_period)
-        target_period_chinese_text = TimePeriod.get_label(target_period)
+        min_period_chinese_text = TimePeriod.get_chinese_label(self.min_period)
+        last_period_chinese_text = TimePeriod.get_chinese_label(last_period)
+        target_period_chinese_text = TimePeriod.get_chinese_label(target_period)
         self.logger.info(f"已切换成功的最小周期：{min_period_chinese_text}，来源周期：{last_period_chinese_text}，目标周期：{target_period_chinese_text}")
         current_time = self.dict_period_process_data[last_period].current_date_time
         self.logger.info(f"来源周期的current_time：{current_time}")
@@ -940,7 +921,7 @@ class IndicatorsViewWidget(QWidget):
         try:
             derived_df = aggregate_period(base_df, period, as_of=as_of)
         except Exception as e:
-            self.logger.error(f"周期{TimePeriod.get_label(period)}切换前聚合失败: {e}")
+            self.logger.error(f"周期{TimePeriod.get_chinese_label(period)}切换前聚合失败: {e}")
             return
         if derived_df is not None and not derived_df.empty:
             self.dict_stock_data[period] = derived_df
@@ -1052,7 +1033,7 @@ class IndicatorsViewWidget(QWidget):
             # 回退到数据起始位置保证出图；周期切换场景由 slot 回退到来源周期，避免复盘位置漂移
             if b_init and not matching_indices and df is not None and not df.empty:
                 self.logger.warning(
-                    f"周期{TimePeriod.get_label(target_period)}在 as_of={start_date} 无匹配数据，回退到数据起始位置")
+                    f"周期{TimePeriod.get_chinese_label(target_period)}在 as_of={start_date} 无匹配数据，回退到数据起始位置")
                 matching_indices = [0]
 
             if b_init:
@@ -1094,8 +1075,8 @@ class IndicatorsViewWidget(QWidget):
                     # 第一次切换默认到最后索引
                     # 不是第一次切换则判断来源周期索引是否发生变化
                     # 有发生变化则更新目标周期索引，没有发生变化则自动切换到目标周期索引
-                    s_last_period_text = TimePeriod.get_label(last_period)
-                    s_target_period_text = TimePeriod.get_label(target_period)
+                    s_last_period_text = TimePeriod.get_chinese_label(last_period)
+                    s_target_period_text = TimePeriod.get_chinese_label(target_period)
                     self.logger.info(f"周期切换--来源周期：{s_last_period_text}，目标周期：{s_target_period_text}")
                     
                     self.logger.info(f"来源周期当前索引：{self.current_animation_index}，开始索引：{self.start_animation_index}")
@@ -1145,7 +1126,7 @@ class IndicatorsViewWidget(QWidget):
                     self.dict_period_process_data[target_period] = review_period_process_data
                     if target_period < self.min_period:
                         self.min_period = target_period
-                        self.logger.info(f"更新最小周期为：{TimePeriod.get_label(self.min_period)}")
+                        self.logger.info(f"更新最小周期为：{TimePeriod.get_chinese_label(self.min_period)}")
 
                     self.update_chart(data, self.start_animation_index)
                     dict_return = {
@@ -1262,7 +1243,7 @@ class IndicatorsViewWidget(QWidget):
         # 未注入的周期不允许切换，回退到原周期并提示，不触发上层数据加载。
         if self.property("review") is not None and target_period not in self.dict_stock_data:
             self.logger.warning(
-                f"{self.current_selected_code}未注入{TimePeriod.get_label(target_period)}数据，"
+                f"{self.current_selected_code}未注入{TimePeriod.get_chinese_label(target_period)}数据，"
                 f"请通过加载按钮加载该周期后再切换"
             )
             last_btn = self.period_button_group.button(self.last_period_btn_checked_id)
@@ -1272,7 +1253,7 @@ class IndicatorsViewWidget(QWidget):
 
         self.set_period(target_period)
         if target_period not in self.dict_stock_data:
-            self.logger.warning(f"{self.current_selected_code}未注入{TimePeriod.get_label(target_period)}数据，切换后图表可能为空")
+            self.logger.warning(f"{self.current_selected_code}未注入{TimePeriod.get_chinese_label(target_period)}数据，切换后图表可能为空")
         checked_id = self.period_button_group.checkedId()
         if self.property("review") is not None:
             # self.logger.info(f"所属复盘模块，暂不支持周期切换")
@@ -1295,7 +1276,7 @@ class IndicatorsViewWidget(QWidget):
                 if not dict_return:
                     # 目标周期数据未覆盖当前复盘位置：回退到来源周期，避免复盘位置漂移
                     self.logger.warning(
-                        f"周期{TimePeriod.get_label(target_period)}数据未覆盖当前位置 {current_date_time}，保持原周期")
+                        f"周期{TimePeriod.get_chinese_label(target_period)}数据未覆盖当前位置 {current_date_time}，保持原周期")
                     last_btn = self.period_button_group.button(self.last_period_btn_checked_id)
                     if last_btn is not None:
                         last_btn.setChecked(True)

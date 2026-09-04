@@ -78,7 +78,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Time</string>
+             <string>分时</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -103,7 +103,7 @@
              </size>
             </property>
             <property name="text">
-             <string>1D</string>
+             <string>日线</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -131,7 +131,7 @@
              </size>
             </property>
             <property name="text">
-             <string>1W</string>
+             <string>周线</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -156,7 +156,7 @@
              </size>
             </property>
             <property name="text">
-             <string>1M</string>
+             <string>月线</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -181,7 +181,7 @@
              </size>
             </property>
             <property name="text">
-             <string>1m</string>
+             <string>1分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -206,7 +206,7 @@
              </size>
             </property>
             <property name="text">
-             <string>5m</string>
+             <string>5分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -231,7 +231,7 @@
              </size>
             </property>
             <property name="text">
-             <string>10m</string>
+             <string>10分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -256,7 +256,7 @@
              </size>
             </property>
             <property name="text">
-             <string>15m</string>
+             <string>15分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -281,7 +281,7 @@
              </size>
             </property>
             <property name="text">
-             <string>30m</string>
+             <string>30分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -306,7 +306,7 @@
              </size>
             </property>
             <property name="text">
-             <string>45m</string>
+             <string>45分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -331,7 +331,7 @@
              </size>
             </property>
             <property name="text">
-             <string>60m</string>
+             <string>60分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -356,7 +356,7 @@
              </size>
             </property>
             <property name="text">
-             <string>90m</string>
+             <string>90分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -381,7 +381,7 @@
              </size>
             </property>
             <property name="text">
-             <string>120m</string>
+             <string>120分</string>
             </property>
             <property name="checkable">
              <bool>true</bool>

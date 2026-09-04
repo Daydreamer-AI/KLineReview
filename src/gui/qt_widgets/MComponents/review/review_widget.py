@@ -94,8 +94,8 @@ class ReviewWidget(QWidget):
 
         self.btn_date_select.setDate(QDate.currentDate().addDays(-365))
 
-        self.btn_period_select.addItems([TimePeriod.get_label(period) for period in self.get_load_periods()])
-        self.btn_period_select.setCurrentText(TimePeriod.get_label(TimePeriod.DAY))
+        self.btn_period_select.addItems([TimePeriod.get_chinese_label(period) for period in self.get_load_periods()])
+        self.btn_period_select.setCurrentText(TimePeriod.get_chinese_label(TimePeriod.DAY))
 
         # self.btn_load_data_random.setAutoDefault(False)
         # self.btn_load_data_random.setDefault(False)
@@ -341,7 +341,7 @@ class ReviewWidget(QWidget):
 
         # 同步周期选择控件选项（保持当前选择，若不在新列表则回退到第一项）
         current_label = self.btn_period_select.currentText()
-        period_labels = [TimePeriod.get_label(p) for p in valid_periods]
+        period_labels = [TimePeriod.get_chinese_label(p) for p in valid_periods]
         self.btn_period_select.blockSignals(True)
         self.btn_period_select.clear()
         self.btn_period_select.addItems(period_labels)
@@ -351,7 +351,7 @@ class ReviewWidget(QWidget):
             self.btn_period_select.setCurrentIndex(0)
         self.btn_period_select.blockSignals(False)
 
-        self.logger.info(f"复盘加载周期更新为: {[TimePeriod.get_label(p) for p in valid_periods]}")
+        self.logger.info(f"复盘加载周期更新为: {[TimePeriod.get_chinese_label(p) for p in valid_periods]}")
 
     def load_data(self, code, date):
         """复盘数据统一加载入口：仅由“加载/随机加载”按钮触发。
@@ -375,7 +375,7 @@ class ReviewWidget(QWidget):
             self.demo_trading_manager.force_update_trading(kline_data)
 
         selected_period = TimePeriod.from_label(self.btn_period_select.currentText())
-        self.logger.info(f"开始加载复盘数据: {code}, {date}, 显示周期={TimePeriod.get_label(selected_period)}")
+        self.logger.info(f"开始加载复盘数据: {code}, {date}, 显示周期={TimePeriod.get_chinese_label(selected_period)}")
 
         # 同股票所有配置周期均已注入内存缓存：仅按新日期重新定位动画，不重复拉取
         if self._all_periods_ready(code):
@@ -420,7 +420,7 @@ class ReviewWidget(QWidget):
             self._on_all_periods_loaded(code, date, selected_period)
             return
 
-        self.logger.info(f"需要远程获取的周期: {[TimePeriod.get_label(p) for p in self._fetch_pending_periods]}")
+        self.logger.info(f"需要远程获取的周期: {[TimePeriod.get_chinese_label(p) for p in self._fetch_pending_periods]}")
         self._fetch_next_period(code, date, selected_period)
 
     def _fetch_next_period(self, code, date, selected_period):
@@ -434,7 +434,7 @@ class ReviewWidget(QWidget):
         from thread.baostock_data_fetch_task import BaostockDataFetchTask2
         from thread.task_pool import get_default_task_pool
 
-        self.logger.info(f"从Baostock远程获取: {code} {TimePeriod.get_label(period)}, 起始={fetch_start_date}")
+        self.logger.info(f"从Baostock远程获取: {code} {TimePeriod.get_chinese_label(period)}, 起始={fetch_start_date}")
         baostock_data_fetch_task = BaostockDataFetchTask2(code=code, period=period, start_date=fetch_start_date)
 
         def on_completed(task_id, result):
@@ -454,7 +454,7 @@ class ReviewWidget(QWidget):
             except TypeError:
                 pass
             self._fetch_failed_periods.append(period)
-            self.logger.error(f"远程获取失败: {code} {TimePeriod.get_label(period)}: {error}")
+            self.logger.error(f"远程获取失败: {code} {TimePeriod.get_chinese_label(period)}: {error}")
             self._fetch_next_period(code, date, selected_period)
 
         baostock_data_fetch_task.task_completed.connect(on_completed)
@@ -491,7 +491,7 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.hide_loading()
 
         if self._fetch_failed_periods:
-            failed_text = "、".join(TimePeriod.get_label(p) for p in self._fetch_failed_periods)
+            failed_text = "、".join(TimePeriod.get_chinese_label(p) for p in self._fetch_failed_periods)
             self.logger.warning(f"以下周期获取失败: {failed_text}")
 
         # 1. 组装各周期 DataFrame
@@ -527,7 +527,7 @@ class ReviewWidget(QWidget):
             try:
                 derived_df = aggregate_period(base_df, period, as_of=date)
             except Exception as e:
-                self.logger.error(f"{code} 周期{TimePeriod.get_label(period)}聚合失败: {e}")
+                self.logger.error(f"{code} 周期{TimePeriod.get_chinese_label(period)}聚合失败: {e}")
                 derived_df = None
             if derived_df is not None and not derived_df.empty:
                 dict_stock_data[period] = derived_df
@@ -550,15 +550,15 @@ class ReviewWidget(QWidget):
 
         if display_period != selected_period:
             self.logger.warning(
-                f"所选周期{TimePeriod.get_label(selected_period)}无数据，"
-                f"回退显示{TimePeriod.get_label(display_period)}"
+                f"所选周期{TimePeriod.get_chinese_label(selected_period)}无数据，"
+                f"回退显示{TimePeriod.get_chinese_label(display_period)}"
             )
 
         indicators_view_widget.set_current_period(display_period)
 
         # 周期选择控件与初始显示周期保持一致
         self.btn_period_select.blockSignals(True)
-        self.btn_period_select.setCurrentText(TimePeriod.get_label(display_period))
+        self.btn_period_select.setCurrentText(TimePeriod.get_chinese_label(display_period))
         self.btn_period_select.blockSignals(False)
 
         # 4. 动画锚点行取显示周期数据的最后一行（远程数据，含 code/name）
@@ -581,7 +581,7 @@ class ReviewWidget(QWidget):
         # 6. 初始化复盘动画并刷新状态
         self.dict_progress_data = indicators_view_widget.init_animation(data_row, date)
         if not self.dict_progress_data:
-            self.logger.warning(f"复盘动画初始化失败: {code}, {date}, {TimePeriod.get_label(display_period)}")
+            self.logger.warning(f"复盘动画初始化失败: {code}, {date}, {TimePeriod.get_chinese_label(display_period)}")
 
         self.current_load_code = code
         self.current_load_period = display_period
