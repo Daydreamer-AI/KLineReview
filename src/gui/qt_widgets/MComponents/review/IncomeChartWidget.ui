@@ -87,7 +87,12 @@
          </widget>
         </item>
         <item>
-         <widget class="BodyLabel" name="label_total_yield">
+         <widget class="QLabel" name="label_total_yield">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>--</string>
           </property>
@@ -114,7 +119,12 @@
          </widget>
         </item>
         <item>
-         <widget class="BodyLabel" name="label_win_rate">
+         <widget class="QLabel" name="label_win_rate">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>--</string>
           </property>

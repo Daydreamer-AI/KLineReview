@@ -101,6 +101,21 @@ class IndicatorsViewWidget(QWidget):
         self.period_button_group.addButton(self.btn_45m, 10)
         self.period_button_group.addButton(self.btn_90m, 11)
 
+        self.btn_time.setText(TimePeriod.TIME.label)
+        self.btn_1m.setText(TimePeriod.MINUTE_1.label)
+        self.btn_5m.setText(TimePeriod.MINUTE_5.label)
+        self.btn_10m.setText(TimePeriod.MINUTE_10.label)
+        self.btn_15m.setText(TimePeriod.MINUTE_15.label)
+        self.btn_30m.setText(TimePeriod.MINUTE_30.label)
+        self.btn_45m.setText(TimePeriod.MINUTE_45.label)
+        self.btn_60m.setText(TimePeriod.MINUTE_60.label)
+        self.btn_90m.setText(TimePeriod.MINUTE_90.label)
+        self.btn_120m.setText(TimePeriod.MINUTE_120.label)
+
+        self.btn_1d.setText(TimePeriod.DAY.label)
+        self.btn_1w.setText(TimePeriod.WEEK.label)
+        self.btn_M.setText(TimePeriod.MONTH.label)
+
         self.btn_time.setEnabled(False)
         self.btn_1m.setEnabled(False)
         # 5/10/15/30/60/120 分钟默认禁用；复盘加载完成后由 set_period_buttons_enabled 按注入周期控制
