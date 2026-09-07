@@ -5,6 +5,8 @@ from functools import partial
 from manager.logging_manager import get_logger
 from manager.indicators_config_manager import *
 
+from gui.qt_widgets.MComponents.qfluentwidgets import (isDarkTheme, ColorDialog)
+
 class BollSettingObject(object):
     def __init__(self, id=0, period_lineedit_obj=None, checkbox_obj=None, line_width_lineedit_obj=None, color_obj=None):
         self.id = id
@@ -39,7 +41,11 @@ class BollSettingDialog(QDialog):
 
 
     def init_ui(self):
-        self.label_title_ma_period_2.hide()
+        if isDarkTheme():
+            self.setStyleSheet("QDialog{background: #1E1E1E;}")
+        else:
+            self.setStyleSheet("QDialog{background: #F0F0F0;}")
+
         # 遍历配置并设置UI
         for id, setting in self.dict_setting_user.items():
             # self.logger.info(f"setting--id: {setting.id}, period: {setting.period}, name: {setting.name}, visible: {setting.visible}, line_width: {setting.line_width}, color: {setting.color}, color_hex: {setting.color_hex}")
@@ -101,7 +107,11 @@ class BollSettingDialog(QDialog):
         current_color_hex = self.dict_setting_user[id].color_hex
         # 将十六进制字符串转换为 QColor 对象
         current_color = QColor(current_color_hex)
-        color = QColorDialog.getColor(current_color, self, f"选择颜色 {id + 1}")
+        
+        color_dlg = ColorDialog(current_color, self.tr(f'Select Color {id + 1}'), self)
+        color = current_color
+        color_dlg.colorChanged.connect(lambda c: color.setRgb(c.red(), c.green(), c.blue(), c.alpha()))
+        color_dlg.exec()
 
         if color.isValid():
             # 更新颜色存储

@@ -47,6 +47,21 @@
         <enum>QFrame::Raised</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>24</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QFrame" name="frame_title_scheme">
           <property name="minimumSize">
@@ -82,6 +97,12 @@
            </property>
            <item>
             <widget class="ToggleButton" name="btn_scheme">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
               <string>Auto</string>
              </property>
@@ -98,6 +119,12 @@
            </item>
            <item>
             <widget class="ToggleButton" name="btn_scheme_1">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
               <string>Light</string>
              </property>
@@ -111,6 +138,12 @@
            </item>
            <item>
             <widget class="ToggleButton" name="btn_scheme_2">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
               <string>Dark</string>
              </property>
@@ -150,7 +183,8 @@
            <bool>true</bool>
           </property>
           <property name="plainText">
-           <string>Indicator Description:​ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; trend highs/lows act as resistance/support. MA levels are thus key support/resistance zones, providing buy/sell signals — the essence of the MA system.</string>
+           <string>Indicator Description:​ 
+The MA (Moving Average) indicator tracks price trends. Trends tend to persist; trend highs/lows act as resistance/support. MA levels are thus key support/resistance zones, providing buy/sell signals — the essence of the MA system.</string>
           </property>
          </widget>
         </item>
@@ -171,6 +205,12 @@
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="1">
             <widget class="BodyLabel" name="label_title_para_value">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
              <property name="text">
               <string>Calculation Cycle</string>
              </property>
@@ -178,13 +218,25 @@
            </item>
            <item row="0" column="2">
             <widget class="BodyLabel" name="label_title_line_width">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Line Widget</string>
+              <string>Line Width</string>
              </property>
             </widget>
            </item>
            <item row="0" column="3">
             <widget class="BodyLabel" name="label_title_line_color">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
              <property name="text">
               <string>Color</string>
              </property>
@@ -195,7 +247,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -208,7 +260,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -224,7 +276,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -237,7 +289,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -250,7 +302,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -266,7 +318,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -279,7 +331,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -292,7 +344,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -305,7 +357,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -318,7 +370,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -331,7 +383,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -344,7 +396,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -357,7 +409,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -373,7 +425,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -386,7 +438,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -399,7 +451,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -412,7 +464,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -425,7 +477,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -438,7 +490,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -451,7 +503,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -464,7 +516,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -480,7 +532,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -493,7 +545,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -506,7 +558,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -519,7 +571,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -532,7 +584,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -545,7 +597,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
@@ -558,11 +610,24 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>32</height>
               </size>
              </property>
              <property name="text">
               <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="BodyLabel" name="label_title_enable">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Enable</string>
              </property>
             </widget>
            </item>
@@ -625,7 +690,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>24</height>
+          <height>32</height>
          </size>
         </property>
         <property name="text">
@@ -651,24 +716,11 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>24</height>
+          <height>32</height>
          </size>
         </property>
         <property name="text">
          <string>Apply</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="PushButton" name="btn_cancel">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Cancel</string>
         </property>
        </widget>
       </item>

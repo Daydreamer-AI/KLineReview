@@ -223,12 +223,12 @@ dict_amount_color_user_hex = dict_amount_color_hex.copy()
 
 # MACD
 dict_macd_color = {
-IndicatrosEnum.MACD_DIFF.value: (0, 0, 0),
+IndicatrosEnum.MACD_DIFF.value: (176, 176, 176),
 IndicatrosEnum.MACD_DEA.value: (217, 186, 38),
 }
 
 dict_macd_color_hex = {
-    IndicatrosEnum.MACD_DIFF.value: '#000000',
+    IndicatrosEnum.MACD_DIFF.value: '#b0b0b0',
     IndicatrosEnum.MACD_DEA.value: '#d9ba26'
 }
 
@@ -272,14 +272,14 @@ dict_boll_color = {
 IndicatrosEnum.BOLL_UPPER.value: (255, 61, 61),
 IndicatrosEnum.BOLL_MID.value: (25, 160, 255),
 IndicatrosEnum.BOLL_LOWER.value: (10, 204, 90),
-IndicatrosEnum.BOLL_CLOSE.value: (0, 0, 0)
+IndicatrosEnum.BOLL_CLOSE.value: (176, 176, 176)
 }
 
 dict_boll_color_hex = { 
     IndicatrosEnum.BOLL_UPPER.value: '#ff3d3d',
     IndicatrosEnum.BOLL_MID.value: '#1fa0ff',
     IndicatrosEnum.BOLL_LOWER.value: '#0acc5a',
-    IndicatrosEnum.BOLL_CLOSE.value: '#000000'
+    IndicatrosEnum.BOLL_CLOSE.value: '#b0b0b0'
 }
 
 dict_boll_color_user = dict_boll_color.copy()
@@ -292,7 +292,7 @@ dict_boll_color_user_hex = dict_boll_color_hex.copy()
 class IndicatorSetting:
     """通用指标设置基类"""
     def __init__(self, id: int = 0, period: int = 5, name: str = '', visible: bool = True, 
-                 line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                 line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
         self.id = id
         self.period = period
         self.name = name
@@ -339,7 +339,7 @@ class IndicatorSetting:
 class KLineSetting(IndicatorSetting):
     """K线设置"""
     def __init__(self, id: int = 0, period: int = 5, name: str = 'kline', visible: bool = True, 
-                 line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                 line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
         
         if not name:
             name = f'kline'
@@ -355,7 +355,7 @@ class KLineSetting(IndicatorSetting):
 class MASetting(IndicatorSetting):
     """均线设置"""
     def __init__(self, id: int = 0, period: int = 5, name: str = '', visible: bool = True, 
-                 line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                 line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
         
         if not name:
             name = f'{IndicatrosEnum.MA.value}{period}'
@@ -398,7 +398,7 @@ class MASetting(IndicatorSetting):
 class VolumeSetting(IndicatorSetting):
     """成交量设置"""
     def __init__(self, id: int = 0, period: int = 5, name: str = '', visible: bool = True, 
-                 line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                 line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
         
         if not name:
             name = f'{IndicatrosEnum.MA.value}{period}'
@@ -414,7 +414,7 @@ class VolumeSetting(IndicatorSetting):
 class AmountSetting(IndicatorSetting):
     """成交额设置"""
     def __init__(self, id: int = 0, period: int = 5, name: str = '', visible: bool = True, 
-                 line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                 line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
         
         if not name:
             name = f'{IndicatrosEnum.MA.value}{period}'
@@ -430,7 +430,7 @@ class AmountSetting(IndicatorSetting):
 class MACDSetting(IndicatorSetting):
     """MACD设置"""
     def __init__(self, id: int = 0, period: int = 5, name: str = '', visible: bool = True, 
-                 line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                 line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
         
         # id: 0-短周期-DIFF，1-长周期-DEA，2-移动平均周期
         if id < 0 or id > 2:
@@ -455,7 +455,7 @@ class MACDSetting(IndicatorSetting):
 class KDJSetting(IndicatorSetting):
     """KDJ设置"""
     def __init__(self, id: int = 0, period: int = 5, name: str = '', visible: bool = True, 
-                line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
     
         # id: 0-计算周期-K，1-移动平均周期-D，2-移动平均周期-J
         if id < 0 or id > 2:
@@ -480,7 +480,7 @@ class KDJSetting(IndicatorSetting):
 class RSISetting(IndicatorSetting):
     """RSI设置"""
     def __init__(self, id: int = 0, period: int = 5, name: str = '', visible: bool = True, 
-                line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
     
         # id: 0-移动平均周期，1-移动平均周期，2-移动平均周期
         if id < 0 or id > 2:
@@ -500,7 +500,7 @@ class RSISetting(IndicatorSetting):
 class BOLLSetting(IndicatorSetting):
     """BOLL设置"""
     def __init__(self, id: int = 0, period: int = 5, name: str = '', visible: bool = True, 
-                line_width: int = 2, color: tuple = (0, 0, 0), color_hex: str = '#000000'):
+                line_width: int = 2, color: tuple = (176, 176, 176), color_hex: str = '#b0b0b0'):
     
         # id: 0-计算周期-MID，1-股票参数特性-UPPER，2-LOWER
         if id < 0 or id > 2:
@@ -588,7 +588,7 @@ class IndicatorConfigManager:
             self.default_configs[IndicatrosEnum.MACD.value] = {
                 0: MACDSetting(0, 12, '', True, 2, dict_macd_color[f'{IndicatrosEnum.MACD_DIFF.value}'], dict_macd_color_hex[f'{IndicatrosEnum.MACD_DIFF.value}']),
                 1: MACDSetting(1, 26, '', True, 2, dict_macd_color[f'{IndicatrosEnum.MACD_DEA.value}'], dict_macd_color_hex[f'{IndicatrosEnum.MACD_DEA.value}']),
-                2: MACDSetting(2, 9, '', True, 2, (0, 0, 0), '#000000')
+                2: MACDSetting(2, 9, '', True, 2, (176, 176, 176), '#b0b0b0')
             }
             
             self.default_configs[IndicatrosEnum.KDJ.value] = {

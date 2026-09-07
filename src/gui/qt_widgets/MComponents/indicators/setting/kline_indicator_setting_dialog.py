@@ -8,7 +8,6 @@ from manager.logging_manager import get_logger
 from manager.indicators_config_manager import *
 
 from gui.qt_widgets.MComponents.qfluentwidgets import (isDarkTheme, ColorDialog)
-from qframelesswindow import FramelessDialog
 
 class MASettingObject(object):
     def __init__(self, id=0, period_lineedit_obj=None, checkbox_obj=None, line_width_lineedit_obj=None, color_obj=None):
@@ -99,7 +98,6 @@ class KLineIndicatorSettingDialog(QDialog):
 
         self.btn_reset.clicked.connect(self.slot_btn_reset_clicked)
         self.btn_apply.clicked.connect(self.slot_btn_apply_clicked)
-        self.btn_cancel.clicked.connect(self.slot_btn_cancel_clicked)
 
 
     def update_button_color(self, button_id):
@@ -164,7 +162,7 @@ class KLineIndicatorSettingDialog(QDialog):
         current_color_hex = self.dict_ma_setting_user[id].color_hex
         # 将十六进制字符串转换为 QColor 对象
         current_color = QColor(current_color_hex)
-        # color = QColorDialog.getColor(current_color, self, f"选择颜色 {id + 1}")
+
         color_dlg = ColorDialog(current_color, self.tr(f'Select Color {id + 1}'), self)
         color = current_color
         color_dlg.colorChanged.connect(lambda c: color.setRgb(c.red(), c.green(), c.blue(), c.alpha()))
@@ -196,8 +194,4 @@ class KLineIndicatorSettingDialog(QDialog):
 
         get_indicator_config_manager().save_user_config()
         self.accept()
-
-    def slot_btn_cancel_clicked(self):
-        self.logger.info("取消")
-        self.reject()
 
