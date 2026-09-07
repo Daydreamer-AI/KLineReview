@@ -163,7 +163,7 @@ def get_dict_kline_color_hex():
 # 均线
 # 默认颜色
 dict_ma_color = {
-f'{IndicatrosEnum.MA.value}5': (0, 0, 0), 
+f'{IndicatrosEnum.MA.value}5': (176, 176, 176), 
 f'{IndicatrosEnum.MA.value}10': (217, 186, 38), 
 f'{IndicatrosEnum.MA.value}20': (25, 160, 255), 
 f'{IndicatrosEnum.MA.value}24': (239, 57, 178),
@@ -175,7 +175,7 @@ f'{IndicatrosEnum.MA.value}250': (175, 117, 234)
 }
 
 dict_ma_color_hex = {
-    f'{IndicatrosEnum.MA.value}5': '#000000', 
+    f'{IndicatrosEnum.MA.value}5': '#b0b0b0', 
     f'{IndicatrosEnum.MA.value}10': '#d9ba26', 
     f'{IndicatrosEnum.MA.value}20': '#1fa0ff', 
     f'{IndicatrosEnum.MA.value}24': '#ef39ae',

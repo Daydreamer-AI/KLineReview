@@ -224,14 +224,19 @@ class KLineWidget(BaseIndicatorWidget):
 
     def slot_btn_setting_clicked(self):
         dlg = KLineIndicatorSettingDialog()
+        dlg.resize(800, 600)
         result = dlg.exec()
         if result == QDialog.Accepted:
             self.logger.info("更新k线设置")
-            auto_ma_calulate(self.df_data)
+
+            if self.df_data is not None and not self.df_data.empty:
+                auto_ma_calulate(self.df_data)
             # 刷新K线图
             self.update_data(self.df_data)
 
             self.auto_scale_to_latest(120)
+
+        # dlg.deleteLater()
 
     def slot_range_changed(self):
         '''当视图范围改变时调用'''
