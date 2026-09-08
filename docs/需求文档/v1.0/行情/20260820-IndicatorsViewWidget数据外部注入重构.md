@@ -1,5 +1,7 @@
 # IndicatorsViewWidget 数据外部注入重构
 
+> 注：本需求完成于 2026-08-20，当时存在独立行情页（`market/`）。V1.0 收尾版（2026-09-08）已移除该页面，本需求中“行情页外部适配”部分仅作历史记录；`IndicatorsViewWidget` 外部注入的结论仍为当前复盘链路沿用。
+
 ## 基本信息
 
 - 需求编号：TODO（编号规则未定）
@@ -51,6 +53,7 @@
 ## 6. 完成状态与备注
 
 - 完成日期：2026-08-20
+- V1.0 收尾：2026-09-08 随 `release/1.0` 合入 `master`（PR #1，dc07eed）
 - 遗留问题/TODO：
   - 外部调用已采用“周期切换信号按需回填”方案；如需改为一次性全量注入可再评估。
   - `market_widget.py` 与 `review_widget.py` 的 `_load_stock_data_with_indicators` 重复，待后续提取公共封装。

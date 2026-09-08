@@ -46,7 +46,7 @@
 ## 4. 影响范围
 
 - 涉及模块/文件：
-  - `src/gui/qt_widgets/MComponents/review_widget.py`（本次重构主体）
+  - `src/gui/qt_widgets/MComponents/review/review_widget.py`（本次重构主体）
   - `src/gui/qt_widgets/MComponents/indicators/indicators_view_widget.py`（新增 `set_current_period`、`set_period_buttons_enabled`；复盘模式周期切换守卫；`init_animation` 初始周期状态修正）
   - `src/manager/bao_stock_data_manager.py`（新增 `get_all_stock_code_name_dict`）
   - `src/thread/baostock_data_fetch_task.py`（改为远程拉取并随结果返回已补名称/指标的 DataFrame，不再写库；修复日线/周线分支）
@@ -64,6 +64,7 @@
 ## 6. 完成状态与备注
 
 - 完成日期：2026-08-23（已合并至 release/1.0）
+- V1.0 收尾：2026-09-08 随 `release/1.0` 合入 `master`（PR #1，dc07eed）
 - 遗留问题/TODO：
   - 默认加载周期已调整为日线、周线（分钟级数据获取暂屏蔽；复盘数据不落库，与本地 `stock_data_*` 表无关）。
   - 分钟级数据获取暂屏蔽：默认仅日线/周线，拉取链会跳过分钟级配置；待分钟级数据范围与周期切换逻辑确认后恢复。
