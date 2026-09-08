@@ -868,11 +868,13 @@ class BaoStockProcessor(QObject):
         self.logger.info(f"总股票数量：{total_count}")
 
 
-        # 每周更新
+        # 每周更新（本地库为空时各板块为空表、无 update_at 列，需一并判空）
         current_date = datetime.datetime.now()
         local_lastest_date = ""
-        if dict_stock_info_local != {} and 'sh_main' in dict_stock_info_local.keys():
-            local_lastest_date = dict_stock_info_local['sh_main']['update_at'].iloc[0]
+        sh_main_local = dict_stock_info_local.get('sh_main') if dict_stock_info_local else None
+        if (sh_main_local is not None and not sh_main_local.empty
+                and 'update_at' in sh_main_local.columns):
+            local_lastest_date = sh_main_local['update_at'].iloc[0]
 
         self.logger.info(f"查询日期：{query_date}，本地个股信息数据最新更新日期：{local_lastest_date}")
         if current_date.weekday() >= 2 and query_date > local_lastest_date:
