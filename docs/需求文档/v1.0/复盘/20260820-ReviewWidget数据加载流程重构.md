@@ -11,26 +11,26 @@
 
 ## 1. 背景与目标
 
-- 背景：ReviewWidget 目前的数据加载存在多个触发入口（“加载”按钮、“随机加载”按钮、图表内部周期切换按钮），职责混乱；本地无数据时 `BaostockDataFetchTask2` 下载完成后只隐藏 Loading、不回填数据，后台加载链路实际是断的；顶部 `comboBox_period` 仅记录日志，未实际参与加载。
+- 背景：ReviewWidget 目前的数据加载存在多个触发入口（“加载”按钮、“随机加载”按钮、图表内部周期切换按钮），职责混乱；本地无数据时 `BaostockDataFetchTask` 下载完成后只隐藏 Loading、不回填数据，后台加载链路实际是断的；顶部 `comboBox_period` 仅记录日志，未实际参与加载。
 - 目标：复盘数据加载统一由“加载 / 随机加载”按钮触发，一次性在后台加载**所有配置周期**（默认 15/30/60 分钟、日线、周线，预留调整接口）的数据，全部加载完成后再统一同步到 `indicators_view_widget`；`comboBox_period` 选择的是“加载完成后初始显示哪个周期”；后台加载期间禁用图表内部周期切换按钮，同步完成后再启用；图表内部周期切换按钮不再触发上层数据加载。
 
 ## 2. 需求描述（功能点）
 
 - [x] 统一入口：`load_data(code, date)` 仅由两个按钮触发；移除 `sig_period_changed → 上层取数` 的链路。
-- [x] 全周期远程加载：一次加载动作覆盖所有配置周期（默认日线、周线；分钟级数据获取暂屏蔽，拉取链会跳过分钟级配置），全部从远程 Baostock 获取、不再读取本地 K 线库；因 baostock 为全局单会话、并发查询不安全，各周期按顺序串行提交 `BaostockDataFetchTask2`，任务随结果返回已补名称与指标列的 DataFrame。
+- [x] 全周期远程加载：一次加载动作覆盖所有配置周期（默认日线、周线；分钟级数据获取暂屏蔽，拉取链会跳过分钟级配置），全部从远程 Baostock 获取、不再读取本地 K 线库；因 baostock 为全局单会话、并发查询不安全，各周期按顺序串行提交 `BaostockDataFetchTask`，任务随结果返回已补名称与指标列的 DataFrame。
 - [x] 预留周期列表调整接口：`get_load_periods()` / `set_load_periods(periods)`，调整后同步刷新 `comboBox_period` 选项。
 - [x] 周期选择：`comboBox_period` 仅决定加载完成后 `IndicatorsViewWidget` 的初始显示周期；所选周期无数据时回退到第一个可用周期并同步下拉框。
 - [ ] 周期切换逻辑：当前实现较复杂、暂不符合预期（如分钟级精确日期匹配失败时图表不更新、切换后图表数据与周期可能不一致），兜底实现已撤销，待方案确认后另行处理。
 - [x] 异步回填：全部周期加载完成后统一 `set_stock_data(code, {所有周期: df})` → `set_period_buttons_enabled(已加载周期)` → `set_current_period(显示周期)` → `init_animation`，自动出图。
 - [x] 加载期间禁用 `IndicatorsViewWidget` 全部周期切换按钮（`set_period_buttons_enabled([])`）；同步完成后仅启用已加载周期的按钮。
-- [x] 修复 `BaostockDataFetchTask2` 日线/周线分支恒为 `False` 的 bug（`TimePeriod == TimePeriod.DAY` 为类与枚举成员比较）。
+- [x] 修复 `BaostockDataFetchTask` 日线/周线分支恒为 `False` 的 bug（`TimePeriod == TimePeriod.DAY` 为类与枚举成员比较）。
 - [x] 图表内部周期按钮：仅在已注入周期数据之间切换；点击未注入周期时回退到原周期并提示，不触发任何上层取数。
 - [x] 加载完成后同步图表内部周期按钮（新增 `IndicatorsViewWidget.set_current_period`）。
 - [x] 同股票全部配置周期均已加载时重复点击：仅按新日期重新定位动画，不重复下载。
 - [x] 不再读取本地 K 线库：动画锚点行取自远程显示周期数据的最后一行，名称取自本地股票信息库；远程返回空数据时按无数据处理并提示。
 - [x] 修复远程数据 `date`（`datetime.date`）/ `time`（Timestamp）与字符串比较的类型错误：任务层统一转为 ISO 字符串（`init_animation` 的防御性 `str()` 转换随周期切换改动一并撤销）。
 - [x] 远程拉取起始日期按复盘日期计算：日/周线往前 400 天（覆盖 MA60/MA52 等指标预热），分钟线以复盘日期为起点并受近两年下限约束；所选日期超出数据范围时自动回退到边界日期，避免“未找到匹配日期、界面空白”。
-- [x] 远程复盘拉取保持前复权（`adjustflag=2`）：baostock 前复权仅提供最近约三年数据，故随机复盘日期限定在近三年窗口内（最早日期再向后预留约 250 天指标预热）；`process_*` 与 `BaostockDataFetchTask2` 新增 `adjustflag` 参数，数据脚本等既有调用不受影响。
+- [x] 远程复盘拉取保持前复权（`adjustflag=2`）：baostock 前复权仅提供最近约三年数据，故随机复盘日期限定在近三年窗口内（最早日期再向后预留约 250 天指标预热）；`process_*` 与 `BaostockDataFetchTask` 新增 `adjustflag` 参数，数据脚本等既有调用不受影响。
 - [x] 修复 `set_current_period` 误匹配“分时”按钮的问题（`TimePeriod.from_label('分时')` 默认返回日线，导致日线按钮未被选中），加载完成后周期按钮正确处于选中状态。
 - [x] 随机加载与代码校验不依赖本地 K 线数据：`BaostockDataManager.get_all_stock_code_name_dict()` 提供“个股代码-名称”映射，随机选股后日期由 `common_api.get_random_date()` 生成，K 线数据统一在加载时远程获取。
 

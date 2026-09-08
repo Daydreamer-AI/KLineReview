@@ -11,12 +11,12 @@
 
 ## 1. 背景与目标
 
-- 背景：`IndicatorsViewWidget` 目前内部直接依赖 `BaostockDataManager` 与后台取数任务（`BaostockDataFetchTask2`），既负责数据获取又负责缓存维护与绘制，职责混杂；本地无数据时还会自行触发网络拉取并显示 Loading，外部难以复用/替换数据来源。
+- 背景：`IndicatorsViewWidget` 目前内部直接依赖 `BaostockDataManager` 与后台取数任务（`BaostockDataFetchTask`），既负责数据获取又负责缓存维护与绘制，职责混杂；本地无数据时还会自行触发网络拉取并显示 Loading，外部难以复用/替换数据来源。
 - 目标：将该类改造为纯展示/维护组件——数据由外部注入，内部只做多周期缓存维护、图表更新与复盘动画维护，不再发起任何数据获取。
 
 ## 2. 需求描述（功能点）
 
-- [x] 移除 `IndicatorsViewWidget` 内部对 `BaostockDataManager`、`BaostockDataFetchTask2`、默认线程池的直接使用。
+- [x] 移除 `IndicatorsViewWidget` 内部对 `BaostockDataManager`、`BaostockDataFetchTask`、默认线程池的直接使用。
 - [x] 新增外部数据注入接口（如 `set_stock_data(code, dict_period_data)`），外部按 `{TimePeriod: DataFrame}` 结构传入各周期 K 线数据。
 - [x] 内部多周期缓存（`dict_stock_data`）、选中股票（`current_selected_code`）、复盘周期状态（`dict_period_process_data`）等维护逻辑保留。
 - [x] `update_chart()` / `init_animation()` 等原有对外方法签名保持稳定，但不再内部取数；未注入数据时给出明确日志并安全返回。
@@ -26,7 +26,7 @@
 
 ## 3. 验收标准
 
-- [x] `indicators_view_widget.py` 中检索不到 `BaostockDataManager` / `BaostockDataFetchTask2` / `get_default_task_pool` 的引用。
+- [x] `indicators_view_widget.py` 中检索不到 `BaostockDataManager` / `BaostockDataFetchTask` / `get_default_task_pool` 的引用。
 - [x] 注入数据后，行情展示、指标绘制、周期切换行为与改造前一致（行情页、复盘页真实冒烟均通过）。
 - [x] 未注入数据时调用 `update_chart` / `init_animation` 不崩溃，日志中有明确提示。
 - [x] 模块可正常 import，语法自检通过。

@@ -9,7 +9,7 @@ from manager.bao_stock_data_manager import BaostockDataManager
 from indicators import stock_data_indicators as sdi
     
 
-class BaostockDataFetchTask2(BaseTask):
+class BaostockDataFetchTask(BaseTask):
     sig_progress_changed = pyqtSignal(int, int)
     def __init__(self, code=None, start_date=None, end_date=None, period=None, adjustflag='2', **kwargs):
         super().__init__(**kwargs)

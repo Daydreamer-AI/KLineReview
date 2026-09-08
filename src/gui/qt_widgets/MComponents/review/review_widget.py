@@ -431,11 +431,11 @@ class ReviewWidget(QWidget):
         period = self._fetch_pending_periods.pop(0)
         fetch_start_date = self._get_fetch_start_date(date, period)
 
-        from thread.baostock_data_fetch_task import BaostockDataFetchTask2
+        from thread.baostock_data_fetch_task import BaostockDataFetchTask
         from thread.task_pool import get_default_task_pool
 
         self.logger.info(f"从Baostock远程获取: {code} {TimePeriod.get_chinese_label(period)}, 起始={fetch_start_date}")
-        baostock_data_fetch_task = BaostockDataFetchTask2(code=code, period=period, start_date=fetch_start_date)
+        baostock_data_fetch_task = BaostockDataFetchTask(code=code, period=period, start_date=fetch_start_date)
 
         def on_completed(task_id, result):
             try:
