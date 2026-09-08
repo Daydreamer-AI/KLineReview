@@ -9,7 +9,6 @@
 
 ![功能演示截图](docs/效果图/V1.0.0_设置.png)
 
-
 ## 功能特点
 
 - 获取股票历史数据
@@ -19,40 +18,52 @@
 
 ## 安装
 
+### 方式一：下载 Release 安装包（推荐，无需 Python 环境）
+
+到 [Releases](https://github.com/Daydreamer-AI/KLineReview/releases/latest) 下载对应系统的安装包：
+
+- **Windows**：下载 `KLineReview-win64-vX.Y.Z.exe`，双击即可运行。
+- **macOS（Apple Silicon）**：下载 `KLineReview-mac-arm64-vX.Y.Z.dmg`。
+- **macOS（Intel）**：下载 `KLineReview-mac-x64-vX.Y.Z.dmg`。
+
+macOS 打开 dmg 后，把 `KLineReview.app` 拖入“应用程序”即可。
+
+首次启动需要联网：程序会从 Baostock 获取股票列表，复盘页按需拉取 K 线数据。程序数据（数据库、配置、日志）保存在用户应用数据目录：Windows 为 `%APPDATA%\KLineReview`，macOS 为 `~/Library/Application Support/KLineReview`。
+
+> 提示：当前安装包未做代码签名，系统可能提示“未知来源”。Windows 可选择“更多信息 → 仍要运行”；macOS 可右键 App 选择“打开”继续。
+
+### 方式二：源码运行
+
 **确保已安装 Python 3.10 或更高版本。**
 
-### 克隆代码到本地仓库
+克隆代码到本地仓库：
 
 ```bash
 git clone https://github.com/Daydreamer-AI/KLineReview.git
 cd KLineReview
 ```
 
-### 创建并激活虚拟环境
-
-venv:
+创建并激活虚拟环境（venv）：
 
 ```bash
-cd ...
 py -3.10 -m venv .venv
 .venv\Scripts\activate
 ```
 
-conda: 
+或使用 conda：
 
 ```bash
 conda create --name myenv python=3.10
-
 conda activate myenv
 ```
 
-### 安装依赖
+安装依赖：
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 使用示例
+运行：
 
 ```bash
 python ./src/main.py
