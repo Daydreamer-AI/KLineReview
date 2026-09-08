@@ -1,4 +1,5 @@
 from PyQt5 import uic
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QColorDialog
 from PyQt5.QtGui import QColor
 from functools import partial
@@ -41,6 +42,7 @@ class AmountSettingDialog(QDialog):
 
 
     def init_ui(self):
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)
         if isDarkTheme():
             self.setStyleSheet("QDialog{background: #1E1E1E;}")
         else:

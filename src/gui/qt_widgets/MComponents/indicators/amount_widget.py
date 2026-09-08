@@ -93,6 +93,7 @@ class AmountWidget(BaseIndicatorWidget):
         else:
             self.item.update_data(self.df_data)
 
+        # TODO: sz.300054 鼎龙股份，2026-04-16,1d，没有绘制图表问题
         self.plot_widget.addItem(self.item)
 
     def set_axis_ranges(self):

@@ -46,7 +46,8 @@ class KLineIndicatorSettingDialog(QDialog):
         }
 
     def init_ui(self):
-        # self.setWindowFlags(Qt.FramelessWindowHint)
+        # Qt.FramelessWindowHint    Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)   
         # self.setAttribute(Qt.WA_TranslucentBackground)
 
         if isDarkTheme():
