@@ -6,7 +6,6 @@ from PyQt5.QtGui import QIcon
 
 from resources import resources_rc
 
-from gui.qt_widgets.main.main_widget import MainWidget
 from manager.logging_manager import get_logger, setup_logging
 
 from common.config import cfg
@@ -32,74 +31,8 @@ if components_path not in sys.path:
 # 提升控件的裸名映射由共享模块 review/ensure_promoted_widgets.py 集中管理
 # （在 review_widget.py 里调用 ensure_promoted_widgets()）。
 
-def setup_high_dpi_support():
-    """
-    设置高 DPI 支持，兼容不同 Qt 版本和平台
-    """
-
-    # 方法1：启用高 DPI 缩放（Qt 5.6+）
-    QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-    QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-
-    # 方法2： 设置固定缩放比例
-    os.environ['QT_SCALE_FACTOR'] = '1'
-
-    # 方法3：设置环境变量 QT_AUTO_SCREEN_SCALE_FACTOR
-    if 'QT_AUTO_SCREEN_SCALE_FACTOR' not in os.environ:
-        os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'  # 可根据需要调整缩放比例
-
-
-    # 方法4：启用高 DPI 缩放（Qt 5.14+）
-    if hasattr(QCoreApplication, "setHighDpiScaleFactorRoundingPolicy"):
-        from PyQt5.QtCore import Qt as QtCoreQt
-        QCoreApplication.setHighDpiScaleFactorRoundingPolicy(
-            QtCoreQt.HighDpiScaleFactorRoundingPolicy.PassThrough
-        )
-
-    # 禁用缩放（适用于 Qt 5.9+）
-    if hasattr(QApplication, "setAttribute") and hasattr(Qt, "AA_Use96Dpi"):
-        QApplication.setAttribute(Qt.AA_Use96Dpi)
-
-    # Qt6 强制指定字体 DPI（如果需要兼容 Qt6）
-    os.environ["QT_FONT_DPI"] = "96"
 
 def app_run():
-    logger = get_logger(__name__)
-    logger.info("应用程序启动")
-    # PyQt5
-    setup_high_dpi_support()
-    app = QApplication(sys.argv)  # 创建应用程序对象
-    app.setWindowIcon(QIcon(":/app.svg"))
-
-    logger.info(f"Screen scale factor: {app.devicePixelRatio()}")
-
-    qssFile = QFile(":/theme/default/main.qss")
-    if qssFile.open(QFile.ReadOnly):
-        # 使用 data() 方法获取字节数据并解码
-        app.setStyleSheet(str(qssFile.readAll(), encoding='utf-8'))
-        # app.setStyleSheet("*{font-family: 'Microsoft YaHei';font-size: 18px;}")
-    else:
-        logger.warning("无法打开整体样式表文件")
-    qssFile.close()
-
-    # qt widgets实现
-    # widget = QWidget()           # 创建窗口实例
-    widget = MainWidget()
-    widget.setWindowTitle("KLineReview")
-    widget.show()                  # 显示窗口
-
-    ret = -1
-    try:
-        ret = app.exec_()
-        logger.info("应用程序正常退出")
-        
-    except Exception as e:
-        logger.error(f"应用程序异常退出: {e}")
-
-    sys.exit(ret)
-
-
-def app_run_2():
     logger = get_logger(__name__)
     logger.info("应用程序启动")
 
@@ -157,8 +90,7 @@ def main():
         unique_log_file=True  # 启用唯一日志文件名
     )
     
-    # app_run()
-    app_run_2()
+    app_run()
 
 
 
