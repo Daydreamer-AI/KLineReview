@@ -1,5 +1,7 @@
 import sys
 import os
+from pathlib import Path
+from PyQt5 import uic as qt_uic
 from PyQt5.QtCore import QFile, QCoreApplication, Qt, QTranslator
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
@@ -8,6 +10,7 @@ from resources import resources_rc
 
 from manager.logging_manager import get_logger, setup_logging
 
+from common.paths import get_log_dir, get_repo_root
 from common.config import cfg
 from gui.qt_widgets.main.main_window import MainWindow
 
@@ -31,6 +34,59 @@ if components_path not in sys.path:
 # qfluentwidgets 包已由上方 "from ...qfluentwidgets import FluentTranslator" 按完整包路径加载。
 # 提升控件的裸名映射由共享模块 review/ensure_promoted_widgets.py 集中管理
 # （在 review_widget.py 里调用 ensure_promoted_widgets()）。
+
+
+def _resolve_ui_path(ui_file):
+    """把 .ui 路径解析为开发态/冻结态下真实存在的文件路径。"""
+    if not isinstance(ui_file, str):
+        return ui_file
+
+    path = Path(ui_file)
+    if path.is_file():
+        return ui_file
+
+    candidates = [
+        Path.cwd() / path,
+        get_repo_root() / path,
+    ]
+    relative = str(path).replace("\\", "/")
+    if relative.startswith("./"):
+        candidates.append(get_repo_root() / relative[2:])
+
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+
+    # 冻结态：模块 __file__ 通常为 _MEIPASS/gui/...，
+    # 而随包资源按 _MEIPASS/src/gui/... 组织，据此补一次换算。
+    root = get_repo_root()
+    try:
+        rel_to_bundle = path.relative_to(root)
+        if rel_to_bundle.parts and rel_to_bundle.parts[0] != "src":
+            candidate = root / "src" / rel_to_bundle
+            if candidate.is_file():
+                return str(candidate)
+    except ValueError:
+        pass
+
+    # 冻结态下模块 __file__ 不一定指向可读目录，最后按文件名在资源树中兜底查找
+    try:
+        hit = next(root.rglob(path.name))
+        return str(hit)
+    except StopIteration:
+        return ui_file
+
+
+def _install_ui_path_resolver():
+    """统一代理 uic.loadUi，使打包后的 .ui 资源也能被找到。"""
+    original_load_ui = qt_uic.loadUi
+
+    def load_ui(*args, **kwargs):
+        if args:
+            args = (_resolve_ui_path(args[0]),) + args[1:]
+        return original_load_ui(*args, **kwargs)
+
+    qt_uic.loadUi = load_ui
 
 
 def app_run():
@@ -80,12 +136,14 @@ def app_run():
     sys.exit(ret)
 
 def main():
+    _install_ui_path_resolver()
+
     # 设置进程标识环境变量
     os.environ['MPOLICY_PROCESS'] = 'main'
     
     # 初始化日志系统
     setup_logging( 
-        log_dir="./data/logs",
+        log_dir=str(get_log_dir()),
         level="INFO",
         enable_file_log=True,
         max_bytes=10 * 1024 * 1024,

@@ -5,6 +5,7 @@ from db_base.stock_db_base import StockDbBase
 from indicators import stock_data_indicators as sdi
 from manager.logging_manager import get_logger
 from common.common_api import *
+from common.paths import get_database_root
 
 from manager.period_manager import TimePeriod
 
@@ -49,7 +50,7 @@ class BaostockDataManager(QObject):
         self.dict_name_code = None            # {name : code}，按需构建的“个股名称-代码”映射缓存
 
         self.stock_info_db_base = StockInfoDBBasePool().get_manager(1)
-        self.stock_db_base = StockDbBase("./data/database/stocks/db/baostock")
+        self.stock_db_base = StockDbBase(str(get_database_root("baostock")))
 
         self.get_all_stocks_from_db()
 

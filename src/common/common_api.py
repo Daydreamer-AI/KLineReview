@@ -4,6 +4,7 @@ import pandas as pd
 import re
 from pathlib import Path
 from manager.logging_manager import get_logger
+from common.paths import get_runtime_src_root
 
 
 import psutil
@@ -1030,8 +1031,4 @@ def get_current_year_dates():
 
 def get_resource_path(relative_path):
     """获取资源文件的绝对路径（兼容开发环境和打包后）"""
-    if hasattr(sys, '_MEIPASS'):  # PyInstaller 打包后
-        base_path = sys._MEIPASS
-    else:
-        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_path, relative_path)
+    return str(get_runtime_src_root() / relative_path)

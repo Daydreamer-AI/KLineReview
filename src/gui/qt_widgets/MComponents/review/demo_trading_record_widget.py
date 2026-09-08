@@ -5,6 +5,7 @@ from PyQt5.QtCore import pyqtSignal
 from pathlib import Path
 
 from common.icon import Icon
+from common.paths import get_module_relative_file
 
 class DemoTradingRecordWidget(QWidget):
     sig_btn_return_clicked = pyqtSignal()
@@ -16,7 +17,7 @@ class DemoTradingRecordWidget(QWidget):
         self.init_connect()
 
     def setup_ui(self):
-        ui_file = Path(__file__).parent / "DemoTradingRecordWidget.ui"
+        ui_file = get_module_relative_file(__file__, "DemoTradingRecordWidget.ui")
         
         # 检查文件是否存在
         if not ui_file.exists():

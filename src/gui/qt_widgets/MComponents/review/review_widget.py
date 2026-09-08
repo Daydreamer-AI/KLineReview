@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QCompleter, QMessageBox, QListWidget, QList
 from PyQt5.QtCore import QDate, QFile, Qt, pyqtSignal
 
 import random
+import sys
 import pandas as pd
 from datetime import date, datetime as dt, timedelta as td
 
@@ -17,6 +18,7 @@ from manager.period_manager import TimePeriod
 from manager.review_demo_trading_manager import ReviewDemoTradingManager
 
 from common.common_api import *
+from gui.qt_widgets.MComponents.review import income_chart_widget as _income_chart_widget_module
 
 from common.icon import Icon
 from common.config import cfg
@@ -968,5 +970,11 @@ class ReviewWidget(QWidget):
 
     def slot_theme_changed_finished(self):
         self.logger.info(f"主题已切换为: {cfg.theme}")
+
+
+# uic 按 .ui 的 <header> 裸模块名导入提升控件；
+# 显式把业务提升模块注册到 sys.modules，兼容打包后无物理目录的形态。
+sys.modules.setdefault("income_chart_widget", _income_chart_widget_module)
+sys.modules.setdefault("review_widget", sys.modules[__name__])
 
 

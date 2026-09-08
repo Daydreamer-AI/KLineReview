@@ -9,6 +9,7 @@ import numpy as np
 from db_base.common_db_base import CommonDBBase
 from manager.logging_manager import get_logger
 from common.common_api import *
+from common.paths import get_database_root
 
 class StockInfoDBBasePool:
     """管理多个 StockInfoDBBase 实例的池（单例模式）"""
@@ -82,11 +83,11 @@ class StockInfoDBBase(CommonDBBase):
     def _get_db_path_by_type(self, db_type):
         """根据db_type获取数据库路径"""
         if db_type == 1:
-            return "./data/database/stocks/db/baostock/stocks.db"
+            return str(get_database_root("baostock") / "stocks.db")
         elif db_type == 2:
-            return "./data/database/stocks/db/efinance/stocks.db"
+            return str(get_database_root("efinance") / "stocks.db")
         else:
-            return "./data/database/stocks/db/akshare/stocks.db"
+            return str(get_database_root("akshare") / "stocks.db")
 
     def init_baostock_db(self):
         self.create_baostock_stocks_info_table()
