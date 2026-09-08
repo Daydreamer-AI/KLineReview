@@ -1,24 +1,19 @@
 # KLineReview
 
-一个基于akshare、baostock的股票数据处理和技术分析工具，自带回放复盘功能。
+**专注于K线回放复盘的PyQt5项目**
 
 ## 效果图
+![功能演示动图](docs/效果图/V1.0.0_主页.png)
 
-![功能演示动图](docs/效果图/行情.gif)
+![功能演示动图](docs/效果图/V1.0.0_回放.png)
 
-![功能演示动图](docs/效果图/回放.gif)
+![功能演示动图](docs/效果图/V1.0.0_设置.png)
 
-![项目架构图](docs/效果图/行情.jpg)
-
-![项目架构图](docs/效果图/行情-回放.jpg)
-
-![项目架构图](docs/效果图/回放2.jpg)
 
 ## 功能特点
 
 - 获取股票历史数据
-- 计算技术指标（MACD、MA等）
-- 数据存储和管理
+- 计算技术指标（MA、MACD、KDJ、RSI、BOLL等）
 - 自定义指标计算
 - k线回放复盘
 
@@ -59,30 +54,6 @@ pip install -r requirements.txt
 
 ## 使用示例
 
-**因使用本地数据，首次运行需手动下载数据。**
-
-执行数据下载脚本：
-
-```bash
-./scripts/run_baostock_data_update.bat
-```
-
-脚本下载较慢，也可下载以下网盘备份（历史数据）：
-
-百度网盘: https://pan.baidu.com/s/5BlN_z8Ga_Ya_Ew4UUN8-cQ
-
-夸克网盘：https://pan.quark.cn/s/6defc64e2982
-
-
-
-解压得到的stocks文件夹，放入KLineReview/data/database目录：
-
-![项目架构图](docs/其他/网盘下载数据.jpg)
-
-
-
-运行主程序（若未事先下载数据，也可在程序运行后的接口界面按需下载数据）
-
 ```bash
 python ./src/main.py
 ```
@@ -108,3 +79,7 @@ AKShare 项目地址：https://github.com/akfamily/akshare
 ### Baostock
 
 Baostock 项目地址：https://pypi.org/project/baostock/
+
+### qfluentwidgets
+
+qfluentwidgets 项目地址：https://github.com/zhiyiYo/PyQt-Fluent-Widgets
