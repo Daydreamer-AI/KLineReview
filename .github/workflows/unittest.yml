@@ -8,9 +8,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      # 避免 APPDATA 未设置时配置写入仓库目录
-      APPDATA: ${{ runner.temp }}/appdata
     steps:
       - uses: actions/checkout@v5
 
@@ -27,4 +24,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run unit tests
+        # 避免 APPDATA 未设置时配置写入仓库目录
+        env:
+          APPDATA: ${{ runner.temp }}/appdata
         run: python -m unittest discover -s tests -v
