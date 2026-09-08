@@ -7,9 +7,10 @@ from PyQt5.QtCore import QCoreApplication
 def translate(text):
     return QCoreApplication.translate(__name__, text)
 
-class DemoTradingRecord(object):
+class DemoTradingRecord(QObject):
     
-    def __init__(self):
+    def __init__(self, parent = None):
+        super().__init__(parent)
         self.code = None
         self.name = None
 
@@ -36,19 +37,19 @@ class DemoTradingRecord(object):
 
     def get_status_text(self):
         if self.status == 0:
-            return QCoreApplication.translate(__name__, "No Trade")
+            return self.tr("No Trade")
         elif self.status == 1:
-            return QCoreApplication.translate(__name__, "Buy Pending")
+            return self.tr("Buy Pending")
         elif self.status == 2:
-            return QCoreApplication.translate(__name__, "Buy Canceled")
+            return self.tr("Buy Canceled")
         elif self.status == 3:
-            return QCoreApplication.translate(__name__, "Sell Pending")
+            return self.tr("Sell Pending")
         elif self.status == 4:
-            return QCoreApplication.translate(__name__, "Sell Canceled")
+            return self.tr("Sell Canceled")
         elif self.status == 5:
-            return QCoreApplication.translate(__name__, "Holding")
+            return self.tr("Holding")
         elif self.status == 6:
-            return QCoreApplication.translate(__name__, "Closed")
+            return self.tr("Closed")
 
 
 

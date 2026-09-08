@@ -311,6 +311,44 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
     </message>
 </context>
 <context>
+    <name>DemoTradingRecord</name>
+    <message>
+        <location filename="../../manager/review_demo_trading_manager.py" line="39"/>
+        <source>No Trade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../manager/review_demo_trading_manager.py" line="41"/>
+        <source>Buy Pending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../manager/review_demo_trading_manager.py" line="43"/>
+        <source>Buy Canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../manager/review_demo_trading_manager.py" line="45"/>
+        <source>Sell Pending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../manager/review_demo_trading_manager.py" line="47"/>
+        <source>Sell Canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../manager/review_demo_trading_manager.py" line="49"/>
+        <source>Holding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../manager/review_demo_trading_manager.py" line="51"/>
+        <source>Closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DemoTradingRecordWidget</name>
     <message>
         <location filename="../../gui/qt_widgets/MComponents/review/DemoTradingRecordWidget.ui" line="14"/>
@@ -454,34 +492,6 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
     </message>
 </context>
 <context>
-    <name>GlobalSettingWidget</name>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/GlobalSettingWidget.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/GlobalSettingWidget.ui" line="27"/>
-        <source>缓存目录：</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/GlobalSettingWidget.ui" line="46"/>
-        <source>D:/KLineReview/cache</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/GlobalSettingWidget.ui" line="65"/>
-        <source>选择</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/GlobalSettingWidget.ui" line="86"/>
-        <source>退出软件删除缓存</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>IncomeChartWidget</name>
     <message>
         <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="230"/>
@@ -511,6 +521,31 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
     <message>
         <location filename="../../gui/qt_widgets/MComponents/review/IncomeChartWidget.ui" line="114"/>
         <source>Winning percentage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="316"/>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="317"/>
+        <source>Trade No.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="318"/>
+        <source>Single Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="319"/>
+        <source>Cumulative Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="320"/>
+        <source>Win Rate</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1232,24 +1267,6 @@ Trading Principles:
     </message>
 </context>
 <context>
-    <name>MainWidget</name>
-    <message>
-        <location filename="../../gui/qt_widgets/main/MainWidget.ui" line="26"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/main/MainWidget.ui" line="104"/>
-        <source>回放</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/main/MainWidget.ui" line="141"/>
-        <source>设置</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MainWindow</name>
     <message>
         <location filename="../../gui/qt_widgets/main/main_window.py" line="101"/>
@@ -1281,7 +1298,7 @@ Trading Principles:
     <name>ReviewDialog</name>
     <message>
         <location filename="../../gui/qt_widgets/review/ReviewDialog.ui" line="20"/>
-        <source>回放</source>
+        <source>Review</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1308,138 +1325,143 @@ Trading Principles:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="170"/>
-        <source>随机股票回放</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="198"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="201"/>
         <source>Load</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="239"/>
-        <source>回退到最前</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="267"/>
-        <source>回退十步</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="295"/>
-        <source>回退一步</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="323"/>
-        <source>播放</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="351"/>
-        <source>前进一步</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="379"/>
-        <source>前进十步</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="407"/>
-        <source>前进到最后</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="440"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="443"/>
         <source>Process: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="466"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="469"/>
         <source>50/100</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="477"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="480"/>
         <source>Assets: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="545"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="548"/>
         <source>10000</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="521"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="524"/>
         <source>Banlance: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="556"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="559"/>
         <source>Price: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="590"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="593"/>
         <source>Count: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="627"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="630"/>
         <source>Amout: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="668"/>
-        <source>比例：</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="693"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="696"/>
         <source>all in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="727"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="730"/>
         <source>1/2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="758"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="761"/>
         <source>1/3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="789"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="792"/>
         <source>1/4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="820"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="823"/>
         <source>1/5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="849"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="852"/>
         <source>Buy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="868"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="871"/>
         <source>Sell</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="887"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="890"/>
         <source>Cancel order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="920"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="923"/>
         <source>Simulated Trading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="170"/>
+        <source>Random stock review</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="198"/>
+        <source>Load the specified stock review</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="242"/>
+        <source>Go back to the beginning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="270"/>
+        <source>Ten steps back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="298"/>
+        <source>Step back one step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="326"/>
+        <source>Play/Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="354"/>
+        <source>Move forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="382"/>
+        <source>Move forward ten steps.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="410"/>
+        <source>Moving forward to the end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/review/ReviewWidget.ui" line="671"/>
+        <source>Proportion:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1691,18 +1713,8 @@ Trading Rules:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="101"/>
-        <source>Discover new features and learn useful tips about PyQt-Fluent-Widgets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="110"/>
         <source>Provide feedback</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="110"/>
-        <source>Help us improve PyQt-Fluent-Widgets by providing feedback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1733,6 +1745,16 @@ Trading Rules:
     <message>
         <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="184"/>
         <source>Choose folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="101"/>
+        <source>Discover new features and learn useful tips about KLineReview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="110"/>
+        <source>Help us improve KLineReview by providing feedback</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1767,7 +1789,7 @@ Trading Rules:
 <context>
     <name>Translator</name>
     <message>
-        <location filename="../../common/translator.py" line="9"/>
+        <location filename="../../common/translator.py" line="10"/>
         <source>Review</source>
         <translation type="unfinished"></translation>
     </message>

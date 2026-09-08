@@ -12,6 +12,7 @@ from common.config import cfg
 from gui.qt_widgets.main.main_window import MainWindow
 
 from gui.qt_widgets.MComponents.qfluentwidgets import FluentTranslator
+from common.translator import KLineReviewTranslator
 
 # 添加项目根目录到Python路径
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -54,12 +55,15 @@ def app_run():
 
     # internationalization
     locale = cfg.get(cfg.language).value
-    translator = FluentTranslator(locale)
-    galleryTranslator = QTranslator()
-    galleryTranslator.load(locale, "gallery", ".", ":/gallery/i18n")
+    logger.info(f"使用语言: {locale.name()}")
+    qfluent_widgets_translator = FluentTranslator(locale)
 
-    app.installTranslator(translator)
-    app.installTranslator(galleryTranslator)
+    appTranslator = KLineReviewTranslator(locale)
+    if not appTranslator.load(locale):
+        logger.warning(f"未找到语言包: {locale.name()}")
+
+    app.installTranslator(qfluent_widgets_translator)
+    app.installTranslator(appTranslator)
 
     # create main window
     w = MainWindow()
@@ -79,7 +83,6 @@ def main():
     # 设置进程标识环境变量
     os.environ['MPOLICY_PROCESS'] = 'main'
     
-    # 初始化日志系统
     # 初始化日志系统
     setup_logging( 
         log_dir="./data/logs",

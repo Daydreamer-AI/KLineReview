@@ -45,8 +45,9 @@ ui_files = [
 
 langs = ["en_US", "zh_CN", "zh_HK"]
 for lang in langs:
-    ts_path = os.path.join(TRANS_DIR, f"indicators_{lang}.ts")
-    cmd = ["pylupdate5", *py_files, *ui_files, "-ts", ts_path]
+    ts_path = os.path.join(TRANS_DIR, f"klinereview_{lang}.ts")
+    # 添加 -noobsolete 参数
+    cmd = ["pylupdate5", "-noobsolete", *py_files, *ui_files, "-ts", ts_path]
     print("RUN:", " ".join(cmd))
     subprocess.run(cmd, check=True)
     subprocess.run(["lrelease", ts_path], check=True)

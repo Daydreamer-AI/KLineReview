@@ -313,15 +313,20 @@ class IncomeChartWidget(QWidget):
                 # 更新主标签显示详细信息
                 if closest_info is not None:
                     # 构建详细信息文本，使用HTML格式设置样式
+                    label = self.tr("Start")
+                    label_1 = self.tr("Trade No.")
+                    label_2 = self.tr("Single Return")
+                    label_3 = self.tr("Cumulative Return")
+                    label_4 = self.tr("Win Rate")
                     info_text = (
                         '<div style="background-color: white; border: 2px solid black; padding: 5px; border-radius: 5px;">'
-                        f'<span style="color: black; font-weight: bold;">{self.tr("Trade No.")}:</span> '
-                        f'<span style="color: blue;">{closest_info["trade_index"] if closest_info["trade_index"] >= 0 else self.tr("Start")}</span><br>'
-                        f'<span style="color: black; font-weight: bold;">{self.tr("Single Return")}:</span> '
+                        f'<span style="color: black; font-weight: bold;">{label_1}:</span> '
+                        f'<span style="color: blue;">{closest_info["trade_index"] if closest_info["trade_index"] >= 0 else label}</span><br>'
+                        f'<span style="color: black; font-weight: bold;">{label_2}:</span> '
                         f'<span style="color: {"#1BCB34" if closest_info["single_yield"] < 0 else "#E5403C"}; font-weight: bold;">{closest_info["single_yield"]:.2f}%</span><br>'
-                        f'<span style="color: black; font-weight: bold;">{self.tr("Cumulative Return")}:</span> '
+                        f'<span style="color: black; font-weight: bold;">{label_3}:</span> '
                         f'<span style="color: {"#1BCB34" if closest_info["cumulative_yield"] < 0 else "#E5403C"}; font-weight: bold;">{closest_info["cumulative_yield"]:.2f}%</span><br>'
-                        f'<span style="color: black; font-weight: bold;">{self.tr("Win Rate")}:</span> '
+                        f'<span style="color: black; font-weight: bold;">{label_4}:</span> '
                         f'<span style="color: purple; font-weight: bold;">{closest_info["win_rate"]:.2f}%</span>'
                         '</div>'
                     )
