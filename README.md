@@ -70,7 +70,9 @@ python ./src/main.py
 
 ## 许可证
 
-本项目采用 MIT 许可证 - 详情请参阅 [LICENSE](LICENSE) 文件。
+本项目采用 GNU GPL-3.0 许可证，因为项目内置了同样为 GPL-3.0 的 qfluentwidgets 控件库。详情请参阅 [LICENSE](LICENSE) 与 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+注意：qfluentwidgets 上游对**商用**场景要求另行购买商业授权（见 [PyQt-Fluent-Widgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets)）。
 
 ## 引用
 

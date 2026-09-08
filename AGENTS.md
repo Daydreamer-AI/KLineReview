@@ -6,6 +6,7 @@
 
 - 定位：A 股 **K 线回放复盘 + 模拟交易**桌面工具（PyQt5），支持自定义指标参数、亮/暗主题与中/繁/英多语言。
 - 版本：`VERSION = "1.0.0"`（见 [src/common/config.py](src/common/config.py)）。
+- 许可证：项目采用 **GPL-3.0**（[LICENSE](LICENSE)）；内置 qfluentwidgets 亦为 GPL-3.0，商用需按上游要求另行授权（见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)）。
 - 技术栈：PyQt5、PyQtGraph、Pandas/NumPy；行情与股票列表通过 **Baostock** 联网获取；qfluentwidgets 已**内置**在 [src/gui/qt_widgets/MComponents/qfluentwidgets](src/gui/qt_widgets/MComponents/qfluentwidgets)；`src/db_base/` 保留 SQLite 读写层。
 - Python：README 要求 3.10+，本地 `.venv` 为 3.12（已确认 [.venv/pyvenv.cfg](.venv/pyvenv.cfg)）。
 
