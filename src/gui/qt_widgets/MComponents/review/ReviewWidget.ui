@@ -167,7 +167,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>随机股票回放</string>
+             <string>Random stock review</string>
             </property>
             <property name="text">
              <string/>
@@ -193,6 +193,9 @@
               <width>16777215</width>
               <height>32</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>Load the specified stock review</string>
             </property>
             <property name="text">
              <string>Load</string>
@@ -236,7 +239,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>回退到最前</string>
+           <string>Go back to the beginning</string>
           </property>
           <property name="text">
            <string/>
@@ -264,7 +267,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>回退十步</string>
+           <string>Ten steps back</string>
           </property>
           <property name="text">
            <string/>
@@ -292,7 +295,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>回退一步</string>
+           <string>Step back one step</string>
           </property>
           <property name="text">
            <string/>
@@ -320,7 +323,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>播放</string>
+           <string>Play/Pause</string>
           </property>
           <property name="text">
            <string/>
@@ -348,7 +351,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>前进一步</string>
+           <string>Move forward</string>
           </property>
           <property name="text">
            <string/>
@@ -376,7 +379,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>前进十步</string>
+           <string>Move forward ten steps.</string>
           </property>
           <property name="text">
            <string/>
@@ -404,7 +407,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>前进到最后</string>
+           <string>Moving forward to the end</string>
           </property>
           <property name="text">
            <string/>
@@ -665,7 +668,7 @@
         <item>
          <widget class="BodyLabel" name="label_7">
           <property name="text">
-           <string>比例：</string>
+           <string>Proportion:</string>
           </property>
          </widget>
         </item>
