@@ -60,6 +60,18 @@ python ./src/main.py
 
 程序需要联网：启动后从 Baostock 获取股票列表，复盘页按需拉取 K 线数据（Baostock 前复权数据约近三年）。
 
+## 发布包构建（可选）
+
+仓库内置 GitHub Actions 发布流程：向 `master`/`release/*` 推送 `vX.Y.Z` tag 后，会在 Windows/macOS 上自动打包 exe/dmg 并发布到 Releases（见 [.github/workflows/release.yml](.github/workflows/release.yml)）。
+
+本地构建需要先安装 PyInstaller：
+
+```bash
+pip install pyinstaller
+python packaging/make_icons.py
+pyinstaller --noconfirm --clean packaging/KLineReview.spec
+```
+
 ## 文档
 
 详细文档请参阅 [docs/](docs/) 目录。

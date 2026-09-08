@@ -34,9 +34,11 @@
 | `src/thread/` | Qt 任务池、可暂停/取消任务基类、Baostock 取数与股票信息任务 |
 | `src/resources/` | `resources.qrc`/`resources_rc.py`（生成文件）、主题 QSS、i18n `.ts/.qm` 与更新脚本 |
 | `scripts/` | 仅保留 `smoke_review_baostock.py`（联网真实数据冒烟，可选） |
+| `packaging/` | 发布打包：PyInstaller spec、图标生成脚本 |
 | `tests/` | `test_period_aggregator.py`、`test_review_period_switch.py`（合成数据/离屏 Qt） |
 | `data/` | 运行时数据与日志（`.gitignore` 忽略；`data/database/stocks/db/baostock/stocks.db` 仍被 git 跟踪） |
 | `docs/` | 项目导读、开发规范、需求文档（v1.0）、设计文档、效果图 |
+| `.github/workflows/` | `unittest.yml`（测试 CI）、`release.yml`（打 v* tag 时构建 exe/dmg 并发布 GitHub Release） |
 
 ## 运行与测试
 
@@ -55,6 +57,12 @@ python scripts/smoke_review_baostock.py --code sz.000615 --date YYYY-MM-DD
 
 # 修改 resources.qrc / 图标 / QSS 后重新编译（勿手改生成文件）
 python src/resources/auto_recompile_resources.py
+
+# 生成应用图标（PyInstaller 前）
+python packaging/make_icons.py
+
+# 本地打包（需先 pip install pyinstaller）
+pyinstaller --noconfirm --clean packaging/KLineReview.spec
 ```
 
 ## 禁止事项

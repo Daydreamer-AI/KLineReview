@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import pandas as pd
 
+from common.paths import get_module_relative_file
+
 class StockCardWidget(QWidget):
 
     # 定义自定义信号
@@ -18,7 +20,7 @@ class StockCardWidget(QWidget):
         super().__init__()
         # uic.loadUi('.gui/qt_widgets/MComponents/StockCardWidget.ui', self)
         # 使用 pathlib 确保跨平台兼容性
-        ui_file = Path(__file__).parent / "StockCardWidget.ui"
+        ui_file = get_module_relative_file(__file__, "StockCardWidget.ui")
         
         # 检查文件是否存在
         if not ui_file.exists():

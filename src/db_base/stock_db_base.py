@@ -4,6 +4,7 @@ import pandas as pd
 from pathlib import Path
 from contextlib import contextmanager
 from common.common_api import *
+from common.paths import get_database_root
 import threading
 import numpy as np
 import datetime
@@ -40,7 +41,7 @@ class StockDbBase:
         """
         self.logger = get_logger(__name__)
         if db_dir is None:
-            self.db_dir = Path("./data/database/stocks/db/akshare")
+            self.db_dir = get_database_root("akshare")
         else:
             self.db_dir = Path(db_dir)
 
@@ -414,7 +415,7 @@ class StockDbBase:
 
     def set_db_dir(self, db_dir):
         if db_dir is None:
-            self.db_dir = Path("./data/database/stocks/db/akshare")
+            self.db_dir = get_database_root("akshare")
         else:
             self.db_dir = Path(db_dir)
 

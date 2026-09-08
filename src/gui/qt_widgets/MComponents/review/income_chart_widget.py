@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 import pyqtgraph as pg
 
 from common.config import cfg
+from common.paths import get_module_relative_file
 from gui.qt_widgets.MComponents.qfluentwidgets import(Theme, isDarkTheme, theme)
 
 class IncomeChartWidget(QWidget):
@@ -46,7 +47,7 @@ class IncomeChartWidget(QWidget):
         self.plot_widget.setBackground(cfg.get_plot_widget_background_color(theme))
 
     def setup_ui(self):
-        ui_file = Path(__file__).parent / "IncomeChartWidget.ui"
+        ui_file = get_module_relative_file(__file__, "IncomeChartWidget.ui")
         
         # 检查文件是否存在
         if not ui_file.exists():

@@ -4,6 +4,8 @@ from PyQt5.QtCore import pyqtSignal, Qt
 
 from pathlib import Path
 
+from common.paths import get_module_relative_file
+
 class DemoTradingCardWidget(QWidget):
     # 定义自定义信号
     clicked = pyqtSignal(object)  # 点击信号
@@ -14,7 +16,7 @@ class DemoTradingCardWidget(QWidget):
     def __init__(self, parent=None):
         super(DemoTradingCardWidget, self).__init__(parent)
 
-        ui_file = Path(__file__).parent / "DemoTradingCardWidget.ui"
+        ui_file = get_module_relative_file(__file__, "DemoTradingCardWidget.ui")
         
         # 检查文件是否存在
         if not ui_file.exists():

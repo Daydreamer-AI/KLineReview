@@ -7,6 +7,8 @@ from gui.qt_widgets.MComponents.qfluentwidgets import (qconfig, QConfig, ConfigI
                             OptionsValidator, RangeConfigItem, RangeValidator,
                             FolderListValidator, Theme, FolderValidator, ConfigSerializer, __version__)
 
+from common.paths import get_config_file
+
 
 class Language(Enum):
     """ Language enumeration """
@@ -81,4 +83,4 @@ EN_SUPPORT_URL = "https://github.com/Daydreamer-AI/KLineReview"
 
 cfg = Config()
 cfg.themeMode.value = Theme.AUTO
-qconfig.load('app/config/config.json', cfg)
+qconfig.load(str(get_config_file()), cfg)
