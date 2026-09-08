@@ -3,11 +3,11 @@
 **专注于K线回放复盘的PyQt5项目**
 
 ## 效果图
-![功能演示动图](docs/效果图/V1.0.0_主页.png)
+![功能演示截图](docs/效果图/V1.0.0_主页.png)
 
-![功能演示动图](docs/效果图/V1.0.0_回放.png)
+![功能演示截图](docs/效果图/V1.0.0_回放.png)
 
-![功能演示动图](docs/效果图/V1.0.0_设置.png)
+![功能演示截图](docs/效果图/V1.0.0_设置.png)
 
 
 ## 功能特点
@@ -58,13 +58,15 @@ pip install -r requirements.txt
 python ./src/main.py
 ```
 
+程序需要联网：启动后从 Baostock 获取股票列表，复盘页按需拉取 K 线数据（Baostock 前复权数据约近三年）。
+
 ## 文档
 
 详细文档请参阅 [docs/](docs/) 目录。
 
-## 贡献指南
+## 反馈与贡献
 
-欢迎提交问题和贡献代码，请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。
+欢迎通过 [Issues](https://github.com/Daydreamer-AI/KLineReview/issues) 提交问题和建议。
 
 ## 许可证
 
@@ -82,4 +84,4 @@ Baostock 项目地址：https://pypi.org/project/baostock/
 
 ### qfluentwidgets
 
-qfluentwidgets 项目地址：https://github.com/zhiyiYo/PyQt-Fluent-Widgets
+qfluentwidgets 项目地址：https://github.com/zhiyiYo/PyQt-Fluent-Widgets（本项目已将其控件源码内置至 `src/gui/qt_widgets/MComponents/qfluentwidgets`）
