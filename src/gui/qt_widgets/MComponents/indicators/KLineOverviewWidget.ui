@@ -50,16 +50,16 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="label_date">
+         <widget class="BodyLabel" name="label_date">
           <property name="text">
            <string>2025-12-03</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_hours">
+         <widget class="BodyLabel" name="label_hours">
           <property name="text">
-           <string>星期/小时</string>
+           <string>Date time</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -71,14 +71,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="label_head_value">
+         <widget class="BodyLabel" name="label_head_value">
           <property name="text">
-           <string>数值</string>
+           <string>Value</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_value">
+         <widget class="BodyLabel" name="label_value">
           <property name="text">
            <string>123.123</string>
           </property>
@@ -92,14 +92,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QLabel" name="label_head_open">
+         <widget class="BodyLabel" name="label_head_open">
           <property name="text">
-           <string>开盘</string>
+           <string>Open</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_open">
+         <widget class="BodyLabel" name="label_open">
           <property name="text">
            <string>123.123</string>
           </property>
@@ -113,14 +113,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="label_head_close">
+         <widget class="BodyLabel" name="label_head_close">
           <property name="text">
-           <string>收盘</string>
+           <string>Close</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_close">
+         <widget class="BodyLabel" name="label_close">
           <property name="text">
            <string>123.123</string>
           </property>
@@ -134,14 +134,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QLabel" name="label_head_high">
+         <widget class="BodyLabel" name="label_head_high">
           <property name="text">
-           <string>最高</string>
+           <string>High</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_high">
+         <widget class="BodyLabel" name="label_high">
           <property name="text">
            <string>123.123</string>
           </property>
@@ -155,14 +155,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QLabel" name="label_head_low">
+         <widget class="BodyLabel" name="label_head_low">
           <property name="text">
-           <string>最低</string>
+           <string>Low</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_low">
+         <widget class="BodyLabel" name="label_low">
           <property name="text">
            <string>123.123</string>
           </property>
@@ -176,14 +176,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QLabel" name="label_head_change_percent">
+         <widget class="BodyLabel" name="label_head_change_percent">
           <property name="text">
-           <string>涨幅</string>
+           <string>Change %</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_change_percent">
+         <widget class="BodyLabel" name="label_change_percent">
           <property name="text">
            <string>+3.2%</string>
           </property>
@@ -197,14 +197,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
-         <widget class="QLabel" name="label_head_amplitude">
+         <widget class="BodyLabel" name="label_head_amplitude">
           <property name="text">
-           <string>振幅</string>
+           <string>Amplitude</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_amplitude">
+         <widget class="BodyLabel" name="label_amplitude">
           <property name="text">
            <string>+6.2%</string>
           </property>
@@ -218,14 +218,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
-         <widget class="QLabel" name="label_head_volume">
+         <widget class="BodyLabel" name="label_head_volume">
           <property name="text">
-           <string>成交量</string>
+           <string>Volume</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_volume">
+         <widget class="BodyLabel" name="label_volume">
           <property name="text">
            <string>123.123</string>
           </property>
@@ -239,14 +239,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
-         <widget class="QLabel" name="label_head_amount">
+         <widget class="BodyLabel" name="label_head_amount">
           <property name="text">
-           <string>成交额</string>
+           <string>Turnover</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_amount">
+         <widget class="BodyLabel" name="label_amount">
           <property name="text">
            <string>123.123</string>
           </property>
@@ -260,14 +260,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
-         <widget class="QLabel" name="label_head_turnover_rate">
+         <widget class="BodyLabel" name="label_head_turnover_rate">
           <property name="text">
-           <string>换手率</string>
+           <string>Turnover Rate</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_turnover_rate">
+         <widget class="BodyLabel" name="label_turnover_rate">
           <property name="text">
            <string>3.3%</string>
           </property>
@@ -281,14 +281,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_12">
         <item>
-         <widget class="QLabel" name="label_head_volume_ratio">
+         <widget class="BodyLabel" name="label_head_volume_ratio">
           <property name="text">
-           <string>量比</string>
+           <string>Volume Ratio</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_volume_ratio">
+         <widget class="BodyLabel" name="label_volume_ratio">
           <property name="text">
            <string>1.0</string>
           </property>
@@ -302,16 +302,16 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_13">
         <item>
-         <widget class="QLabel" name="label_head_kline_status">
+         <widget class="BodyLabel" name="label_head_kline_status">
           <property name="text">
-           <string>k线状态</string>
+           <string>Status</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_kline_status">
+         <widget class="BodyLabel" name="label_kline_status">
           <property name="text">
-           <string>涨停/跌停</string>
+           <string>--</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -325,6 +325,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

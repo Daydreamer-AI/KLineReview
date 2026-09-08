@@ -17,12 +17,12 @@ from gui.qt_widgets.MComponents.indicators.kdj_widget import KdjWidget
 from gui.qt_widgets.MComponents.indicators.rsi_widget import RsiWidget
 from gui.qt_widgets.MComponents.indicators.boll_widget import BollWidget
 
-from gui.qt_widgets.MComponents.mloading_widget import LoadingWidget
+from gui.qt_widgets.MComponents.review.mloading_widget import LoadingWidget
 
 from indicators import stock_data_indicators as sdi
 
 from manager.period_manager import TimePeriod, ReviewPeriodProcessData
-from manager.bao_stock_data_manager import BaostockDataManager
+from processor.period_aggregator import period_start_key, aggregate_period
 
 from manager.indicators_config_manager import get_indicator_config_manager, IndicatrosEnum
 
@@ -32,6 +32,7 @@ class IndicatorsViewWidget(QWidget):
     sig_current_animation_index_changed = pyqtSignal(int)
     sig_init_review_animation_finished = pyqtSignal(bool, object)
     sig_animation_play_finished = pyqtSignal()
+    sig_period_changed = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(IndicatorsViewWidget, self).__init__(parent)
@@ -55,8 +56,12 @@ class IndicatorsViewWidget(QWidget):
 
         self.indicator_widgets = {} 
         self.kline_widget = None
+        self.loading_widget = None
 
-        # self.df_data列结构：date, code, name, open, high, low, close, volume, amount, change_percent, turnover_rate, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
+        # self.df_data列结构：
+        # 日线级别：date, code, name, open, high, low, close, volume, amount, change_percent, turnover_rate, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
+        # 周线及以上级别（无change_percent）：date, code, name, open, high, low, close, volume, amount, turnover_rate, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
+        # 分钟级别（多time，无change_percent）：date, time, code, name, open, high, low, close, volume, amount, adjustflag, diff, dea, macd, ma5, ma10, ma20, ma24, ma30, ma52, ma60, volume_ratio
         self.df_data = None                 # pd.DataFrame
 
         self.current_selected_code = ""
@@ -64,6 +69,7 @@ class IndicatorsViewWidget(QWidget):
 
 
         # 复盘相关参数
+        self._base_stock_data = {}        # {TimePeriod: DataFrame}，注入时的原始基周期数据，供切换时重建进行中bar
         self.animation_timer = QtCore.QTimer()
         self.animation_timer.timeout.connect(self.slot_animation_step)
         self.start_animation_index = 0
@@ -80,16 +86,6 @@ class IndicatorsViewWidget(QWidget):
         self.index_changed = False
 
     def init_ui(self):
-        # 创建新的Loading控件
-        self.loading_widget = LoadingWidget(
-            self, 
-            message='loading...',
-            animation_type='dots',
-            show_mask=True,
-            mask_opacity=0.5
-        )
-        self.hide_loading()
-
         self.period_button_group = QtWidgets.QButtonGroup(self)
         self.period_button_group.addButton(self.btn_time)
         self.period_button_group.addButton(self.btn_1m, 0)
@@ -101,24 +97,52 @@ class IndicatorsViewWidget(QWidget):
         self.period_button_group.addButton(self.btn_120m, 6)
         self.period_button_group.addButton(self.btn_1d, 7)
         self.period_button_group.addButton(self.btn_1w, 8)
+        self.period_button_group.addButton(self.btn_M, 9)
+        self.period_button_group.addButton(self.btn_45m, 10)
+        self.period_button_group.addButton(self.btn_90m, 11)
+
+        self.btn_time.setText(TimePeriod.TIME.label)
+        self.btn_1m.setText(TimePeriod.MINUTE_1.label)
+        self.btn_5m.setText(TimePeriod.MINUTE_5.label)
+        self.btn_10m.setText(TimePeriod.MINUTE_10.label)
+        self.btn_15m.setText(TimePeriod.MINUTE_15.label)
+        self.btn_30m.setText(TimePeriod.MINUTE_30.label)
+        self.btn_45m.setText(TimePeriod.MINUTE_45.label)
+        self.btn_60m.setText(TimePeriod.MINUTE_60.label)
+        self.btn_90m.setText(TimePeriod.MINUTE_90.label)
+        self.btn_120m.setText(TimePeriod.MINUTE_120.label)
+
+        self.btn_1d.setText(TimePeriod.DAY.label)
+        self.btn_1w.setText(TimePeriod.WEEK.label)
+        self.btn_M.setText(TimePeriod.MONTH.label)
 
         self.btn_time.setEnabled(False)
         self.btn_1m.setEnabled(False)
+        # 5/10/15/30/60/120 分钟默认禁用；复盘加载完成后由 set_period_buttons_enabled 按注入周期控制
         self.btn_5m.setEnabled(False)
         self.btn_10m.setEnabled(False)
+        self.btn_15m.setEnabled(False)
+        self.btn_30m.setEnabled(False)
+        self.btn_45m.setEnabled(False)
+        self.btn_60m.setEnabled(False)
+        self.btn_90m.setEnabled(False)
         self.btn_120m.setEnabled(False)
 
-        # self.init_stock_card_list()
+        self.btn_1d.setEnabled(False)
+        self.btn_1w.setEnabled(False)
+        self.btn_M.setEnabled(False)
+
+        self.btn_1d.setChecked(True)
 
         self.kline_widget = KLineWidget(self.df_data, self.type, self)
         self.verticalLayout.addWidget(self.kline_widget, 3)
         self.btn_indicator_ma.setChecked(True)
         self.kline_widget.show_ma()
         self.kline_widget.set_period(TimePeriod.DAY)
-        self.kline_widget.set_period_text("日线")
-        self.kline_widget.set_indicator_name("均线")
+        self.kline_widget.set_period_text(self.tr("1D"))
+        self.kline_widget.set_indicator_name(self.tr("MA"))
 
-        self.load_qss()
+        # self.load_qss()
 
     def init_connect(self):
         self.period_button_group.buttonClicked.connect(self.slot_period_button_clicked)
@@ -211,7 +235,7 @@ class IndicatorsViewWidget(QWidget):
             if btn.isChecked():  # 忽略选中的按钮
                 continue
             
-            if self.period_button_group.id(btn) in [0, 2, 6]:
+            if self.period_button_group.id(btn) in [0]:  # 仅 1 分钟无数据源，保持禁用
                 continue
 
             btn.setEnabled(b_enable)
@@ -227,7 +251,7 @@ class IndicatorsViewWidget(QWidget):
         checked_id = self.period_button_group.checkedId()
         target_period_text = self.period_button_group.button(checked_id).text()
         target_period = TimePeriod.from_label(target_period_text)
-        s_date_time_col = "time" if TimePeriod.is_minute_level(target_period) else "date"
+        s_date_time_col = "time" if "time" in self.df_data.columns else "date"
         current_date_time = self.df_data[s_date_time_col].iloc[-1]
         return current_date_time
     
@@ -258,6 +282,13 @@ class IndicatorsViewWidget(QWidget):
 
         return dict_return
 
+    def get_current_kline_data(self):
+        """返回最后一条K线数据"""
+        df_data = self.get_stock_data()
+        if df_data.empty:
+            return pd.DataFrame()
+        
+        return df_data.iloc[self.current_animation_index]
 
     def get_stock_data(self):
         checked_btn = self.period_button_group.checkedButton()
@@ -278,49 +309,58 @@ class IndicatorsViewWidget(QWidget):
     
         return self.dict_stock_data[period]
 
-    def update_stock_data_dict(self, code):
+    def get_base_stock_data_by_period(self, period):
+        """获取注入时的原始基周期数据（不含切换时重建的进行中 bar）"""
+        return self._base_stock_data.get(period)
+
+
+
+    def get_current_period(self):
+        """返回当前选中的周期（TimePeriod），未选中时返回 None。"""
         checked_btn = self.period_button_group.checkedButton()
         if checked_btn is None:
-            return pd.DataFrame()
-        
+            return None
+        return TimePeriod.from_label(checked_btn.text())
+
+    def set_stock_data(self, code, dict_stock_data):
+        """
+        外部注入股票各周期K线数据，本控件不再自行获取数据，只负责缓存维护。
+
+        Args:
+            code: 股票代码，如 'sh.600000'
+            dict_stock_data: {TimePeriod: DataFrame}，各周期K线数据（建议含指标列，
+                             列结构参考 init_para 中的注释）
+        """
         if code != self.current_selected_code:
-            self.logger.info(f"self.current_selected_code为{self.current_selected_code}，code为{code}")
-            self.dict_stock_data.clear()
+            self.logger.info(f"切换股票：{self.current_selected_code} -> {code}")
             self.dict_stock_data = {}
+            self._base_stock_data = {}
             self.current_selected_code = code
-        
-        period_text = checked_btn.text()
-        time_period = TimePeriod.from_label(period_text)
-        
-        if time_period not in self.dict_stock_data.keys():   # 暂无该级别数据
 
-            # 优先加载本地数据
-            bao_stock_data_manager = BaostockDataManager()
-            df_time_period_stock_data = bao_stock_data_manager.get_stock_data_from_db_by_period_with_indicators_auto(code, time_period) # TODO：这里可优化成多数据来源接口。
+        if not dict_stock_data:
+            self.logger.warning(f"外部注入的{code}数据为空，跳过缓存更新")
+            return
 
-            # 无本地数据则从Baostock获取
-            if df_time_period_stock_data is None or df_time_period_stock_data.empty:  # 无本地数据
-                self.logger.info(f"无本地数据，开始从Baostock获取{code}的{period_text}数据")
-            
-                from thread.baostock_data_fetch_task import BaostockDataFetchTask2
-                from thread.task_pool import get_default_task_pool
-                
-                baostock_data_fetch_task = BaostockDataFetchTask2(code=code, period=time_period)
-                baostock_data_fetch_task.task_completed.connect(
-                    lambda task_id, result: self.hide_loading()
-                    )
-                task_id = get_default_task_pool().submit(baostock_data_fetch_task)
-                self.show_loading("dots", "loading...")
+        required_cols = ['open', 'high', 'low', 'close', 'volume']
+        valid_dict = {}
+        for period, df in dict_stock_data.items():
+            if df is None or df.empty:
+                self.logger.warning(f"{code}的{TimePeriod.get_chinese_label(period)}数据为空，跳过")
+                continue
+            missing_cols = [col for col in required_cols if col not in df.columns]
+            if missing_cols:
+                self.logger.warning(f"{code}的{TimePeriod.get_chinese_label(period)}数据缺少列：{missing_cols}，可能导致绘图异常")
+            valid_dict[period] = df
 
-            if self.dict_stock_data:
-                self.logger.info(f"重新获取{code}的{period_text}数据")
-                self.dict_stock_data[time_period] = df_time_period_stock_data
-            else:
-                self.logger.info(f"更新{code}的{period_text}数据")
-                self.dict_stock_data = {time_period: df_time_period_stock_data}
-        else:
-            # self.logger.info(f"{code}的{period_text}数据已存在，无需重复加载")
-            pass
+        if not valid_dict:
+            self.logger.warning(f"{code}的各周期数据均为空，缓存未更新")
+            return
+
+        self.dict_stock_data.update(valid_dict)
+        self._base_stock_data.update({period: df.copy() for period, df in valid_dict.items()})
+        periods_text = [TimePeriod.get_chinese_label(period) for period in valid_dict.keys()]
+        self.logger.info(f"已注入{code}的{len(valid_dict)}个周期数据：{periods_text}")
+
     def show_default_indicator(self):
         self.btn_indicator_volume.setChecked(True)
         self.slot_btn_indicator_volume_clicked()
@@ -334,11 +374,24 @@ class IndicatorsViewWidget(QWidget):
 
     def update_chart(self, data, start_index=None):
         code = data['code']
-        self.update_stock_data_dict(code)
+        if code != self.current_selected_code or not self.dict_stock_data:
+            self.logger.warning(f"未找到{code}的外部注入数据，请先调用 set_stock_data(code, dict_stock_data) 注入数据")
+            return
         self.kline_widget.set_stock_name(data['name'])
 
         df = self.get_stock_data()
+        if df is None or df.empty:
+            checked_btn = self.period_button_group.checkedButton()
+            period_text = checked_btn.text() if checked_btn else "未知"
+            self.logger.warning(f"{code}的当前周期[{period_text}]数据未注入，无法更新图表")
+            return
+
         if start_index is not None and start_index != "":  # 获取数据成功
+            # 若当前周期含进行中 bar，先按目标位置同步（前进后未走完 bar 自动走完）
+            self._sync_partial_bar_for_position(start_index)
+            df = self.get_stock_data()
+            if df is None or df.empty:
+                return
             # self.logger.info(f"df的长度: {len(df)}")
             # if self.max_animation_index == -1:
             #     self.max_animation_index = len(df) - 1
@@ -359,7 +412,7 @@ class IndicatorsViewWidget(QWidget):
             target_period_text = self.period_button_group.button(checked_id).text()
             target_period = TimePeriod.from_label(target_period_text)
             self.dict_period_process_data[target_period].current_index = start_index
-            s_date_time_col = "time" if TimePeriod.is_minute_level(target_period) else "date"
+            s_date_time_col = "time" if "time" in self.df_data.columns else "date"
             self.dict_period_process_data[target_period].current_date_time = self.df_data[s_date_time_col].iloc[-1]
 
             if start_index != self.current_animation_index:
@@ -398,10 +451,33 @@ class IndicatorsViewWidget(QWidget):
 
         # 更新最后一根k线指标值
 
+    def _sync_partial_bar_for_position(self, index):
+        """当前周期数据若含进行中 bar，按目标索引代表的复盘位置重新构建（前进后自动走完）。
+
+        复盘动画在周期内前进时，未走完的 bar（如盘中当日、周中当周、进行中分钟槽）
+        应随位置前进自动补全；以目标索引 bar 的 as_of 时刻重建当前周期数据，
+        随后 update_chart 用重建后的数据重新截断。
+        """
+        if self.property("review") is None:
+            return
+        period = self.get_current_period()
+        df = self.get_stock_data()
+        if df is None or df.empty:
+            return
+        if 'is_complete' not in df.columns or bool(df['is_complete'].all()):
+            return
+        if index < 0 or index >= len(df):
+            return
+        if 'time' in df.columns:
+            as_of = df['time'].iloc[index]
+        else:
+            as_of = df['date'].iloc[index]
+        self._refresh_derived_period_data(period, as_of)
+
     def update_indicator_chart(self, df_data):
         is_volume_checked = self.btn_indicator_volume.isChecked()
         if is_volume_checked:
-            volume_widget = self.indicator_widgets[IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME)]
+            volume_widget = self.indicator_widgets[IndicatrosEnum.get_label(IndicatrosEnum.VOLUME)]
             if volume_widget is None:
                 self.btn_indicator_volume.setChecked(False)
             else:
@@ -410,7 +486,7 @@ class IndicatorsViewWidget(QWidget):
 
         is_amount_checked = self.btn_indicator_amount.isChecked()
         if is_amount_checked:
-            amount_widget = self.indicator_widgets[IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT)]
+            amount_widget = self.indicator_widgets[IndicatrosEnum.get_label(IndicatrosEnum.AMOUNT)]
             if amount_widget is None:
                 self.btn_indicator_amount.setChecked(False)
             else:
@@ -418,7 +494,7 @@ class IndicatorsViewWidget(QWidget):
 
         is_macd_checked = self.btn_indicator_macd.isChecked()
         if is_macd_checked:
-            macd_widget = self.indicator_widgets[IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD)]
+            macd_widget = self.indicator_widgets[IndicatrosEnum.get_label(IndicatrosEnum.MACD)]
             if macd_widget is None:
                 self.btn_indicator_macd.setChecked(False)
             else:
@@ -426,7 +502,7 @@ class IndicatorsViewWidget(QWidget):
 
         is_kdj_checked = self.btn_indicator_kdj.isChecked()
         if is_kdj_checked:
-            kdj_widget = self.indicator_widgets[IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ)]
+            kdj_widget = self.indicator_widgets[IndicatrosEnum.get_label(IndicatrosEnum.KDJ)]
             if kdj_widget is None:
                 self.btn_indicator_kdj.setChecked(False)
             else:
@@ -434,7 +510,7 @@ class IndicatorsViewWidget(QWidget):
 
         is_rsi_checked = self.btn_indicator_rsi.isChecked()
         if is_rsi_checked:
-            rsi_widget = self.indicator_widgets[IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI)]
+            rsi_widget = self.indicator_widgets[IndicatrosEnum.get_label(IndicatrosEnum.RSI)]
             if rsi_widget is None:
                 self.btn_indicator_rsi.setChecked(False)
             else:
@@ -442,7 +518,7 @@ class IndicatorsViewWidget(QWidget):
 
         is_boll_checked = self.btn_indicator_boll.isChecked()
         if is_boll_checked:
-            boll_widget = self.indicator_widgets[IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL)]
+            boll_widget = self.indicator_widgets[IndicatrosEnum.get_label(IndicatrosEnum.BOLL)]
             if boll_widget is None:
                 self.btn_indicator_boll.setChecked(False)
             else:
@@ -495,12 +571,12 @@ class IndicatorsViewWidget(QWidget):
         '''
             动态添加指标图
         '''
-        # if self.df_data is None or self.df_data.empty:
-        #     # self.logger.warning(f"数据为空，无法添加指标图：{indicator_name}")
-        #     return None
+        if self.df_data is None or self.df_data.empty:
+            self.logger.warning(f"数据为空，无法添加指标图：{indicator_name}")
+            return None
         
         # 先检查是否支持该指标
-        supported_indicators = [IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME), IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT), IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD), IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ), IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI), IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL)]
+        supported_indicators = [IndicatrosEnum.get_label(IndicatrosEnum.VOLUME), IndicatrosEnum.get_label(IndicatrosEnum.AMOUNT), IndicatrosEnum.get_label(IndicatrosEnum.MACD), IndicatrosEnum.get_label(IndicatrosEnum.KDJ), IndicatrosEnum.get_label(IndicatrosEnum.RSI), IndicatrosEnum.get_label(IndicatrosEnum.BOLL)]
         if indicator_name not in supported_indicators:
             self.logger.warning(f"不支持的指标：{indicator_name}")
             return None
@@ -511,17 +587,17 @@ class IndicatorsViewWidget(QWidget):
             return self.indicator_widgets[indicator_name]
 
         indicator_widget = None
-        if indicator_name == IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME):
+        if indicator_name == IndicatrosEnum.get_label(IndicatrosEnum.VOLUME):
             indicator_widget = self.draw_volume()
-        elif indicator_name == IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT):
+        elif indicator_name == IndicatrosEnum.get_label(IndicatrosEnum.AMOUNT):
             indicator_widget = self.draw_amount()
-        elif indicator_name == IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD):
+        elif indicator_name == IndicatrosEnum.get_label(IndicatrosEnum.MACD):
             indicator_widget = self.draw_macd()
-        elif indicator_name == IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ):
+        elif indicator_name == IndicatrosEnum.get_label(IndicatrosEnum.KDJ):
             indicator_widget = self.draw_kdj()
-        elif indicator_name == IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI):
+        elif indicator_name == IndicatrosEnum.get_label(IndicatrosEnum.RSI):
             indicator_widget = self.draw_rsi()
-        elif indicator_name == IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL):
+        elif indicator_name == IndicatrosEnum.get_label(IndicatrosEnum.BOLL):
             indicator_widget = self.draw_boll()
         else:
             self.logger.warning(f"不支持的指标：{indicator_name}")
@@ -541,7 +617,7 @@ class IndicatorsViewWidget(QWidget):
                     plot_widget.setXLink(kline_plot_widget)
                     kline_plot_widget.setXLink(plot_widget)
         
-        if indicator_name == IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME):
+        if indicator_name == IndicatrosEnum.get_label(IndicatrosEnum.VOLUME):
             # 成交量指标图固定在k线图下方
             # 找到K线图在布局中的索引位置
             kline_index = self.verticalLayout.indexOf(self.kline_widget)
@@ -609,73 +685,44 @@ class IndicatorsViewWidget(QWidget):
         for indicator_name, widget in self.indicator_widgets.items():
             widget.set_period(period)
 
+    def set_current_period(self, period):
+        """外部指定当前展示周期（如复盘数据加载完成后同步周期按钮/图表），不触发 slot_period_button_clicked 的切换逻辑"""
+        for btn in self.period_button_group.buttons():
+            if self.period_button_group.id(btn) < 0:  # btn_time（分时）不作为周期切换目标
+                continue
+            if TimePeriod.from_label(btn.text()) == period:
+                btn.setChecked(True)
+                self.last_period_btn_checked_id = self.period_button_group.id(btn)
+                self.set_period(period)
+                self.kline_widget.set_period_text(btn.text())
+                return True
+        self.logger.warning(f"未找到周期 {TimePeriod.get_chinese_label(period)} 对应的周期按钮")
+        return False
+
+    def set_period_buttons_enabled(self, periods=None):
+        """按周期列表启用/禁用切换按钮（不触碰分时按钮）。
+
+        复盘数据后台加载期间调用 set_period_buttons_enabled([]) 全部禁用；
+        加载完成同步后传入已加载周期列表，仅启用对应按钮。
+        """
+        enabled_periods = set(periods) if periods else set()
+        for btn in self.period_button_group.buttons():
+            if self.period_button_group.id(btn) < 0:  # btn_time
+                continue
+            btn.setEnabled(TimePeriod.from_label(btn.text()) in enabled_periods)
+
     def get_time_intervals_for_period(self, period):
         """
         根据周期返回对应的时间区间列表
         返回: [(start_time, end_time), ...] 格式的列表
+        分钟级按 A 股两段交易时段（09:30-11:30、13:00-15:00）按周期分钟数切槽，
+        与聚合器共用同一时段规则；非分钟级返回空列表。
         """
-        # A股交易时间: 09:30-11:30, 13:00-15:00
-        morning_start = pd.Timestamp("09:30").time()
-        morning_end = pd.Timestamp("11:30").time()
-        afternoon_start = pd.Timestamp("13:00").time()
-        afternoon_end = pd.Timestamp("15:00").time()
-        
-        if period == TimePeriod.MINUTE_15:
-            # 16个15分钟区间
-            intervals = []
-            # 上午时段: 09:30-11:30 (9个区间)
-            current = morning_start
-            while current < morning_end:
-                next_time = self.add_minutes(current, 15)
-                if next_time > morning_end:
-                    next_time = morning_end
-                intervals.append((current, next_time))
-                current = next_time
-                
-            # 下午时段: 13:00-15:00 (8个区间)
-            current = afternoon_start
-            while current < afternoon_end:
-                next_time = self.add_minutes(current, 15)
-                if next_time > afternoon_end:
-                    next_time = afternoon_end
-                intervals.append((current, next_time))
-                current = next_time
-                
-            return intervals[:16]  # 确保只有16个区间
-            
-        elif period == TimePeriod.MINUTE_30:
-            # 8个30分钟区间
-            intervals = [
-                (pd.Timestamp("09:30").time(), pd.Timestamp("10:00").time()),
-                (pd.Timestamp("10:00").time(), pd.Timestamp("10:30").time()),
-                (pd.Timestamp("10:30").time(), pd.Timestamp("11:00").time()),
-                (pd.Timestamp("11:00").time(), pd.Timestamp("11:30").time()),
-                (pd.Timestamp("13:00").time(), pd.Timestamp("13:30").time()),
-                (pd.Timestamp("13:30").time(), pd.Timestamp("14:00").time()),
-                (pd.Timestamp("14:00").time(), pd.Timestamp("14:30").time()),
-                (pd.Timestamp("14:30").time(), pd.Timestamp("15:00").time())
-            ]
-            return intervals
-            
-        elif period == TimePeriod.MINUTE_60:
-            # 4个60分钟区间
-            intervals = [
-                (pd.Timestamp("09:30").time(), pd.Timestamp("10:30").time()),
-                (pd.Timestamp("10:30").time(), pd.Timestamp("11:30").time()),
-                (pd.Timestamp("13:00").time(), pd.Timestamp("14:00").time()),
-                (pd.Timestamp("14:00").time(), pd.Timestamp("15:00").time())
-            ]
-            return intervals
-            
-        elif period == TimePeriod.MINUTE_120:
-            # 2个120分钟区间
-            intervals = [
-                (pd.Timestamp("09:30").time(), pd.Timestamp("11:30").time()),
-                (pd.Timestamp("13:00").time(), pd.Timestamp("15:00").time())
-            ]
-            return intervals
-            
-        return []
+        if not TimePeriod.is_minute_level(period):
+            return []
+        minutes = int(TimePeriod.get_number_label(period))
+        from processor.period_aggregator import get_minute_slot_intervals
+        return get_minute_slot_intervals(minutes)
 
     def add_minutes(self, time_obj, minutes):
         """给time对象加上指定分钟数"""
@@ -832,13 +879,132 @@ class IndicatorsViewWidget(QWidget):
             
         return -1
 
+    def _get_anchor_matching_indices(self, df, period, as_of):
+        """通用锚定匹配：返回目标周期中“周期开始时刻 <= as_of”的 bar 位置列表。
+
+        日线及以上：周期开始由 bar 日期推导（周=周一、月=1 日、日=当日），
+        进行中（未走完）的 bar 周期开始时刻早于 as_of，也会被匹配到；
+        分钟级：限定 as_of 当日，匹配“bar 开始时刻 <= as_of”的 bar
+        （当前分钟级获取暂屏蔽，保留原按日定位语义作为扩展预留）。
+        """
+        if df is None or df.empty:
+            return []
+        if TimePeriod.is_minute_level(period):
+            if 'time' not in df.columns:
+                return []
+            dates = pd.to_datetime(df['date'])
+            times = pd.to_datetime(
+                df['date'].astype(str) + ' ' + df['time'].astype(str).str[-8:], errors='coerce')
+            starts = [period_start_key(period, t) for t in times]
+            return [
+                i for i, (d, s) in enumerate(zip(dates, starts))
+                # 分钟 bar 区间为 [start, end)：as_of 恰为某根 bar 起始时刻时属于上一根 bar
+                if pd.notna(s) and d.date() == as_of.date() and s < as_of
+            ]
+        dates = pd.to_datetime(df['date'])
+        starts = [period_start_key(period, d) for d in dates]
+        return [i for i, s in enumerate(starts) if s <= as_of]
+
+    def _refresh_derived_period_data(self, period, as_of):
+        """周期切换前按当前复盘位置重新生成上级周期数据（上级周期由基周期本地聚合）。
+
+        复盘动画前进后，进行中周期（如当周）的 bar 随复盘位置变化，切换前需重新聚合，
+        否则会锚定到加载时刻生成的部分周期 bar，或把未走完的周期显示为完整周期。
+        """
+        as_of = pd.Timestamp(as_of)
+        if period == TimePeriod.DAY:
+            day_df = self._build_partial_day_df(as_of)
+            if day_df is not None:
+                self.dict_stock_data[TimePeriod.DAY] = day_df
+            return
+        if TimePeriod.is_minute_level(period):
+            minute_bases = [
+                p for p in self.dict_stock_data
+                if TimePeriod.is_minute_level(p) and p < period
+            ]
+            if not minute_bases:
+                return
+            base_period = min(minute_bases)
+            base_df = self._base_stock_data.get(base_period)
+            if base_df is None:
+                base_df = self.dict_stock_data.get(base_period)
+        else:
+            # 周/月等：以“进行中当日”为基聚合（as_of 带时间时当日为盘中形态，否则为完整日线）
+            base_df = self._build_partial_day_df(as_of)
+        if base_df is None or base_df.empty:
+            return
+        try:
+            derived_df = aggregate_period(base_df, period, as_of=as_of)
+        except Exception as e:
+            self.logger.error(f"周期{TimePeriod.get_chinese_label(period)}切换前聚合失败: {e}")
+            return
+        if derived_df is not None and not derived_df.empty:
+            self.dict_stock_data[period] = derived_df
+
+    def _build_partial_day_df(self, as_of):
+        """构建日线展示数据：完整日线 + 盘中 as_of 时把当日 bar 重建为进行中形态。
+
+        返回的日线 DataFrame 带 time 列（完整日为 'YYYY-MM-DD 15:00:00'，进行中当日为 as_of），
+        便于从日线再切回分钟级时沿用盘中时间；周/月聚合也以该数据为基，保证未走完当日不泄漏。
+        """
+        base_day = self._base_stock_data.get(TimePeriod.DAY)
+        if base_day is None:
+            base_day = self.dict_stock_data.get(TimePeriod.DAY)
+        if base_day is None or base_day.empty:
+            return None
+        as_of = pd.Timestamp(as_of)
+        day_df = base_day.copy()
+        if 'time' not in day_df.columns:
+            day_df['time'] = pd.to_datetime(day_df['date']).dt.strftime('%Y-%m-%d') + ' 15:00:00'
+        day_df['is_complete'] = True
+        if as_of.time() == pd.Timestamp('00:00:00').time():
+            return day_df
+        minute_bases = [p for p in self.dict_stock_data if TimePeriod.is_minute_level(p)]
+        if not minute_bases:
+            return day_df
+        minute_base = self._base_stock_data.get(min(minute_bases))
+        if minute_base is None:
+            minute_base = self.dict_stock_data.get(min(minute_bases))
+        if minute_base is None or minute_base.empty:
+            return day_df
+        mdates = pd.to_datetime(minute_base['date'])
+        mtimes = pd.to_datetime(
+            minute_base['date'].astype(str) + ' ' + minute_base['time'].astype(str).str[-8:], errors='coerce')
+        day_mask = mdates.dt.date == as_of.date()
+        sub = minute_base[day_mask & (mtimes <= as_of)]
+        if sub.empty:
+            return day_df
+        target_idx = day_df.index[pd.to_datetime(day_df['date']).dt.date == as_of.date()]
+        if len(target_idx) == 0:
+            return day_df
+        idx = target_idx[0]
+        day_df.loc[idx, 'open'] = sub['open'].iloc[0]
+        day_df.loc[idx, 'high'] = sub['high'].max()
+        day_df.loc[idx, 'low'] = sub['low'].min()
+        day_df.loc[idx, 'close'] = sub['close'].iloc[-1]
+        day_df.loc[idx, 'volume'] = sub['volume'].sum()
+        if 'amount' in sub.columns and 'amount' in day_df.columns:
+            day_df.loc[idx, 'amount'] = sub['amount'].sum()
+        if 'turnover_rate' in sub.columns and 'turnover_rate' in day_df.columns:
+            day_df.loc[idx, 'turnover_rate'] = sub['turnover_rate'].sum()
+        day_df.loc[idx, 'time'] = as_of.strftime('%Y-%m-%d %H:%M:%S')
+        last_time = mtimes[day_mask].max()
+        day_df.loc[idx, 'is_complete'] = bool(pd.notna(last_time) and as_of >= last_time)
+        # 重算指标与涨跌幅（以进行中 close 为准，as-of 语义）
+        if 'change_percent' in day_df.columns:
+            day_df = day_df.drop(columns=['change_percent'])
+        sdi.default_indicators_auto_calculate(day_df)
+        return day_df
 
     # -----------------------复盘回放相关接口----------------------
     def init_animation(self, data, start_date, b_init=True):
         dict_return = {}
         code = data['code']
         self.logger.info(f"初始化动画：{code}, 日期：{start_date}")
-        self.update_stock_data_dict(code)
+        if code != self.current_selected_code or not self.dict_stock_data:
+            self.logger.warning(f"未找到{code}的外部注入数据，请先调用 set_stock_data(code, dict_stock_data) 注入数据")
+            self.sig_init_review_animation_finished.emit(False, dict_return)
+            return dict_return
         df = self.get_stock_data()
 
         if df is None or df.empty:
@@ -858,8 +1024,34 @@ class IndicatorsViewWidget(QWidget):
             target_period = TimePeriod.from_label(target_period_text)
             current_period_date_col = 'time' if TimePeriod.is_minute_level(last_period) else 'date'
 
+            # 统一锚定：以复盘基准时刻 as_of 为准，匹配“周期开始时刻 <= as_of”的 bar。
+            # 上级周期包含进行中（未走完）bar：周中复盘时当周 bar 由基周期聚合生成，
+            # 其周期开始（如周一）<= as_of 即应被选中，不再使用 date < start_date 跳过当周。
+            as_of = pd.Timestamp(start_date)
+            last_process = self.dict_period_process_data.get(last_period)
+            source_has_time = (
+                last_process is not None
+                and last_process.current_date_time
+                and ' ' in str(last_process.current_date_time)
+            )
+            if source_has_time:
+                # 分钟级来源或日线进行中当日：沿用当前精确时间
+                try:
+                    as_of = pd.to_datetime(last_process.current_date_time)
+                except (ValueError, TypeError):
+                    pass
+            elif TimePeriod.is_minute_level(target_period):
+                # 非分钟级来源或初始加载切分钟级：以当日收盘时刻定位（进行中分钟数据由基周期聚合）
+                as_of = pd.Timestamp(start_date) + pd.Timedelta(hours=15)
+            matching_indices = self._get_anchor_matching_indices(df, target_period, as_of)
+            # 初始加载时目标数据未覆盖 as_of（如分钟数据源仅保留当年，复盘日期早于分钟数据起点）：
+            # 回退到数据起始位置保证出图；周期切换场景由 slot 回退到来源周期，避免复盘位置漂移
+            if b_init and not matching_indices and df is not None and not df.empty:
+                self.logger.warning(
+                    f"周期{TimePeriod.get_chinese_label(target_period)}在 as_of={start_date} 无匹配数据，回退到数据起始位置")
+                matching_indices = [0]
+
             if b_init:
-                matching_indices = df[df['date'] <= start_date].index
                 if len(matching_indices) > 0:
                         # 普通处理
                         self.logger.info(f"动画初始化--找到 {len(matching_indices)} 个匹配的日期记录")
@@ -883,15 +1075,11 @@ class IndicatorsViewWidget(QWidget):
                             "start_date": review_period_process_data.current_start_date_time
                         }
 
-                        self.last_period_btn_checked_id = 7
-                        self.min_period = TimePeriod.DAY
+                        self.last_period_btn_checked_id = checked_id
+                        self.min_period = target_period
                 else:
                     self.logger.warning(f"普通处理--未找到匹配的日期记录：{start_date}")
             else:
-                if checked_id >= 8:
-                    matching_indices = df[df['date'] < start_date].index    # 这里使用<是因为本周未结束时，Baostock无本周周线数据，因此加载上周周线数据。
-                else:
-                    matching_indices = df[df['date'] == start_date].index
 
                 matching_indices_len = len(matching_indices)
                 self.logger.info(f"切换--找到 {matching_indices_len} 个匹配的日期记录")
@@ -912,7 +1100,8 @@ class IndicatorsViewWidget(QWidget):
                     last_start_index = self.dict_period_process_data[last_period].current_start_index
                     self.logger.info(f"来源周期[{s_last_period_text}]索引：{last_current_index}，日期：{self.dict_period_process_data[last_period].current_date_time}，来源周期[{s_last_period_text}]开始索引：{last_start_index}, 开始日期：{self.dict_period_process_data[last_period].current_start_date_time}")
                     
-                    index = self.get_target_index_auto(last_period, target_period)
+                    # 统一取“周期开始时刻 <= as_of”的最后一根 bar（进行中 bar 也包含）
+                    index = -1
                     self.logger.info(f"目标周期索引：{index}")
                     self.start_animation_index = matching_indices[index]
                     if target_period not in self.dict_period_process_data:
@@ -1063,7 +1252,23 @@ class IndicatorsViewWidget(QWidget):
         if self.df_data is None or self.df_data.empty:
             self.logger.warning("数据为空，无法切换图表周期数据")
             return
-        self.set_period(TimePeriod.from_label(btn.text()))
+        target_period = TimePeriod.from_label(btn.text())
+
+        # 复盘模式：周期数据只由外部（加载/随机加载按钮）按需注入；
+        # 未注入的周期不允许切换，回退到原周期并提示，不触发上层数据加载。
+        if self.property("review") is not None and target_period not in self.dict_stock_data:
+            self.logger.warning(
+                f"{self.current_selected_code}未注入{TimePeriod.get_chinese_label(target_period)}数据，"
+                f"请通过加载按钮加载该周期后再切换"
+            )
+            last_btn = self.period_button_group.button(self.last_period_btn_checked_id)
+            if last_btn is not None and last_btn is not btn:
+                last_btn.setChecked(True)
+            return
+
+        self.set_period(target_period)
+        if target_period not in self.dict_stock_data:
+            self.logger.warning(f"{self.current_selected_code}未注入{TimePeriod.get_chinese_label(target_period)}数据，切换后图表可能为空")
         checked_id = self.period_button_group.checkedId()
         if self.property("review") is not None:
             # self.logger.info(f"所属复盘模块，暂不支持周期切换")
@@ -1072,7 +1277,30 @@ class IndicatorsViewWidget(QWidget):
                 target_period_text = self.period_button_group.button(checked_id).text()
                 last_period_text = self.period_button_group.button(self.last_period_btn_checked_id).text()
                 self.logger.info(f"此前周期id：{self.last_period_btn_checked_id}，名称：{last_period_text}，切换到目标周期id：{checked_id}，名称：{target_period_text}")
-                self.init_animation(self.df_data.iloc[0], self.df_data.iloc[self.current_animation_index]['date'], False)
+                # 切换前按当前复盘位置重新生成上级周期数据（上级周期由基周期本地聚合）
+                # 分钟级需携带完整 date+time，否则进行中槽位会按日期 00:00 定位
+                last_period = TimePeriod.from_label(last_period_text)
+                current_date_time = (
+                    self.df_data.iloc[self.current_animation_index]['time']
+                    if 'time' in self.df_data.columns
+                    else self.df_data.iloc[self.current_animation_index]['date']
+                )
+                self._refresh_derived_period_data(
+                    target_period, current_date_time)
+                dict_return = self.init_animation(self.df_data.iloc[0], current_date_time, False)
+                if not dict_return:
+                    # 目标周期数据未覆盖当前复盘位置：回退到来源周期，避免复盘位置漂移
+                    self.logger.warning(
+                        f"周期{TimePeriod.get_chinese_label(target_period)}数据未覆盖当前位置 {current_date_time}，保持原周期")
+                    last_btn = self.period_button_group.button(self.last_period_btn_checked_id)
+                    if last_btn is not None:
+                        last_btn.setChecked(True)
+                    self.set_period(last_period)
+                    self.update_chart(self.df_data.iloc[0], self.current_animation_index)
+                    if last_btn is not None:
+                        self.kline_widget.set_period_text(last_btn.text())
+                    self.sig_period_changed.emit(last_period)
+                    return
                 # if checked_id < self.last_period_btn_checked_id:
                 #     # 大周期切小周期
                 #     # 需更新：self.current_animation_index，self.min_animation_index，self.max_animation_index，并通知外层控件
@@ -1087,6 +1315,9 @@ class IndicatorsViewWidget(QWidget):
         else:
             self.update_chart(self.df_data.iloc[0])
 
+        # 周期切换完成后通知外部（外部可按需补齐该周期数据并刷新图表）
+        self.sig_period_changed.emit(target_period)
+
         self.kline_widget.set_period_text(btn.text())
         self.last_period_btn_checked_id = checked_id
         
@@ -1094,44 +1325,56 @@ class IndicatorsViewWidget(QWidget):
     def slot_btn_indicator_volume_clicked(self):
         is_checked = self.btn_indicator_volume.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.VOLUME))
+            if widget is None:
+                self.btn_indicator_volume.setChecked(False)
         else:
-            self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.VOLUME))
+            self.remove_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.VOLUME))
 
     def slot_btn_indicator_amount_clicked(self):
         is_checked = self.btn_indicator_amount.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.AMOUNT))
+            if widget is None:
+                self.btn_indicator_amount.setChecked(False)
         else:
-            self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.AMOUNT))
+            self.remove_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.AMOUNT))
 
     def slot_btn_indicator_macd_clicked(self):
         is_checked = self.btn_indicator_macd.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.MACD))
+            if widget is None:
+                self.btn_indicator_macd.setChecked(False)
         else:
-            self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.MACD))
+            self.remove_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.MACD))
 
     def slot_btn_indicator_kdj_clicked(self):
         is_checked = self.btn_indicator_kdj.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.KDJ))
+            if widget is None:
+                self.btn_indicator_kdj.setChecked(False)
         else:
-            self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.KDJ))
+            self.remove_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.KDJ))
 
     def slot_btn_indicator_rsi_clicked(self):
         is_checked = self.btn_indicator_rsi.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.RSI))
+            if widget is None:
+                self.btn_indicator_rsi.setChecked(False)
         else:
-            self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.RSI))
+            self.remove_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.RSI))
 
     def slot_btn_indicator_boll_clicked(self):
         is_checked = self.btn_indicator_boll.isChecked()
         if is_checked:
-            self.add_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL))
+            widget = self.add_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.BOLL))
+            if widget is None:
+                self.btn_indicator_boll.setChecked(False)
         else:
-            self.remove_indicator_chart(IndicatrosEnum.get_chinese_label(IndicatrosEnum.BOLL))
+            self.remove_indicator_chart(IndicatrosEnum.get_label(IndicatrosEnum.BOLL))
 
     def slot_btn_indicator_ma_clicked(self):
         is_checked = self.btn_indicator_ma.isChecked()

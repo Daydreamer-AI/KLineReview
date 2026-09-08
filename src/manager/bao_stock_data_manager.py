@@ -45,6 +45,8 @@ class BaostockDataManager(QObject):
         self.dict_stocks_info = {}  # {'board': pd.DataFrame()}, 示例：{'sh_main' : pd.DataFrame()}
         # self.dict_stock_data = {}   # {'TimePeriod': {'code': DataFrame}}，示例：{'TimePeriod.Day': {'sh.600000': pd.DataFrame()}}
         self.dict_lastest_1d_stock_data = {}  # {code : pd.DataFrame}, 仅缓存最后一行数据用于快速加载股票list列表
+        self.dict_stock_code_name = None      # {code : name}，按需构建的“个股代码-名称”映射缓存
+        self.dict_name_code = None            # {name : code}，按需构建的“个股名称-代码”映射缓存
 
         self.stock_info_db_base = StockInfoDBBasePool().get_manager(1)
         self.stock_db_base = StockDbBase("./data/database/stocks/db/baostock")
@@ -54,7 +56,10 @@ class BaostockDataManager(QObject):
     def get_stock_info_dict(self):
         with self.lock:
             return MappingProxyType(self.dict_stocks_info)
-        
+
+    def update_stock_info_dict(self, dict_data):
+        with self.lock:
+            self.dict_stocks_info = dict_data
     def get_lastest_1d_stock_data_dict_from_cache(self):
         '''
             返回缓存中的最后一天（行）的股票数据
@@ -63,19 +68,91 @@ class BaostockDataManager(QObject):
         with self.lock:
             return MappingProxyType(self.dict_lastest_1d_stock_data)
 
+    def get_all_stock_code_name_dict(self, code_column_name='code', name_column_name='name'):
+        """从本地股票信息库同步构建 {code: name} 映射（不依赖后台日线缓存）。
+
+        供复盘随机选股及后续需要“个股代码-名称”的功能使用；结果按需缓存。
+        """
+        if self.dict_stock_code_name is not None:
+            return self.dict_stock_code_name
+
+        with self.lock:
+            dict_stocks_info = self.dict_stocks_info
+
+        dict_code_name = {}
+        for board_name, board_data in dict_stocks_info.items():
+            if board_data is None or board_data.empty:
+                continue
+            for index, row in board_data.iterrows():
+                code = row.get(code_column_name)
+                name = row.get(name_column_name, '未知')
+                if code and code not in dict_code_name:
+                    dict_code_name[code] = name
+
+        self.dict_stock_code_name = dict_code_name
+        return dict_code_name
+
+    def get_name_code_dict(self, code_column_name='code', name_column_name='name'):
+            """从本地股票信息库同步构建 {code: name} 映射（不依赖后台日线缓存）。
+    
+            供复盘随机选股及后续需要“个股代码-名称”的功能使用；结果按需缓存。
+            """
+            if self.dict_name_code is not None:
+                return self.dict_name_code
+    
+            with self.lock:
+                dict_stocks_info = self.dict_stocks_info
+    
+            dict_name_code = {}
+            for board_name, board_data in dict_stocks_info.items():
+                if board_data is None or board_data.empty:
+                    continue
+                for index, row in board_data.iterrows():
+                    code = row.get(code_column_name)
+                    name = row.get(name_column_name, '未知')
+                    if name and name not in dict_name_code:
+                        dict_name_code[name] = code
+    
+            self.dict_name_code = dict_name_code
+            return dict_name_code
+
+    def get_code_name_complete_list(self):
+        """获取所有股票代码-名称列表。
+
+        Returns:
+            list: 所有股票代码-名称列表，如：["sh.600000 - 浦发银行", "sh.600001 - 平安银行"]。
+        """
+        list_result = []
+        dict_code_name = self.get_all_stock_code_name_dict()
+        for code, name in dict_code_name.items():
+            list_result.append(f"{code} - {name}")
+        return list_result
+
+    def get_complete_text(self, code, name):
+        return f"{code} - {name}"
+
+    def parse_code_name_by_complete_text(self, complete_text: str):
+        """从完整的股票代码-名称字符串中解析出股票代码。
+
+        Args:
+            complete_text (str): 完整的股票代码-名称字符串，如："600000 - 浦发银行"。
+
+        Returns:
+            list: 股票代码名称list，如：["600000", "浦发银行"]。
+        """
+        if not complete_text:
+            return None
+
+        code_name_list = complete_text.split(' - ')
+        return code_name_list
+
+
 
     # ----------------------stock_info相关接口-----------------------------------------
     def get_all_stocks_from_db(self):
         with self.lock:
-            # self.dict_stocks_info['sh_main'] = self.stock_info_db_base.get_sh_main_stocks()
-            # self.dict_stocks_info['sz_main'] = self.stock_info_db_base.get_sz_main_stocks()
-            # self.dict_stocks_info['gem'] = self.stock_info_db_base.get_gem_stocks()
-            # self.dict_stocks_info['star'] = self.stock_info_db_base.get_star_stocks()
-
-            self.dict_stocks_info['sh_main'] = self.stock_info_db_base.get_lastest_stocks(table_name='sh_main')
-            self.dict_stocks_info['sz_main'] = self.stock_info_db_base.get_lastest_stocks(table_name='sz_main')
-            self.dict_stocks_info['gem'] = self.stock_info_db_base.get_lastest_stocks(table_name='gem')
-            self.dict_stocks_info['star'] = self.stock_info_db_base.get_lastest_stocks(table_name='star')
+            df_all_stocks_info = self.stock_info_db_base.get_lastest_stocks(table_name='stock_basic_info')
+            self.dict_stocks_info = classify_a_stocks_by_board(df_all_stocks_info)
 
         sh_main_count = len(self.dict_stocks_info['sh_main'])
         sz_main_count = len(self.dict_stocks_info['sz_main'])
@@ -89,9 +166,9 @@ class BaostockDataManager(QObject):
         self.logger.info(f"总股票数量(未计算北交所股票)：{sh_main_count + sz_main_count + gem_main_count + star_main_count}")
 
 
-    def save_stock_info_to_db(self, df_data, board='stock_basic_info'):
+    def save_stock_info_to_db(self, df_data, table_name='stock_basic_info'):
         with self.lock:
-            self.stock_info_db_base.save_tao_stocks_to_db(df_data, board)
+            self.stock_info_db_base.save_bao_stocks_to_db(df_data, table_name)
 
     def get_stock_name_by_code(self, code):
         try:
@@ -107,10 +184,10 @@ class BaostockDataManager(QObject):
                 return None
                 
             # 使用query方法（更直观）
-            matched_row = df_board_data[df_board_data['证券代码'] == code]
+            matched_row = df_board_data[df_board_data['code'] == code]
             
             if not matched_row.empty:
-                return matched_row.iloc[0].get('证券名称', '未知')
+                return matched_row.iloc[0].get('name', '未知')
             else:
                 return None
                 
@@ -146,67 +223,6 @@ class BaostockDataManager(QObject):
         """
         self.get_all_lastest_row_data_dict_by_period(TimePeriod.DAY)
         return True
-        total_count = 0
-
-        dict_daily_stock_data = {}
-        
-        # 遍历所有板块
-        board_index = 0
-
-        self.logger.info(f"开始读取本地数据库日线股票数据...")
-        start_time = time.time()  # 记录开始时间
-
-        dict_stock_info = self.get_stock_info_dict()
-        for board_name, board_data in dict_stock_info.items():
-            if board_index > 1:
-                break
-            board_index += 1
-
-            self.logger.info(f"读取 {board_name} 板块...")
-            board_start_time = time.time()  # 记录开始时间
-            
-            # 遍历该板块的每一行数据
-            for index, row in board_data.iterrows():
-                # if index > 100:
-                #     break
-
-                try:
-                    stock_code = row['证券代码']
-                    stock_name = row['证券名称'] if '证券名称' in row else '未知'
-                    
-                    # 获取日线和周线数据
-                    daily_data = self.get_stock_data_from_db_by_period_with_indicators(stock_code, TimePeriod.DAY)
-        
-                    
-                    # 检查数据是否为None，如果是则创建空的DataFrame
-                    if daily_data is None or daily_data.empty:
-                        continue
-                        
-
-                    # 存储数据
-                    dict_daily_stock_data[stock_code] = daily_data
-                    
-                    total_count += 1
-                    
-                except Exception as e:
-                    self.logger.error(f"处理股票 {stock_code} 时发生错误: {str(e)}")
-                    self.logger.error(traceback.format_exc())
-                    # 继续处理下一个股票
-                    continue
-
-            board_read_elapsed_time = time.time() - board_start_time  # 计算耗时
-            self.logger.info(f"读取完成，共读取{total_count}只股票，耗时: {board_read_elapsed_time:.2f}秒，即{board_read_elapsed_time/60:.2f}分钟")
-
-        
-        all_read_elapsed_time = time.time() - start_time  # 计算耗时
-        self.logger.info(f"读取完成，总耗时: {all_read_elapsed_time:.2f}秒，即{all_read_elapsed_time/60:.2f}分钟")
-
-        # 不再加载完整的日线数据到内存
-        # with self.lock:
-        #     self.dict_stock_data[TimePeriod.DAY] = dict_daily_stock_data
-
-        self.logger.info(f"总共处理了 {total_count} 只股票")
-        return True  
 
     def get_stock_data_from_db_by_period(self, code, period=TimePeriod.DAY, start_date=None, end_date=None):
         '''从数据中获取股票指定周期的k线数据(原始数据库数据，未处理指标)'''
@@ -272,8 +288,8 @@ class BaostockDataManager(QObject):
                 #     break
 
                 try:
-                    code = row['证券代码']
-                    name = row['证券名称'] if '证券名称' in row else '未知'
+                    code = row['code']
+                    name = row['code'] if 'name' in row else '未知'
                     
                     with self.lock:
                         lastest_1d_data = self.stock_db_base.get_lastest_stock_data(code, table_name)     

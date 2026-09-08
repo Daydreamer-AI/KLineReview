@@ -7,6 +7,8 @@ from functools import partial
 from manager.logging_manager import get_logger
 from manager.indicators_config_manager import *
 
+from gui.qt_widgets.MComponents.qfluentwidgets import (isDarkTheme, ColorDialog)
+
 class MASettingObject(object):
     def __init__(self, id=0, period_lineedit_obj=None, checkbox_obj=None, line_width_lineedit_obj=None, color_obj=None):
         self.id = id
@@ -44,6 +46,16 @@ class KLineIndicatorSettingDialog(QDialog):
         }
 
     def init_ui(self):
+        # Qt.FramelessWindowHint    Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)   
+        # self.setAttribute(Qt.WA_TranslucentBackground)
+
+        if isDarkTheme():
+            self.setStyleSheet("QDialog{background: #1E1E1E;}")
+        else:
+            self.setStyleSheet("QDialog{background: #F0F0F0;}")
+
+        self.frame_title_scheme.hide()
         self.frame_indicators.hide()
         self.btn_scheme_1.hide()
         self.btn_scheme_2.hide()
@@ -151,7 +163,11 @@ class KLineIndicatorSettingDialog(QDialog):
         current_color_hex = self.dict_ma_setting_user[id].color_hex
         # 将十六进制字符串转换为 QColor 对象
         current_color = QColor(current_color_hex)
-        color = QColorDialog.getColor(current_color, self, f"选择颜色 {id + 1}")
+
+        color_dlg = ColorDialog(current_color, self.tr(f'Select Color {id + 1}'), self)
+        color = current_color
+        color_dlg.colorChanged.connect(lambda c: color.setRgb(c.red(), c.green(), c.blue(), c.alpha()))
+        color_dlg.exec()
 
         if color.isValid():
             # 更新颜色存储
@@ -179,3 +195,4 @@ class KLineIndicatorSettingDialog(QDialog):
 
         get_indicator_config_manager().save_user_config()
         self.accept()
+

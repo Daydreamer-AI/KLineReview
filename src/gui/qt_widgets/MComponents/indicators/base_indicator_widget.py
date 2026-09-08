@@ -7,6 +7,9 @@ import numpy as np
 
 from manager.period_manager import TimePeriod
 
+from common.config import cfg
+from gui.qt_widgets.MComponents.qfluentwidgets import(Theme, isDarkTheme, theme)
+
 # 需要发送到外部控件（如BaseIndicatorWidget的父控件或其他子类）时，使用全局信号
 # 问题：当存在多个BaseIndicatorWidget（及其子类）对象连接同一个全局信号时，触发全局信号后所有槽函数都会响应。解决方案：传递self，在槽函数中判断，不是当前实例，则不响应。
 class SignalManager(QObject):
@@ -84,7 +87,9 @@ class BaseIndicatorWidget(QWidget):
         """设置plot widget的基本属性"""
         self.plot_widget.hideAxis('bottom')
         self.plot_widget.getAxis('left').setWidth(60)
-        self.plot_widget.setBackground('w')
+
+        self.plot_widget.setBackground(cfg.get_plot_widget_background_color(theme()))
+
         self.plot_widget.showGrid(x=True, y=True)
         self.plot_widget.setMouseEnabled(x=True, y=False)
 
@@ -195,7 +200,7 @@ class BaseIndicatorWidget(QWidget):
             
             # 使用 .loc 访问器获取指定行的 时间列数据
             s_col_name = 'date'
-            if TimePeriod.is_minute_level(self.period):
+            if TimePeriod.is_minute_level(self.period) and 'time' in self.df_data.columns:
                 s_col_name = 'time'
                 
             date_str = self.df_data.loc[index, s_col_name]
@@ -266,11 +271,17 @@ class BaseIndicatorWidget(QWidget):
 
         signal_manager.global_reset_labels.connect(self.slot_global_reset_labels)
 
+        cfg.themeChanged.connect(self.set_theme)
+
         self.addtional_connect()
 
     def addtional_connect(self):
         # raise NotImplementedError("子类必须实现 addtional_connect 方法")
         pass
+
+    def set_theme(self, theme):
+        self.logger.info(f"set_theme: {theme}, type: {type(theme)}")
+        self.plot_widget.setBackground(cfg.get_plot_widget_background_color(theme))
 
     def set_period(self, period):
         self.period = period

@@ -64,9 +64,21 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QPushButton" name="btn_time">
+           <widget class="ToggleButton" name="btn_time">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>分时</string>
+             <string>Time</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -77,9 +89,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_1d">
+           <widget class="ToggleButton" name="btn_1d">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>日线</string>
+             <string>1d</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -93,9 +117,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_1w">
+           <widget class="ToggleButton" name="btn_1w">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>周线</string>
+             <string>1w</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -106,9 +142,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_1m">
+           <widget class="ToggleButton" name="btn_M">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>1分</string>
+             <string>1M</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -119,9 +167,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_5m">
+           <widget class="ToggleButton" name="btn_1m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>5分</string>
+             <string>1m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -132,9 +192,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_10m">
+           <widget class="ToggleButton" name="btn_5m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>10分</string>
+             <string>5m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -145,9 +217,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_15m">
+           <widget class="ToggleButton" name="btn_10m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>15分</string>
+             <string>10m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -158,9 +242,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_30m">
+           <widget class="ToggleButton" name="btn_15m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>30分</string>
+             <string>15m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -171,9 +267,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_60m">
+           <widget class="ToggleButton" name="btn_30m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>60分</string>
+             <string>30m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -184,9 +292,96 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_120m">
+           <widget class="ToggleButton" name="btn_45m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
             <property name="text">
-             <string>120分</string>
+             <string>45m</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="ToggleButton" name="btn_60m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>60m</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="ToggleButton" name="btn_90m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>90m</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="ToggleButton" name="btn_120m">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>120m</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -213,9 +408,27 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_review">
+        <widget class="PushButton" name="btn_review">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>32</height>
+          </size>
+         </property>
          <property name="text">
-          <string>回放</string>
+          <string>review</string>
          </property>
          <property name="checkable">
           <bool>false</bool>
@@ -251,7 +464,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
-       <number>12</number>
+       <number>6</number>
       </property>
       <property name="leftMargin">
        <number>0</number>
@@ -266,21 +479,21 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QPushButton" name="btn_indicator_volume">
+       <widget class="TransparentTogglePushButton" name="btn_indicator_volume">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>24</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>24</height>
-         </size>
-        </property>
         <property name="text">
-         <string>成交量</string>
+         <string>Volume</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -288,21 +501,21 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_indicator_amount">
+       <widget class="TransparentTogglePushButton" name="btn_indicator_amount">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>24</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>24</height>
-         </size>
-        </property>
         <property name="text">
-         <string>成交额</string>
+         <string>Turnover</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -310,16 +523,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_indicator_macd">
+       <widget class="TransparentTogglePushButton" name="btn_indicator_macd">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
           <height>24</height>
          </size>
         </property>
@@ -332,16 +545,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_indicator_kdj">
+       <widget class="TransparentTogglePushButton" name="btn_indicator_kdj">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
           <height>24</height>
          </size>
         </property>
@@ -354,16 +567,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_indicator_rsi">
+       <widget class="TransparentTogglePushButton" name="btn_indicator_rsi">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
           <height>24</height>
          </size>
         </property>
@@ -376,16 +589,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_indicator_boll">
+       <widget class="TransparentTogglePushButton" name="btn_indicator_boll">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
           <height>24</height>
          </size>
         </property>
@@ -411,21 +624,21 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_indicator_ma">
+       <widget class="TransparentTogglePushButton" name="btn_indicator_ma">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>24</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>24</height>
-         </size>
-        </property>
         <property name="text">
-         <string>均线</string>
+         <string>MA</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -437,6 +650,23 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PushButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">button</header>
+  </customwidget>
+  <customwidget>
+   <class>ToggleButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">button</header>
+  </customwidget>
+  <customwidget>
+   <class>TransparentTogglePushButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">button</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -12,14 +12,14 @@ def get_user_config_dir():
     system = platform.system()
     
     if system == "Windows":
-        # Windows: %APPDATA%\MPolicy\
-        config_dir = Path(os.environ.get('APPDATA', '')) / 'MPolicy'
+        # Windows: %APPDATA%\KLineReview\
+        config_dir = Path(os.environ.get('APPDATA', '')) / 'KLineReview'
     elif system == "Darwin":  # macOS
-        # macOS: ~/Library/Application Support/MPolicy/
-        config_dir = Path.home() / 'Library' / 'Application Support' / 'MPolicy'
+        # macOS: ~/Library/Application Support/KLineReview/
+        config_dir = Path.home() / 'Library' / 'Application Support' / 'KLineReview'
     else:  # Linux and other Unix-like systems
-        # Linux: ~/.config/MPolicy/
-        config_dir = Path.home() / '.config' / 'MPolicy'
+        # Linux: ~/.config/KLineReview/
+        config_dir = Path.home() / '.config' / 'KLineReview'
     
     config_dir.mkdir(parents=True, exist_ok=True)
     return config_dir

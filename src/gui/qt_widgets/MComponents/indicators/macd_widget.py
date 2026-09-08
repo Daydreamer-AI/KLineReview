@@ -13,6 +13,8 @@ from gui.qt_widgets.MComponents.indicators.setting.macd_setting_dialog import Ma
 from indicators.stock_data_indicators import *
 from manager.indicators_config_manager import *
 
+from common.icon import Icon
+
 class MacdWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):
         super(MacdWidget, self).__init__(data, type, parent)
@@ -21,6 +23,8 @@ class MacdWidget(BaseIndicatorWidget):
 
     def custom_init(self):
         self.btn_close.hide()
+        self.btn_close.setIcon(Icon.CLOSE)
+        self.btn_setting.setIcon(Icon.SETTING)
         self.btn_setting.clicked.connect(self.slot_btn_setting_clicked)
 
     def init_para(self, data):
@@ -91,7 +95,7 @@ class MacdWidget(BaseIndicatorWidget):
     def additional_draw(self):
         """添加零轴线"""
         # 添加零轴线
-        zero_line = pg.InfiniteLine(pos=0, angle=0, pen=pg.mkPen('g', width=1, style=QtCore.Qt.DashLine))
+        zero_line = pg.InfiniteLine(pos=0, angle=0, pen=pg.mkPen('gray', width=1, style=QtCore.Qt.DashLine))
         self.plot_widget.addItem(zero_line)
 
     def slot_btn_setting_clicked(self):

@@ -26,7 +26,7 @@ class KLineOverviewWidget(QWidget):
         pass
 
     def load_qss(self):
-        self.setStyleSheet("QFrame{border: 2px solid #2982ff; background-color: #a0ffffff;} QLabel{border: None; background-color: transparent; font-size: 16px}")
+        self.setStyleSheet("QFrame{border: 2px solid #2982ff; background: transparent;} QLabel{border: None; background-color: transparent; font-size: 16px}")
         self.label_amplitude.setStyleSheet("color: #00a9b2; font-size: 18px")
         self.label_volume.setStyleSheet("color: #00a9b2; font-size: 18px")
         self.label_amount.setStyleSheet("color: #00a9b2; font-size: 18px")
@@ -49,8 +49,8 @@ class KLineOverviewWidget(QWidget):
             low = df_current_row['low']
             change_percent = df_current_row['change_percent']
             amplitude = (high - low) / low * 100
-            volume = df_current_row['volume'] / 10000      # 单位：万
-            amount = df_current_row['amount'] / 100000000  # 单位：亿
+            volume = df_current_row['volume']   
+            amount = df_current_row['amount']
             turnover_rate = df_current_row['turnover_rate']
             volume_ratio = df_current_row['volume_ratio']
 
@@ -67,8 +67,8 @@ class KLineOverviewWidget(QWidget):
             self.label_low.setText(f"{low:.2f}")
             self.label_change_percent.setText(f"{change_percent:.2f}%")
             self.label_amplitude.setText(f"+{amplitude:.2f}%")
-            self.label_volume.setText(f"{volume:.2f}万")
-            self.label_amount.setText(f"{amount:.2f}亿")
+            self.label_volume.setText(f"{volume:.2f}")
+            self.label_amount.setText(f"{amount:.2f}")
             self.label_turnover_rate.setText(f"{turnover_rate:.2f}%")
             self.label_volume_ratio.setText(f"{volume_ratio:.2f}")
             self.label_kline_status.setText("--")

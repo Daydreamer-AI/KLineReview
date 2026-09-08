@@ -16,6 +16,8 @@ from manager.indicators_config_manager import *
 from gui.qt_widgets.MComponents.indicators.kline_overview_widget import KLineOverviewWidget
 from indicators.stock_data_indicators import *
 
+from common.icon import Icon
+
 class KLineWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):
         # 调用父类初始化，这会自动调用init_para, init_ui, init_connect
@@ -47,6 +49,11 @@ class KLineWidget(BaseIndicatorWidget):
         self.label_ma20.hide()
         self.label_ma30.hide()
         self.label_ma60.hide()
+
+        self.btn_restore.setIcon(Icon.RESET)
+        self.btn_zoom_in.setIcon(Icon.ZOOM_IN)
+        self.btn_zoom_out.setIcon(Icon.ZOOM_OUT)
+        self.btn_setting.setIcon(Icon.SETTING)
 
         self.btn_restore.clicked.connect(self.slot_btn_restore_clicked)
         self.btn_zoom_in.clicked.connect(self.slot_btn_zoom_in_clicked)
@@ -217,14 +224,19 @@ class KLineWidget(BaseIndicatorWidget):
 
     def slot_btn_setting_clicked(self):
         dlg = KLineIndicatorSettingDialog()
+        dlg.resize(800, 600)
         result = dlg.exec()
         if result == QDialog.Accepted:
             self.logger.info("更新k线设置")
-            auto_ma_calulate(self.df_data)
+
+            if self.df_data is not None and not self.df_data.empty:
+                auto_ma_calulate(self.df_data)
             # 刷新K线图
             self.update_data(self.df_data)
 
             self.auto_scale_to_latest(120)
+
+        # dlg.deleteLater()
 
     def slot_range_changed(self):
         '''当视图范围改变时调用'''

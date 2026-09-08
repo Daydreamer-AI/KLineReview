@@ -2,9 +2,15 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from manager.logging_manager import get_logger
 
-class DemoTradingRecord(object):
+from PyQt5.QtCore import QCoreApplication
+
+def translate(text):
+    return QCoreApplication.translate(__name__, text)
+
+class DemoTradingRecord(QObject):
     
-    def __init__(self):
+    def __init__(self, parent = None):
+        super().__init__(parent)
         self.code = None
         self.name = None
 
@@ -31,19 +37,19 @@ class DemoTradingRecord(object):
 
     def get_status_text(self):
         if self.status == 0:
-            return "未交易"
+            return self.tr("No Trade")
         elif self.status == 1:
-            return "买入挂单"
+            return self.tr("Buy Pending")
         elif self.status == 2:
-            return "买入撤单"
+            return self.tr("Buy Canceled")
         elif self.status == 3:
-            return "卖出挂单"
+            return self.tr("Sell Pending")
         elif self.status == 4:
-            return "卖出撤单"
+            return self.tr("Sell Canceled")
         elif self.status == 5:
-            return "持有中"
+            return self.tr("Holding")
         elif self.status == 6:
-            return "交易完成"
+            return self.tr("Closed")
 
 
 
@@ -52,7 +58,7 @@ class ReviewDemoTradingManager(QObject):
     sig_trading_status_changed = pyqtSignal(int)
     sig_trading_yield_changed = pyqtSignal(float)
 
-    def __init__(self, total_assets=10000, available_balance = 10000, parent = None):
+    def __init__(self, total_assets=1000000, available_balance = 1000000, parent = None):
         super().__init__(parent)
 
         self.logger = get_logger(__name__)
@@ -315,7 +321,7 @@ class ReviewDemoTradingManager(QObject):
             self.sig_trading_yield_changed.emit(self.current_trading_record.trading_yield)    # 通知更新收益率
 
 
-    def reset_trading_record(self, total_assets=10000, available_balance = 10000):
+    def reset_trading_record(self, total_assets=1000000, available_balance = 1000000):
         self.logger.info("重置交易记录")
         self.current_trading_record = None
 
@@ -323,3 +329,38 @@ class ReviewDemoTradingManager(QObject):
         self.available_balance = available_balance     # 可用资金
 
         self.sig_total_assets_and_available_balance_changed.emit(self.total_assets, self.available_balance)
+
+    def force_update_trading(self, df_kline_data):
+        date = df_kline_data['date']
+        close = df_kline_data['close']
+        date_time = date
+        if self.current_trading_record.status == 1:
+            # 买入挂单时强制撤单
+            self.current_trading_record.status = 2  # 买入撤单后状态应该是未交易，当然买入撤单状态也属于未交易状态。
+            self.current_trading_record.pending_order_buy_cancel_date_time = date_time
+            self.logger.info(f"强制买入撤单成功, 时间：{date_time}")
+            self.trding_record_list.append(self.current_trading_record)
+            
+            self.sig_trading_status_changed.emit(self.current_trading_record.status)
+
+            if self.current_trading_record.status == 2:
+                self.current_trading_record = None
+
+        elif self.current_trading_record.status == 3 or self.current_trading_record.status == 5:
+            self.current_trading_record.status = 6
+            # 卖出挂单或持有中时，强制卖出成交
+            self.current_trading_record.sell_price = close
+            self.current_trading_record.sell_count = self.current_trading_record.buy_count
+            self.current_trading_record.sell_amount = self.current_trading_record.buy_count * self.current_trading_record.sell_price
+
+            self.current_trading_record.sell_date_time = date_time
+            self.current_trading_record.trading_yield = (self.current_trading_record.sell_price - self.current_trading_record.buy_price) / self.current_trading_record.buy_price
+            self.update_available_balance(2, self.current_trading_record.sell_price, self.current_trading_record.sell_count)
+            self.trding_record_list.append(self.current_trading_record)
+
+            self.sig_trading_status_changed.emit(self.current_trading_record.status)
+            self.sig_trading_yield_changed.emit(self.current_trading_record.trading_yield)    # 通知更新收益率
+            self.logger.info(f"强制卖出成交，交易完成, 时间：{date_time}，成交价格：{self.current_trading_record.sell_price}")
+            self.current_trading_record = None
+
+

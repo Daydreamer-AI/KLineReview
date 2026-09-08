@@ -355,7 +355,7 @@ def default_indicators_auto_calculate(stock_data):
 
     quantity_ratio(stock_data)
 
-    auto_kdj_calulate
+    auto_kdj_calulate(stock_data)
 
     auto_rsi_calulate(stock_data)
 

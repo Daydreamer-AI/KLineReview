@@ -5,85 +5,13 @@ import time
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from manager.period_manager import TimePeriod
+from manager.bao_stock_data_manager import BaostockDataManager
+from indicators import stock_data_indicators as sdi
+    
 
 class BaostockDataFetchTask(BaseTask):
     sig_progress_changed = pyqtSignal(int, int)
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._current_board_type = None
-        self._current_level = None
-        self._current_stock_index = 0
-        self._total_stocks = 0
-
-    def execute(self):
-        """执行任务的主要方法"""
-        board_types = ['sh_main', 'sz_main']
-        levels = ['15', '30', '60']
-        
-        total_tasks = len(board_types) * len(levels)
-        completed_tasks = 0
-        self.sig_progress_changed.emit(0, total_tasks)
-
-        # BaoStockProcessor().process_sh_main_stock_data()
-
-        # sleep_time = random.uniform(0.3, 0.5)
-        # time.sleep(sleep_time)
-
-        # BaoStockProcessor().process_sz_main_stock_data()
-        
-        for board_type in board_types:
-            # 检查暂停状态
-            self._check_pause()
-            
-            # 检查取消状态
-            if self.is_cancelled():
-                return {"status": "cancelled", "message": "Task was cancelled"}
-            
-            sleep_time = random.uniform(0.3, 0.5)
-            time.sleep(sleep_time)
-            
-            for level in levels:
-                # 检查暂停状态
-                self._check_pause()
-                
-                # 检查取消状态
-                if self.is_cancelled():
-                    return {"status": "cancelled", "message": "Task was cancelled"}
-                
-                # 记录当前处理的类型和级别，便于状态跟踪
-                self._current_board_type = board_type
-                self._current_level = level
-                
-                # 执行具体的股票数据获取任务
-                BaoStockProcessor().process_minute_level_stock_data_with_board_type(board_type, level, self)
-                
-                completed_tasks += 1
-                progress = int((completed_tasks / total_tasks) * 100)
-                self.sig_progress_changed.emit(completed_tasks, total_tasks)
-                self.set_progress(progress)
-        
-        # 校验更新结果
-        return {
-            "status": "completed", 
-            "message": f"Successfully processed all data for {board_types} with levels {levels}",
-            "completed_tasks": completed_tasks,
-            "total_tasks": total_tasks
-        }
-
-    def get_task_status_info(self):
-        """获取任务详细状态信息"""
-        return {
-            "current_board_type": self._current_board_type,
-            "current_level": self._current_level,
-            "is_paused": self.is_paused(),
-            "is_cancelled": self.is_cancelled(),
-            "status": self.status.value
-        }
-    
-
-class BaostockDataFetchTask2(BaseTask):
-    sig_progress_changed = pyqtSignal(int, int)
-    def __init__(self, code=None, start_date=None, end_date=None, period=None, **kwargs):
+    def __init__(self, code=None, start_date=None, end_date=None, period=None, adjustflag='2', **kwargs):
         super().__init__(**kwargs)
         self._current_board_type = None
         self._current_level = None
@@ -95,6 +23,8 @@ class BaostockDataFetchTask2(BaseTask):
         self.start_date = start_date
         self.end_date = end_date
         self.period = period
+        # baostock 前复权(2)仅提供最近约三年数据；复盘随机日期已按该窗口限定
+        self.adjustflag = adjustflag
 
 
     def get_task_status_info(self):
@@ -108,30 +38,94 @@ class BaostockDataFetchTask2(BaseTask):
         }
     
     def execute(self):
+        # 检查暂停状态
+        self._check_pause()
+        
+        # 检查取消状态
+        if self.is_cancelled():
+            return {"result": False, "status": "cancelled", "message": "Task was cancelled"}
+
         self.sig_progress_changed.emit(0, 1)
+        self.set_progress(0)
+
+        if TimePeriod.is_minute_level(self.period):
+            df_data = BaoStockProcessor().process_minute_level_stock_data(
+                self.code, self.period, self.start_date, self.end_date, self.adjustflag)
+        else:
+            if self.period == TimePeriod.DAY:
+                df_data = BaoStockProcessor().process_daily_stock_data(self.code, self.start_date, self.end_date, self.adjustflag)
+            elif self.period == TimePeriod.WEEK:
+                df_data = BaoStockProcessor().process_weekly_stock_data(self.code, self.start_date, self.end_date, self.adjustflag)
+
+        df_data = self._prepare_stock_data_with_indicators(df_data)
+
+        self.sig_progress_changed.emit(1, 1)
+        self.set_progress(100)
+
+        bSuccess = df_data is not None and not df_data.empty
+
+        msg = f"Failed processed all data"
+        if bSuccess:
+            msg = f"Successfully processed all data"
+
+
+        # 校验更新结果
+        return {
+            "result": bSuccess,
+            "status": "completed", 
+            "message": msg,
+            "completed_tasks": 1,
+            "total_tasks": 1,
+            "data": df_data,
+        }
+
+    def _prepare_stock_data_with_indicators(self, df_data):
+        """远程拉取的原始 K 线数据：补充股票名称并计算指标列，便于直接注入展示组件"""
+        if df_data is None or df_data.empty:
+            return df_data
+
+        df_data = df_data.copy()
+        name = BaostockDataManager().get_stock_name_by_code(self.code)
+        df_data['name'] = str(name) if name else '未知'
+
+        # 统一日期/时间为 ISO 字符串（与本地历史数据格式一致），
+        # 避免 data_type_conversion 生成的 date/Timestamp 对象与下游字符串比较时报类型错误
+        if 'date' in df_data.columns:
+            df_data['date'] = df_data['date'].astype(str)
+        if 'time' in df_data.columns:
+            df_data['time'] = df_data['time'].astype(str)
+
+        sdi.default_indicators_auto_calculate(df_data)
+        return df_data
+
+class BaostockInfoFetchTask(BaseTask):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def execute(self):
+        self.set_progress(0)
 
         # 检查暂停状态
         self._check_pause()
         
         # 检查取消状态
         if self.is_cancelled():
-            return {"status": "cancelled", "message": "Task was cancelled"}
+            return {"status": "cancelled", "message": "BaostockInfoFetchTask was cancelled"}
 
-        if TimePeriod.is_minute_level(self.period):
-            BaoStockProcessor().process_and_save_minute_level_stock_data(self.code, TimePeriod.get_number_label(self.period))
-        else:
-            if TimePeriod == TimePeriod.DAY:
-                result = BaoStockProcessor().process_and_save_daily_stock_data(self.code)
-            elif TimePeriod == TimePeriod.WEEK:
-                result = BaoStockProcessor().process_and_save_weekly_stock_data(self.code)
+        bRet = BaoStockProcessor().query_all_stock()
 
-        self.sig_progress_changed.emit(1, 1)
-        self.set_progress(1)
+        self.set_progress(100)
 
-        # 校验更新结果
+        task_status = "Failed"
+        task_msg = "Failed query_all_stock"
+        if bRet:
+            task_status = "completed"
+            task_msg = f"Successfully query_all_stock"
+
         return {
-            "status": "completed", 
-            "message": f"Successfully processed all data",
+            "result": bRet,
+            "status": task_status, 
+            "message": task_msg,
             "completed_tasks": 1,
             "total_tasks": 1
         }

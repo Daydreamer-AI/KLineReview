@@ -1,7 +1,12 @@
 akshare
 baostock
 PyQt5
+PyQt5-Frameless-Window
 PyQtGraph
 Pandas
 PyQtChart
 psutil
+darkdetect
+colorthief
+scipy
+pillow

@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>回放</string>
+   <string>Review</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>

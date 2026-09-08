@@ -66,16 +66,16 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_volume">
+       <widget class="BodyLabel" name="label_volume">
         <property name="text">
-         <string>成交量</string>
+         <string>Volume</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_total_volume">
+       <widget class="BodyLabel" name="label_total_volume">
         <property name="text">
-         <string>总量：</string>
+         <string>Total: </string>
         </property>
        </widget>
       </item>
@@ -114,7 +114,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_close">
+       <widget class="TransparentToolButton" name="btn_close">
         <property name="minimumSize">
          <size>
           <width>16</width>
@@ -133,7 +133,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_setting">
+       <widget class="TransparentToolButton" name="btn_setting">
         <property name="minimumSize">
          <size>
           <width>16</width>
@@ -156,6 +156,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TransparentToolButton</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

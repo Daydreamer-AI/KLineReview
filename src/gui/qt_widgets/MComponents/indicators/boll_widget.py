@@ -13,6 +13,8 @@ from gui.qt_widgets.MComponents.indicators.setting.boll_setting_dialog import Bo
 from manager.indicators_config_manager import *
 from indicators.stock_data_indicators import *
 
+from common.icon import Icon
+
 class BollWidget(BaseIndicatorWidget):
     def __init__(self, data, type, parent=None):
         super(BollWidget, self).__init__(data, type, parent)
@@ -21,6 +23,9 @@ class BollWidget(BaseIndicatorWidget):
 
     def custom_init(self):
         self.btn_close.hide()
+
+        self.btn_close.setIcon(Icon.CLOSE)
+        self.btn_setting.setIcon(Icon.SETTING)
 
         self.btn_setting.clicked.connect(self.slot_btn_setting_clicked)
 

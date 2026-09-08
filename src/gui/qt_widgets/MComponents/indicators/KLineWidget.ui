@@ -71,16 +71,23 @@
          <number>12</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_ma_period">
+         <widget class="BodyLabel" name="label_ma_period">
           <property name="text">
-           <string>周期</string>
+           <string>Period</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_stock_name">
+         <widget class="BodyLabel" name="label_stock_name">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="text">
-           <string>股票名称</string>
+           <string>Name</string>
           </property>
          </widget>
         </item>
@@ -92,9 +99,9 @@
          <number>12</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_indicator">
+         <widget class="BodyLabel" name="label_indicator">
           <property name="text">
-           <string>指标</string>
+           <string>Indicator</string>
           </property>
          </widget>
         </item>
@@ -168,14 +175,14 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_restoration_method">
+         <widget class="BodyLabel" name="label_restoration_method">
           <property name="text">
-           <string>前复权</string>
+           <string>Restoration</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_restore">
+         <widget class="TransparentToolButton" name="btn_restore">
           <property name="minimumSize">
            <size>
             <width>16</width>
@@ -194,7 +201,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_zoom_in">
+         <widget class="TransparentToolButton" name="btn_zoom_in">
           <property name="minimumSize">
            <size>
             <width>16</width>
@@ -210,10 +217,16 @@
           <property name="text">
            <string/>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>12</width>
+            <height>12</height>
+           </size>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_zoom_out">
+         <widget class="TransparentToolButton" name="btn_zoom_out">
           <property name="minimumSize">
            <size>
             <width>16</width>
@@ -229,10 +242,16 @@
           <property name="text">
            <string/>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>12</width>
+            <height>12</height>
+           </size>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_setting">
+         <widget class="TransparentToolButton" name="btn_setting">
           <property name="minimumSize">
            <size>
             <width>16</width>
@@ -257,6 +276,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TransparentToolButton</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
