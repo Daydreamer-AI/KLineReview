@@ -198,7 +198,10 @@ class BaostockDataManager(QObject):
         except Exception as e:
             self.logger.error(f"获取股票 {code} 名称时出错: {e}")
             return None
-        
+
+    def clear_db_data(self, table_name='stock_basic_info'):
+        return self.stock_info_db_base.truncate_table(table_name)
+
     # ----------------------stock_db_base相关接口-----------------------------------------
     def check_stock_db_exists(self, code):
         with self.lock:

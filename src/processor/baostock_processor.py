@@ -8,6 +8,7 @@ import threading
 from datetime import date, timedelta
 from manager.config_manager import ConfigManager
 from common.common_api import *
+from common.config import VERSION
 from manager.logging_manager import get_logger
 import traceback
 import gc
@@ -223,7 +224,40 @@ class BaoStockProcessor(QObject):
         )
         
         return len(self.df_trade_dates[mask])
+
+
+    def get_lastest_trade_date(self, str_query_date: str) -> str | None:
+        '''
+        获取指定截止日期之前（包括截止日期）的最后一个股票交易日
+        :param str_query_date: 截止日期字符串，格式要求为 'YYYY-MM-DD'
+        :return: 最后一个交易日的日期字符串，若未找到则返回 None
+        '''
+        # 1. 基础防御：检查 DataFrame 是否有效
+        if self.df_trade_dates is None or self.df_trade_dates.empty:
+            self.logger.warning("交易日数据未初始化，返回 None")
+            return None
         
+        # 2. 类型转换与过滤：
+        # 将日历日期转为 datetime 类型，并筛选出 <= 截止日期 且 是交易日(is_trading_day == '1') 的记录
+        # 注意：这里假设 df_trade_dates['calendar_date'] 是字符串类型，如果是 datetime 类型可去掉 pd.to_datetime
+        mask = (
+            (pd.to_datetime(self.df_trade_dates['calendar_date']) <= pd.to_datetime(str_query_date)) & 
+            (self.df_trade_dates['is_trading_day'] == '1')
+        )
+        
+        # 3. 提取符合条件的日期
+        valid_dates = self.df_trade_dates.loc[mask, 'calendar_date']
+        
+        # 4. 判断是否有结果并返回最大值（即最靠近截止日期的一天）
+        if not valid_dates.empty:
+            # 返回字符串格式的最大日期
+            return valid_dates.max()
+        else:
+            self.logger.warning(f"未找到 {str_query_date} 及之前的有效交易日")
+            return None
+
+
+    # ======================================数据更新接口======================================
 
     # 日线全量更新
     def process_daily_stock_data(self, code, start_date=None, end_date=None, adjustflag='2'):
@@ -822,19 +856,47 @@ class BaoStockProcessor(QObject):
 
     # -----------------其他接口-------------------
     def query_all_stock(self):
-        query_date = datetime.datetime.now().strftime("%Y-%m-%d")
-        # 获取前一天的日期
-        yesterday = (datetime.datetime.now() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
-        # query_date = yesterday
+        str_query_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        str_lastest_trade_date = self.get_lastest_trade_date(str_query_date)
 
-        self.logger.info(f"开始获取所有股票列表，日期：{query_date}")
-        rs = bs.query_all_stock(query_date)     # 交易日查询18点前当日数据返回空，非交易日调用也返回空。
+        self.logger.info(f"最近一个交易日：{str_lastest_trade_date}")
+        if str_lastest_trade_date is not None:
+            str_query_date = str_lastest_trade_date
+        
+        dict_stock_info_local = BaostockDataManager().get_stock_info_dict()
+        # 本地库为空时各板块为空表、无 update_at 列，需一并判空
+        sh_main_local = dict_stock_info_local.get('sh_main') if dict_stock_info_local else None
+        str_local_lastest_date = ""
+        if (sh_main_local is not None and not sh_main_local.empty
+                    and 'update_at' in sh_main_local.columns):
+            # 近一周内可直接使用本地数据
+            str_local_lastest_date = sh_main_local['update_at'].iloc[0]
+
+            self.logger.info(f"查询日期：{str_query_date}，本地个股信息数据最新更新日期：{str_local_lastest_date}")
+
+            query_date = datetime.datetime.strptime(str_query_date, "%Y-%m-%d").date()
+            local_lastest_date = datetime.datetime.strptime(str_local_lastest_date, "%Y-%m-%d").date()
+
+            # 计算时间差并判断是否小于等于 7 天
+            # 注意：使用 abs() 取绝对值，防止 local_lastest_date 晚于 query_date 导致负数
+            days_diff = abs((query_date - local_lastest_date).days)
+
+            is_within_7_days = days_diff <= 7
+
+            self.logger.info(f"相差天数: {days_diff} 天")
+            self.logger.info(f"是否在 7 天内: {is_within_7_days}")
+            if is_within_7_days:  # 7天内使用本地数据
+                self.logger.info(f"使用本地个股信息数据")
+                return True
+
+        
+        self.logger.info(f"开始获取所有股票列表，日期：{str_query_date}")
+        rs = bs.query_all_stock(str_query_date)     # 交易日查询18点前当日数据返回空，非交易日调用也返回空。
         self.logger.info('query_all_stock respond error_code:'+rs.error_code)
         self.logger.info('query_all_stock respond  error_msg:'+rs.error_msg)
-
-        dict_stock_info_local = BaostockDataManager().get_stock_info_dict()
+        
         if rs.error_code != '0':
-            self.logger.error(f"获取所有股票列表失败: {rs.error_msg}，即将使用本地个股信息")
+            self.logger.error(f"获取所有股票列表失败，即将使用本地个股信息，error_msg: {rs.error_msg}")
 
             b_ret = dict_stock_info_local != {}
             return b_ret
@@ -854,7 +916,8 @@ class BaoStockProcessor(QObject):
             b_ret = dict_stock_info_local != {}
             return b_ret
 
-        result['version'] = ConfigManager().get('App', 'version', '0.0.1')
+        result['version'] = VERSION
+        result['update_at'] = str_query_date
 
         self.logger.info(f"result列信息：{result.columns}")
 
@@ -867,19 +930,10 @@ class BaoStockProcessor(QObject):
 
         self.logger.info(f"总股票数量：{total_count}")
 
-
-        # 每周更新（本地库为空时各板块为空表、无 update_at 列，需一并判空）
-        current_date = datetime.datetime.now()
-        local_lastest_date = ""
-        sh_main_local = dict_stock_info_local.get('sh_main') if dict_stock_info_local else None
-        if (sh_main_local is not None and not sh_main_local.empty
-                and 'update_at' in sh_main_local.columns):
-            local_lastest_date = sh_main_local['update_at'].iloc[0]
-
-        self.logger.info(f"查询日期：{query_date}，本地个股信息数据最新更新日期：{local_lastest_date}")
-        if current_date.weekday() >= 2 and query_date > local_lastest_date:
-            BaostockDataManager().save_stock_info_to_db(result, 'stock_basic_info')
-
+        # 每周更新
+        b_clear_ret = BaostockDataManager().clear_db_data()
+        self.logger.info(f"清除数据库数据结果：{b_clear_ret}")
+        BaostockDataManager().save_stock_info_to_db(result, 'stock_basic_info')
         BaostockDataManager().update_stock_info_dict(dict_stocks_info)
 
         return True
