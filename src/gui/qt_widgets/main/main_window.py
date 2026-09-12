@@ -8,22 +8,8 @@ from gui.qt_widgets.MComponents.qfluentwidgets import(NavigationAvatarWidget, Na
 
 from gui.qt_widgets.MComponents.qfluentwidgets import FluentIcon as FIF
 
-
-# from .gallery_interface import GalleryInterface
 from .home_interface import HomeInterface
-# from .basic_input_interface import BasicInputInterface
-# from .date_time_interface import DateTimeInterface
-# from .dialog_interface import DialogInterface
-# from .layout_interface import LayoutInterface
-# from .icon_interface import IconInterface
-# from .material_interface import MaterialInterface
-# from .menu_interface import MenuInterface
-# from .navigation_view_interface import NavigationViewInterface
-# from .scroll_interface import ScrollInterface
-# from .status_info_interface import StatusInfoInterface
 from ..setting.setting_interface import SettingInterface
-# from .text_interface import TextInterface
-# from .view_interface import ViewInterface
 
 from ..review.review_interface import ReviewInterface
 
@@ -35,6 +21,7 @@ from common import resource
 
 from thread.task_pool import get_default_task_pool
 from processor.baostock_processor import BaoStockProcessor
+from processor.tushare_processor import TushareProcessor
 from thread.baostock_data_fetch_task import *
 from manager.logging_manager import get_logger
 
@@ -101,11 +88,6 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
         self.addSubInterface(self.reviewInterface, Icon.REVIEW, self.tr('Review'))
 
-        # t = Translator()
-        # self.navigationInterface.addSeparator()
-        # pos = NavigationItemPosition.SCROLL
-        # self.addSubInterface(self.basicInputInterface, FIF.CHECKBOX,t.basicInput, pos)
-
         # add custom widget to bottom
         self.addSubInterface(
             self.settingInterface, FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
@@ -133,13 +115,11 @@ class MainWindow(FluentWindow):
         """初始化所有处理器（如Baostock）"""
         self.logger.info("初始化所有处理器")
         try:
-            ak_success = True
-            success = BaoStockProcessor().initialize()
-            if ak_success and success:
-                self.logger.info("所有处理器初始化成功")
-
-            else:
-                self.logger.info("处理器初始化失败")
+            bs_success = BaoStockProcessor().initialize()
+            ts_success = TushareProcessor().initialize()
+            self.logger.info(f"bs_success: {bs_success}, ts_success: {ts_success}")
+            if not bs_success and not ts_success:
+                self.logger.info("所有处理器初始化失败")
                 quit()
         except Exception as e:
             self.logger.info(f"初始化过程中发生错误: {e}")
@@ -202,8 +182,3 @@ class MainWindow(FluentWindow):
     def switchToSample(self, routeKey, index):
         """ switch to sample """
         pass
-        # interfaces = self.findChildren(GalleryInterface)
-        # for w in interfaces:
-        #     if w.objectName() == routeKey:
-        #         self.stackedWidget.setCurrentWidget(w, False)
-        #         w.scrollToCard(index)

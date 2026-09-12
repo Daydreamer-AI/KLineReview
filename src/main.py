@@ -17,6 +17,8 @@ from gui.qt_widgets.main.main_window import MainWindow
 from gui.qt_widgets.MComponents.qfluentwidgets import FluentTranslator
 from common.translator import KLineReviewTranslator
 
+from dotenv import load_dotenv
+
 # 添加项目根目录到Python路径
 project_root = os.path.dirname(os.path.abspath(__file__))
 if project_root not in sys.path:
@@ -150,6 +152,8 @@ def main():
         backup_count=5,
         unique_log_file=True  # 启用唯一日志文件名
     )
+
+    load_dotenv(verbose=True)
     
     app_run()
 
