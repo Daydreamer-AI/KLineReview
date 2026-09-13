@@ -15,6 +15,8 @@ import random
 import datetime
 from datetime import timedelta
 
+import calendar
+
 logger = get_logger(__name__)
 
 class StockCodeAnalyzer:
@@ -1017,17 +1019,67 @@ def get_random_date(start_date: str = "2014-01-01",
     # 6. 格式化为字符串并返回
     return random_dt.strftime(fmt)
 
-def get_current_year_dates():
+def get_current_year_dates(year_offset: int = 0):
     """
-    获取当前年份的起始和结束日期
+    获取指定年份的起始和结束日期
+    
+    Args:
+        year_offset (int): 相对于当前年份的偏移量。
+                           0 表示当前年份，-1 表示上一年，1 表示下一年。默认为 0。
     
     Returns:
-        tuple: (start_date, end_date) 格式为 "YYYY-MM-DD"
+        tuple: (start_date, end_date) 格式为 "YYYY-MM-DD" 的字符串
     """
-    current_year = datetime.datetime.now().year
-    start_date = f"{current_year}-01-01"
-    end_date = f"{current_year}-12-31"
+    current_year = datetime.datetime.now().year + year_offset
+    start_date = datetime.date(current_year, 1, 1).strftime("%Y-%m-%d")
+    end_date = datetime.date(current_year, 12, 31).strftime("%Y-%m-%d")
     return start_date, end_date
+
+def get_year_start_end_dates(year_offset: int = 0):
+    """
+    获取指定年份的起始和结束日期
+    
+    Args:
+        year_offset (int): 相对于当前年份的偏移量。
+                            0 表示当前年份，-1 表示上一年，1 表示下一年。默认为 0。
+    
+    Returns:
+        tuple: (start_date, end_date) 格式为 "YYYY-MM-DD" 的字符串
+    """
+    current_date = datetime.datetime.now()
+    target_year = current_date.year + year_offset
+    start_date = datetime.date(target_year, 1, 1).strftime("%Y-%m-%d")
+    end_date = datetime.date(current_date.year, 12, 31).strftime("%Y-%m-%d")
+    return start_date, end_date
+
+def get_year_ranges(start_year: int, end_year: int = None):
+    """
+    返回指定起始年份到结束年份（默认到当前年）的所有年度日期范围。
+
+    Args:
+        start_year (int): 起始年份（包含）。
+        end_year (int, optional): 结束年份（包含）。默认为 None，表示当前年份。
+
+    Returns:
+        list[tuple]: 包含多个 (start_date, end_date) 元组的列表，格式为 "YYYY-MM-DD"。
+    """
+    # 1. 处理默认结束年份
+    if end_year is None:
+        end_year = datetime.datetime.now().year
+        
+    # 2. 边界防御：如果起始年份大于结束年份，返回空列表
+    if start_year > end_year:
+        return []
+    
+    # 3. 遍历年份生成日期范围
+    date_ranges = []
+    for year in range(start_year, end_year + 1):
+        start_date = f"{year}-01-01"
+        # 使用 calendar 模块获取该年 12 月的最后一天，完美兼容闰年（如 2024-12-31）
+        end_date = f"{year}-12-{calendar.monthrange(year, 12)[1]}"
+        date_ranges.append((start_date, end_date))
+        
+    return date_ranges
 
 def get_resource_path(relative_path):
     """获取资源文件的绝对路径（兼容开发环境和打包后）"""

@@ -113,7 +113,7 @@ class BaoStockProcessor(QObject):
 
     # 获取当年交易日信息
     def get_current_trade_dates(self):
-        start_date, end_date = get_current_year_dates()
+        start_date, end_date = get_year_start_end_dates(-2)
         rs = bs.query_trade_dates(start_date=start_date, end_date=end_date)
         self.logger.info('query_trade_dates respond error_code:'+rs.error_code)
         self.logger.info('query_trade_dates respond  error_msg:'+rs.error_msg)
@@ -917,7 +917,7 @@ class BaoStockProcessor(QObject):
             return b_ret
 
         result['version'] = VERSION
-        result['update_at'] = str_query_date
+        # result['update_at'] = str_query_date
 
         self.logger.info(f"result列信息：{result.columns}")
 
