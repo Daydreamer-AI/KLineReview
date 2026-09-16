@@ -121,7 +121,8 @@ class TushareProcessor:
             return False
 
         # 接口(trade_cal)频率超限(1次/小时)，具体频次详情：https://tushare.pro/document/1?doc_id=108。
-        df_trade_calendar = self.tushare_pro.trade_cal(exchange='', start_date=start_date, end_date=start_date)
+        df_trade_calendar = self.tushare_pro.trade_cal(exchange='', start_date=start_date, end_date=end_date)
+        # df_trade_calendar = self.tushare_pro.query('trade_cal', start_date=start_date, end_date=end_date)
         if df_trade_calendar is None or df_trade_calendar.empty: 
             self.logger.info("Failed to retrieve trade calendar data.")
             return False
