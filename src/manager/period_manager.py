@@ -47,6 +47,14 @@ class TimePeriod(Enum):
     MINUTE_7 = '7m'
     MINUTE_25 = '25m'
 
+    # Tushare 周期映射
+    _TUSHARE_PERIOD_MAPPING = {
+        DAY: 'D',
+        WEEK: 'W',
+        MONTH: 'M',
+    }
+
+
     # ================= 动态翻译与反查 =================
 
     @property
@@ -98,6 +106,15 @@ class TimePeriod(Enum):
     def get_table_name(self):
         """获取对应级别的数据库表名"""
         return f"stock_data_{self.value}"
+
+    # ================= Tushare 扩展 ==============
+    @classmethod
+    def get_tushare_period(cls, period):
+        """根据枚举值获取对应的tushare周期"""
+        if period in cls._TUSHARE_PERIOD_MAPPING:
+            return cls._TUSHARE_PERIOD_MAPPING[period]
+        else:
+            return period.value
     
 
     # ================= 比较运算符 =================

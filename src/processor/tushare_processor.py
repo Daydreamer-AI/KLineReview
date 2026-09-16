@@ -12,7 +12,7 @@ from common.config import VERSION
 from manager.logging_manager import get_logger
 from manager.environment_config_manager import EnvironmentConfigManager
 from manager.tushare_stock_data_manager import TuShareStockDataManager
-
+from manager.period_manager import TimePeriod
 
 
 TUSHARE_PRO_API_KEY = "Tushare_Pro_API_KEY"
@@ -49,6 +49,8 @@ class TushareProcessor:
         self.df_trade_calendar = None
         self.df_stock_basic_info = None
 
+        self._allowed_adjust_factors = [None, 'qfq', 'hfq']     # 允许的复权因子，默认为None：不复权
+
     def initialize(self) -> bool:
         """显式登录TuShare系统。应在程序开始时调用。"""
         try:
@@ -72,7 +74,7 @@ class TushareProcessor:
 
                 formatted_start_date = start_date.replace('-', '')
                 formatted_end_date = end_date.replace('-', '')
-                # self.update_trade_calendar(formatted_start_date, formatted_end_date)
+                self.update_trade_calendar(formatted_start_date, formatted_end_date)
 
                 self.update_stock_basic_info()
 
@@ -184,5 +186,79 @@ class TushareProcessor:
 
         return True
 
-    
+    def query_stock_unadjusted_data(self, ts_code: str, start_date: str, end_date: str, period: TimePeriod=TimePeriod.DAY):
+        '''
+            查询个股日线、周线、月线数据。
+            注意：
+                本接口是未复权行情，停牌期间不提供数据
+                获取周线、月线时最后一个交易日更新
+
+            参数：
+                ts_code：股票代码（支持多个股票同时提取，逗号分隔）
+                start_date：开始日期(YYYYMMDD)
+                end_date：结束日期(YYYYMMDD)
+                period：要获取的数据时间周期，默认为日线数据
         
+        '''
+        df_data = None
+        if not self.is_initialized():
+            self.logger.info("Tushare is not initialized.")
+            return df_data
+
+        self.logger.info(f"query_stock_unadjusted_data--ts_code: {ts_code}, start_date: {start_date}, end_date: {end_date}, period: {TimePeriod.get_chinese_label(period)}")
+        if end_date == None or end_date == "":
+            end_date = (datetime.datetime.now()).strftime("%Y%m%d")
+            self.logger.info(f"更新end_date: {end_date}")
+
+        # ts_code   trade_date  close  open  high   low     pre_close  change  pct_chg  vol    amount
+        # 股票代码  交易日期    收盘价  开盘价  最高价  最低价  昨收价      涨跌额  涨跌幅  成交量  成交额
+        if period == TimePeriod.DAY:
+            df_data = self.tushare_pro.daily(ts_code=ts_code, start_date=start_date, end_date=end_date)
+        elif period == TimePeriod.WEEK:
+            df_data = self.tushare_pro.weekly(ts_code=ts_code, start_date=start_date, end_date=end_date)
+        elif period == TimePeriod.MONTH:
+            df_data = self.tushare_pro.monthly(ts_code=ts_code, start_date=start_date, end_date=end_date)
+
+        self.logger.info(f"df_data type: {type(df_data)}, columns: {df_data.columns}, len: {len(df_data)}")
+        self.logger.info(f"df_data head: {df_data.head(3)}")
+        self.logger.info(f"df_data tail: {df_data.tail(3)}")
+
+        return df_data
+
+    def query_stock_adjusted_data(self, ts_code: str, start_date: str, end_date: str, adj, period: TimePeriod=TimePeriod.DAY):
+        '''
+            查询个股复权数据
+
+            参数：
+                ts_code：股票代码（支持多个股票同时提取，逗号分隔）
+                start_date：开始日期(YYYYMMDD)
+                end_date：结束日期(YYYYMMDD)
+                adj：复权类型(只针对股票)：None未复权 qfq前复权 hfq后复权，默认None
+                period：要获取的数据时间周期。需转换成TuShare的样式：1MIN表示1分钟（1/5/15/30/60分钟）D日线，默认D
+        '''
+        df_data = None
+
+        if not self.is_initialized():
+            self.logger.info("Tushare is not initialized.")
+            return df_data
+
+        self.logger.info(f"query_stock_adjusted_data--ts_code: {ts_code}, start_date: {start_date}, end_date: {end_date}, adj: {adj}, period: {TimePeriod.get_chinese_label(period)}")
+
+        if adj not in self._allowed_adjust_factors:
+            self.logger.error(f"Invalid adj: {adj}. Allowed values are: {self._allowed_adjust_factors}")
+            return df_data
+
+        if end_date == None or end_date == "":
+            end_date = (datetime.datetime.now()).strftime("%Y%m%d")
+            self.logger.info(f"更新end_date: {end_date}")
+
+        # ts_code   trade_date  close  open  high   low     pre_close  change  pct_chg  vol    amount
+        # 股票代码  交易日期    收盘价  开盘价  最高价  最低价  昨收价      涨跌额  涨跌幅  成交量  成交额
+
+        df_data = self.tushare_pro.pro_bar(ts_code=ts_code, start_date=start_date, end_date=end_date, adj=adj,freq=TimePeriod.get_tushare_period(period))
+
+        self.logger.info(f"df_data type: {type(df_data)}, columns: {df_data.columns}, len: {len(df_data)}")
+        self.logger.info(f"df_data head: {df_data.head(3)}")
+        self.logger.info(f"df_data tail: {df_data.tail(3)}")
+
+        return df_data
