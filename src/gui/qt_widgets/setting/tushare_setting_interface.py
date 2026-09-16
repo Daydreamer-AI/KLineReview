@@ -14,6 +14,8 @@ from common.config import cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, is
 from common.signal_bus import signalBus
 from common.style_sheet import StyleSheet
 
+from .tushare_setting.tushare_setting_widget import TuShareSettingWidget
+
 
 class TuShareSettingInterface(ScrollArea):
     """ TuShare Setting interface """
@@ -23,11 +25,7 @@ class TuShareSettingInterface(ScrollArea):
         self.scrollWidget = QWidget()
         self.expandLayout = ExpandLayout(self.scrollWidget)
 
-        # setting label
-        self.settingLabel = QLabel(self.tr("TuShareSettings"), self)
-
         self.__initWidget()
-
 
     def __initWidget(self):
         self.resize(1000, 800)
@@ -39,11 +37,15 @@ class TuShareSettingInterface(ScrollArea):
 
         # initialize style sheet
         self.scrollWidget.setObjectName('scrollWidget')
-        self.settingLabel.setObjectName('settingLabel')
+
         # StyleSheet.SETTING_INTERFACE.apply(self)
+
+        self.tushare_setting_widget = TuShareSettingWidget(self)
 
         # initialize layout
         self.__initLayout()
     
     def __initLayout(self):
-        self.settingLabel.move(36, 30)
+        self.expandLayout.setSpacing(28)
+        self.expandLayout.setContentsMargins(36, 10, 36, 0)
+        self.expandLayout.addWidget(self.tushare_setting_widget)

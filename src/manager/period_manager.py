@@ -47,14 +47,6 @@ class TimePeriod(Enum):
     MINUTE_7 = '7m'
     MINUTE_25 = '25m'
 
-    # Tushare 周期映射
-    _TUSHARE_PERIOD_MAPPING = {
-        DAY: 'D',
-        WEEK: 'W',
-        MONTH: 'M',
-    }
-
-
     # ================= 动态翻译与反查 =================
 
     @property
@@ -107,16 +99,6 @@ class TimePeriod(Enum):
         """获取对应级别的数据库表名"""
         return f"stock_data_{self.value}"
 
-    # ================= Tushare 扩展 ==============
-    @classmethod
-    def get_tushare_period(cls, period):
-        """根据枚举值获取对应的tushare周期"""
-        if period in cls._TUSHARE_PERIOD_MAPPING:
-            return cls._TUSHARE_PERIOD_MAPPING[period]
-        else:
-            return period.value
-    
-
     # ================= 比较运算符 =================
 
     def _get_order_index(self):
@@ -165,3 +147,23 @@ class ReviewPeriodProcessData(object):
         self.current_min_index = None
         self.current_max_index = None
 
+# 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
+_DEFAULT_LOAD_PERIODS = [
+    # TimePeriod.MINUTE_5,
+    # TimePeriod.MINUTE_10,
+    # TimePeriod.MINUTE_15,
+    # TimePeriod.MINUTE_30,
+    # TimePeriod.MINUTE_45,
+    # TimePeriod.MINUTE_60,
+    # TimePeriod.MINUTE_90,
+    # TimePeriod.MINUTE_120,
+    TimePeriod.DAY,
+    TimePeriod.WEEK,
+    TimePeriod.MONTH,
+]
+
+# 基周期：远程只拉取基周期，周线等上级周期由基周期本地聚合生成（不依赖远程上级周期接口）
+_BASE_LOAD_PERIODS = [
+    TimePeriod.DAY
+    # , TimePeriod.MINUTE_5,
+]

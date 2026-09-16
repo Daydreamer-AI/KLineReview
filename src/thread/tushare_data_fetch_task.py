@@ -48,13 +48,13 @@ class TushareUnadjustedDataFetchTask(BaseTask):
         }
 
 class TushareAdjustedDataFetchTask(BaseTask):
-    def __init__(self, code=None, start_date=None, end_date=None, period=None, adjustflag=None, **kwargs):
+    def __init__(self, code=None, start_date=None, end_date=None, freq=None, adjustflag=None, **kwargs):
         super().__init__(**kwargs)
 
         self.code = code
         self.start_date = start_date
         self.end_date = end_date
-        self.period = period
+        self.freq = freq
         self.adjustflag = adjustflag
 
     def execute(self):
@@ -67,7 +67,7 @@ class TushareAdjustedDataFetchTask(BaseTask):
         if self.is_cancelled():
             return {"status": "cancelled", "message": "TushareAdjustedDataFetchTask was cancelled"}
 
-        df_data = TushareProcessor().query_stock_adjusted_data(self.code, self.start_date, self.end_date, self.adjustflag, self.period)
+        df_data = TushareProcessor().query_stock_adjusted_data(self.code, self.start_date, self.end_date, self.adjustflag, self.freq)
         bRet = df_data is not None and len(df_data) > 0
 
         self.set_progress(100)

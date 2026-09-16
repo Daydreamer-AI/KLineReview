@@ -49,7 +49,7 @@ class TushareProcessor:
         self.df_trade_calendar = None
         self.df_stock_basic_info = None
 
-        self._allowed_adjust_factors = [None, 'qfq', 'hfq']     # 允许的复权因子，默认为None：不复权
+        self._allowed_adjust_factors = ['bfq', 'qfq', 'hfq']     # 允许的复权因子，默认为None：不复权
 
     def initialize(self) -> bool:
         """显式登录TuShare系统。应在程序开始时调用。"""
@@ -226,7 +226,7 @@ class TushareProcessor:
 
         return df_data
 
-    def query_stock_adjusted_data(self, ts_code: str, start_date: str, end_date: str, adj, period: TimePeriod=TimePeriod.DAY):
+    def query_stock_adjusted_data(self, ts_code: str, start_date: str, end_date: str, adj: str, freq: str="D"):
         '''
             查询个股复权数据
 
@@ -243,11 +243,14 @@ class TushareProcessor:
             self.logger.info("Tushare is not initialized.")
             return df_data
 
-        self.logger.info(f"query_stock_adjusted_data--ts_code: {ts_code}, start_date: {start_date}, end_date: {end_date}, adj: {adj}, period: {TimePeriod.get_chinese_label(period)}")
+        self.logger.info(f"query_stock_adjusted_data--ts_code: {ts_code}, start_date: {start_date}, end_date: {end_date}, adj: {adj}, freq: {freq}")
 
         if adj not in self._allowed_adjust_factors:
             self.logger.error(f"Invalid adj: {adj}. Allowed values are: {self._allowed_adjust_factors}")
             return df_data
+
+        if adj == 'bfq':
+            adj = None
 
         if end_date == None or end_date == "":
             end_date = (datetime.datetime.now()).strftime("%Y%m%d")
@@ -256,7 +259,7 @@ class TushareProcessor:
         # ts_code   trade_date  close  open  high   low     pre_close  change  pct_chg  vol    amount
         # 股票代码  交易日期    收盘价  开盘价  最高价  最低价  昨收价      涨跌额  涨跌幅  成交量  成交额
 
-        df_data = self.tushare_pro.pro_bar(ts_code=ts_code, start_date=start_date, end_date=end_date, adj=adj,freq=TimePeriod.get_tushare_period(period))
+        df_data = self.tushare_pro.pro_bar(ts_code=ts_code, start_date=start_date, end_date=end_date, adj=adj,freq=freq)
 
         self.logger.info(f"df_data type: {type(df_data)}, columns: {df_data.columns}, len: {len(df_data)}")
         self.logger.info(f"df_data head: {df_data.head(3)}")

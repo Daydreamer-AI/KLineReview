@@ -14,7 +14,7 @@ from gui.qt_widgets.MComponents.review.demo_trading_record_widget import DemoTra
 from processor.baostock_processor import BaoStockProcessor
 from processor.period_aggregator import aggregate_period
 from manager.bao_stock_data_manager import BaostockDataManager
-from manager.period_manager import TimePeriod
+from manager.period_manager import TimePeriod, _DEFAULT_LOAD_PERIODS, _BASE_LOAD_PERIODS
 from manager.review_demo_trading_manager import ReviewDemoTradingManager
 
 from common.common_api import *
@@ -35,27 +35,6 @@ class ReviewWidget(QWidget):
 
     random_data_generated = pyqtSignal(object)
 
-    # 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
-    _DEFAULT_LOAD_PERIODS = [
-        # TimePeriod.MINUTE_5,
-        # TimePeriod.MINUTE_10,
-        # TimePeriod.MINUTE_15,
-        # TimePeriod.MINUTE_30,
-        # TimePeriod.MINUTE_45,
-        # TimePeriod.MINUTE_60,
-        # TimePeriod.MINUTE_90,
-        # TimePeriod.MINUTE_120,
-        TimePeriod.DAY,
-        TimePeriod.WEEK,
-        TimePeriod.MONTH,
-    ]
-
-    # 基周期：远程只拉取基周期，周线等上级周期由基周期本地聚合生成（不依赖远程上级周期接口）
-    _BASE_LOAD_PERIODS = [
-        TimePeriod.DAY
-        # , TimePeriod.MINUTE_5,
-    ]
-
     def __init__(self, parent=None):
         super(ReviewWidget, self).__init__(parent) 
         uic.loadUi('./src/gui/qt_widgets/MComponents/review/ReviewWidget.ui', self)
@@ -75,8 +54,8 @@ class ReviewWidget(QWidget):
         self.current_load_code = ""
         self.current_load_period = None
         self._is_loading = False
-        self._load_periods = list(self._DEFAULT_LOAD_PERIODS)
-        self._base_load_periods = list(self._BASE_LOAD_PERIODS)
+        self._load_periods = list(_DEFAULT_LOAD_PERIODS)
+        self._base_load_periods = list(_BASE_LOAD_PERIODS)
         self._fetch_pending_periods = []
         self._fetch_failed_periods = []
         self._fetched_period_data = {}
