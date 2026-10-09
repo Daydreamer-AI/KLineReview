@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, uic, QtGui
 from PyQt5.QtWidgets import QWidget, QCompleter, QMessageBox, QListWidget, QListWidgetItem, QButtonGroup
-from PyQt5.QtCore import QDate, QFile, Qt, pyqtSignal
+from PyQt5.QtCore import QDate, QFile, Qt, pyqtSignal, QEvent
 
 import random
 import sys
@@ -156,6 +156,8 @@ class ReviewWidget(QWidget):
         self.demo_trading_manager.sig_trading_status_changed.connect(self.slot_demo_trading_manager_sig_trading_status_changed)
         self.demo_trading_record_widget.sig_btn_return_clicked.connect(self.slot_demo_trading_record_widget_sig_btn_return_clicked)
 
+        cfg.regretMode.valueChanged.connect(self.slot_regretModeChanged)
+
     def load_qss(self, theme="default"):
         qss_file_name = f":/theme/{theme}/mcomponents/review_widget.qss"
         self.logger.info(f"回放模块样式表文件路径：{qss_file_name}")
@@ -168,6 +170,14 @@ class ReviewWidget(QWidget):
             self.logger.warning("无法打开回放模块样式表文件")
         qssFile.close()
 
+    def hideEvent(self, event):
+        self.logger.info("ReviewWidget控件隐藏")
+
+        if self.btn_play.property("is_play"):
+            self.logger.info("回放模块离开事件，暂停播放")
+            self.slot_btn_play_clicked()
+
+        super().hideEvent(event)
 
     def preload_data(self, df_row):
         self.logger.info(f"回放预加载数据: {df_row}")
@@ -219,9 +229,9 @@ class ReviewWidget(QWidget):
         self.btn_date_select.setEnabled(True if b_init else not is_playing)
         self.btn_period_select.setEnabled(True if b_init else not is_playing)
 
-        self.btn_back_to_front.setEnabled(not is_playing)
-        self.btn_back_ten.setEnabled(not is_playing)
-        self.btn_back.setEnabled(not is_playing)
+        self.btn_back_to_front.setEnabled(not is_playing and cfg.regretMode.value)
+        self.btn_back_ten.setEnabled(not is_playing and cfg.regretMode.value)
+        self.btn_back.setEnabled(not is_playing and cfg.regretMode.value)
         self.btn_move_on.setEnabled(not is_playing)
         self.btn_move_on_10.setEnabled(not is_playing)
         self.btn_move_to_last.setEnabled(not is_playing)
@@ -772,21 +782,27 @@ class ReviewWidget(QWidget):
 
     def slot_btn_play_clicked(self):
         if self.btn_play.property("is_play"):
-            self.logger.info("暂停播放")
-            self.indicators_view_widget.pause_animation()
+            self.pause_kline_review()
             self.btn_play.setProperty("is_play", False)
-            self.btn_play.setIcon(Icon.PLAY)
-            self.playing_enabled(False)
         else:
-            self.logger.info("开始播放")
-            self.indicators_view_widget.start_animation()
+            self.play_kline_review()
             self.btn_play.setProperty("is_play", True)
-            self.btn_play.setIcon(Icon.PAUSE)
-            self.playing_enabled(True)
 
         self.btn_play.style().unpolish(self.btn_play)
         self.btn_play.style().polish(self.btn_play)
         self.btn_play.update()
+
+    def play_kline_review(self):
+        self.logger.info("开始播放")
+        self.indicators_view_widget.start_animation()
+        self.btn_play.setIcon(Icon.PAUSE)
+        self.playing_enabled(True)
+
+    def pause_kline_review(self):
+        self.logger.info("暂停播放")
+        self.indicators_view_widget.pause_animation()
+        self.btn_play.setIcon(Icon.PLAY)
+        self.playing_enabled(False)
 
     def slot_btn_back_to_front_clicked(self):
         self.indicators_view_widget.back_to_front()
@@ -950,6 +966,13 @@ class ReviewWidget(QWidget):
 
     def slot_theme_changed_finished(self):
         self.logger.info(f"主题已切换为: {cfg.theme}")
+
+    def slot_regretModeChanged(self):
+        self.logger.info(f"回退模式已切换为: {cfg.regretMode.value}")
+        is_playing = self.btn_play.property("is_play")
+        self.btn_back_to_front.setEnabled(not is_playing and cfg.regretMode.value)
+        self.btn_back_ten.setEnabled(not is_playing and cfg.regretMode.value)
+        self.btn_back.setEnabled(not is_playing and cfg.regretMode.value)
 
 
 # uic 按 .ui 的 <header> 裸模块名导入提升控件；

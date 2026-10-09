@@ -8,6 +8,7 @@ from gui.qt_widgets.MComponents.qfluentwidgets import (qconfig, QConfig, ConfigI
                             FolderListValidator, Theme, FolderValidator, ConfigSerializer, __version__)
 
 from common.paths import get_config_file
+from pathlib import Path
 
 
 class Language(Enum):
@@ -35,13 +36,6 @@ def isWin11():
 
 class Config(QConfig):
     """ Config of application """
-
-    # folders
-    musicFolders = ConfigItem(
-        "Folders", "LocalMusic", [], FolderListValidator())
-    downloadFolder = ConfigItem(
-        "Folders", "Download", "app/download", FolderValidator())
-
     # main window
     micaEnabled = ConfigItem("MainWindow", "MicaEnabled", isWin11(), BoolValidator())
     dpiScale = OptionsConfigItem(
@@ -67,6 +61,11 @@ class Config(QConfig):
 
     def get_plot_widget_background_color(self, theme):
         return self.plot_widget_background[theme]
+
+    # Review
+    ctfEnabled = ConfigItem("Review", "ctfEnabled", False, BoolValidator())
+    regretMode = ConfigItem("Review", "regretMode", False, BoolValidator())
+
 
 
 YEAR = 2026

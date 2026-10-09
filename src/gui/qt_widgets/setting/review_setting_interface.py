@@ -42,8 +42,37 @@ class ReviewSettingInterface(ScrollArea):
         self.settingLabel.setObjectName('settingLabel')
         # StyleSheet.SETTING_INTERFACE.apply(self)
 
+        
+        # operation
+        self.operationGroup = SettingCardGroup(
+            self.tr('Operation'), self.scrollWidget)
+        self.ctfCard = SwitchSettingCard(
+            '',
+            self.tr('Complete the forward'),
+            self.tr('Complete the current unfinished candlestick and move on to the next one'),
+            cfg.ctfEnabled,
+            self.operationGroup
+        )
+
+        self.regretModeCard = SwitchSettingCard(
+                    '',
+                    self.tr('Regret mode'),
+                    self.tr('Allow k-line backward operation'),
+                    cfg.regretMode,
+                    self.operationGroup
+                )
+
         # initialize layout
         self.__initLayout()
     
     def __initLayout(self):
         self.settingLabel.move(36, 30)
+
+        # add cards to group
+        self.operationGroup.addSettingCard(self.ctfCard)
+        self.operationGroup.addSettingCard(self.regretModeCard)
+
+        # add setting card group to layout
+        self.expandLayout.setSpacing(28)
+        self.expandLayout.setContentsMargins(36, 10, 36, 0)
+        self.expandLayout.addWidget(self.operationGroup)

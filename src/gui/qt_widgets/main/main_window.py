@@ -116,7 +116,7 @@ class MainWindow(FluentWindow):
         self.logger.info("初始化所有处理器")
         try:
             bs_success = BaoStockProcessor().initialize()
-            ts_success = TushareProcessor().initialize()
+            ts_success = True   # TushareProcessor().initialize()
             self.logger.info(f"bs_success: {bs_success}, ts_success: {ts_success}")
             if not bs_success and not ts_success:
                 self.logger.info("所有处理器初始化失败")
@@ -165,6 +165,7 @@ class MainWindow(FluentWindow):
             self.logger.info("开始执行清理操作...")
             self.themeListener.terminate()
             self.themeListener.deleteLater()
+            BaoStockProcessor().cleanup()
             super().closeEvent(e)
         else:
             self.logger.info("取消退出")
