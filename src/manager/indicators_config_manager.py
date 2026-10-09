@@ -563,13 +563,11 @@ class IndicatorConfigManager:
             self.default_configs[IndicatrosEnum.MA.value] = {
                 0: MASetting(0, 5, '', True, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}5'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}5']),
                 1: MASetting(1, 10, '', True, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}10'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}10']),
-                2: MASetting(2, 20, '', False, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}20'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}20']),
-                3: MASetting(3, 24, '', True, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}24'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}24']),
-                4: MASetting(4, 30, '', False, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}30'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}30']),
-                5: MASetting(5, 52, '', True, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}52'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}52']),
-                6: MASetting(6, 60, '', False, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}60'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}60']),
-                7: MASetting(7, 120, '', False, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}120'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}120']),
-                8: MASetting(8, 250, '', False, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}250'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}250'])
+                2: MASetting(2, 20, '', True, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}20'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}20']),
+                3: MASetting(4, 30, '', True, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}30'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}30']),
+                4: MASetting(6, 60, '', True, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}60'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}60']),
+                5: MASetting(7, 120, '', False, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}120'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}120']),
+                6: MASetting(8, 250, '', False, 2, dict_ma_color[f'{IndicatrosEnum.MA.value}250'], dict_ma_color_hex[f'{IndicatrosEnum.MA.value}250'])
             }
             
             # 其他指标默认配置

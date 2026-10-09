@@ -363,6 +363,9 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
              <property name="text">
               <string>MA3</string>
              </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="4" column="1">
@@ -429,7 +432,7 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
               </size>
              </property>
              <property name="text">
-              <string>24</string>
+              <string>30</string>
              </property>
             </widget>
            </item>
@@ -470,6 +473,9 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
              <property name="text">
               <string>MA5</string>
              </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="6" column="1">
@@ -481,7 +487,7 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
               </size>
              </property>
              <property name="text">
-              <string>30</string>
+              <string>60</string>
              </property>
             </widget>
            </item>
@@ -523,7 +529,7 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
               <string>MA6</string>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -536,7 +542,7 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
               </size>
              </property>
              <property name="text">
-              <string>54</string>
+              <string>120</string>
              </property>
             </widget>
            </item>
@@ -588,7 +594,7 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
               </size>
              </property>
              <property name="text">
-              <string>60</string>
+              <string>250</string>
              </property>
             </widget>
            </item>
