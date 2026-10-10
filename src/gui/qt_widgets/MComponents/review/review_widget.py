@@ -15,7 +15,7 @@ from processor.baostock_processor import BaoStockProcessor
 from processor.period_aggregator import aggregate_period
 from manager.bao_stock_data_manager import BaostockDataManager
 from manager.period_manager import TimePeriod, _DEFAULT_LOAD_PERIODS, _BASE_LOAD_PERIODS
-from manager.review_demo_trading_manager import ReviewDemoTradingManager
+from manager.review_demo_trading_manager import review_demo_trading_manager
 
 from common.common_api import *
 from gui.qt_widgets.MComponents.review import income_chart_widget as _income_chart_widget_module
@@ -60,7 +60,7 @@ class ReviewWidget(QWidget):
         self._fetch_failed_periods = []
         self._fetched_period_data = {}
 
-        self.demo_trading_manager = ReviewDemoTradingManager()
+        self.demo_trading_manager = review_demo_trading_manager
 
     def init_ui(self):
         from gui.qt_widgets.MComponents.indicators.indicators_view_widget import IndicatorsViewWidget

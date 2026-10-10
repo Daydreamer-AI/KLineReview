@@ -8,6 +8,7 @@ import pyqtgraph as pg
 from common.config import cfg
 from common.paths import get_module_relative_file
 from gui.qt_widgets.MComponents.qfluentwidgets import(Theme, isDarkTheme, theme)
+from manager.review_demo_trading_manager import review_demo_trading_manager
 
 class IncomeChartWidget(QWidget):
     def __init__(self, parent=None):
@@ -123,13 +124,16 @@ class IncomeChartWidget(QWidget):
         for record in list_data:
             if record.status == 6 and record.sell_date_time is not None:  # 交易完成
                 single_yield = record.trading_yield * 100  # 转换为百分比
-                total_yield += single_yield
+                # total_yield += single_yield
                 
                 # 统计获胜次数（收益率大于0）
                 if single_yield > 0:
                     win_count += 1
                 
                 total_completed_trades += 1
+
+        # 总收益率 = 当前资产 / 初始资产 * 100
+        total_yield = review_demo_trading_manager.get_total_yield()
 
         # 计算胜率
         win_rate = 0.0

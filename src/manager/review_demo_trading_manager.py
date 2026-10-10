@@ -63,8 +63,9 @@ class ReviewDemoTradingManager(QObject):
 
         self.logger = get_logger(__name__)
 
-        self.total_assets = total_assets               # 总资产
-        self.available_balance = available_balance          # 可用资金
+        self.total_assets = total_assets                # 总资产
+        self.available_balance = available_balance      # 可用资金
+        self.initial_assets = total_assets              # 初始总资产
 
         self.current_trading_record = None
         self.trding_record_list = []
@@ -106,7 +107,14 @@ class ReviewDemoTradingManager(QObject):
     
     def set_total_assets(self, total_assets):
         self.total_assets = total_assets
-    
+
+    def get_initial_assets(self):
+        return self.initial_assets
+
+    def get_total_yield(self):
+        total_yield = (self.total_assets - self.initial_assets) / self.initial_assets * 100
+        self.logger.info(f"总资产：{self.total_assets}, 初始资产：{self.initial_assets}，总收益率：{total_yield}")
+        return total_yield
     def get_available_balance(self):
         return self.available_balance
     
@@ -364,3 +372,4 @@ class ReviewDemoTradingManager(QObject):
             self.current_trading_record = None
 
 
+review_demo_trading_manager = ReviewDemoTradingManager()
