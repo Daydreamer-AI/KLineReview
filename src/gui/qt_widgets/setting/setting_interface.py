@@ -35,16 +35,16 @@ class SettingInterface(QWidget):
 
         self.generalInterface = GeneralSettingInterface(self)
         self.reviewInterface = ReviewSettingInterface(self)
-        self.baostockInterface = BaostockSettingInterface(self)
-        self.akshareInterface = AKShareSettingInterface(self)
-        self.tushareInterface = TuShareSettingInterface(self)
+        # self.baostockInterface = BaostockSettingInterface(self)
+        # self.akshareInterface = AKShareSettingInterface(self)
+        # self.tushareInterface = TuShareSettingInterface(self)
 
         # add items to pivot
         self.addSubInterface(self.generalInterface, 'generalInterface', self.tr('General'))
         self.addSubInterface(self.reviewInterface, 'reviewInterface', self.tr('Review'))
-        self.addSubInterface(self.baostockInterface, 'baostockInterface', self.tr('Baostock'))
-        self.addSubInterface(self.akshareInterface, 'akshareInterface', self.tr('AKShare'))
-        self.addSubInterface(self.tushareInterface, 'tushareInterface', self.tr('TuShare'))
+        # self.addSubInterface(self.baostockInterface, 'baostockInterface', self.tr('Baostock'))
+        # self.addSubInterface(self.akshareInterface, 'akshareInterface', self.tr('AKShare'))
+        # self.addSubInterface(self.tushareInterface, 'tushareInterface', self.tr('TuShare'))
 
         self.vBoxLayout.addWidget(self.pivot, 0, Qt.AlignLeft)
         self.vBoxLayout.addWidget(self.stackedWidget)

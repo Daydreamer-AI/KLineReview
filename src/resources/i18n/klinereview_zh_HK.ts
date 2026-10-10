@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>AKShareSettingInterface</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/akshare_setting_interface.py" line="27"/>
+        <source>AKShareSettings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AmountSettingDialog</name>
     <message>
         <location filename="../../gui/qt_widgets/MComponents/indicators/setting/amount_setting_dialog.py" line="109"/>
@@ -313,37 +321,37 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
 <context>
     <name>DemoTradingRecord</name>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="39"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="40"/>
         <source>No Trade</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="41"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="42"/>
         <source>Buy Pending</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="43"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="44"/>
         <source>Buy Canceled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="45"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="46"/>
         <source>Sell Pending</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="47"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="48"/>
         <source>Sell Canceled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="49"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="50"/>
         <source>Holding</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="51"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="52"/>
         <source>Closed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -492,14 +500,177 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
     </message>
 </context>
 <context>
+    <name>GeneralSettingInterface</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="30"/>
+        <source>Personalization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
+        <source>Mica effect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
+        <source>Apply semi transparent to windows and surfaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <source>Application theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <source>Change the appearance of your application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <source>Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <source>Dark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <source>Use system setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="50"/>
+        <source>Theme color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="50"/>
+        <source>Change the theme color of you application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="57"/>
+        <source>Interface zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="57"/>
+        <source>Change the size of widgets and fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <source>Set your preferred language for UI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="78"/>
+        <source>Material</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
+        <source>Acrylic blur radius</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
+        <source>The greater the radius, the more blurred the image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="89"/>
+        <source>Software update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
+        <source>Check for updates when the application starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
+        <source>The new version will be more stable and have more features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <source>Open help page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <source>Discover new features and learn useful tips about KLineReview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="110"/>
+        <source>Provide feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="110"/>
+        <source>Help us improve KLineReview by providing feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <source>Check update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <source>Copyright</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <source>Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="175"/>
+        <source>Updated successfully</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="175"/>
+        <source>Configuration takes effect after restart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="184"/>
+        <source>Choose folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>IncomeChartWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="230"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="231"/>
         <source>Return</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="234"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="235"/>
         <source>Yield Curve</source>
         <translation type="unfinished"></translation>
     </message>
@@ -524,27 +695,27 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="316"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="317"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="317"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="318"/>
         <source>Trade No.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="318"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="319"/>
         <source>Single Return</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="319"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="320"/>
         <source>Cumulative Return</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="320"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="321"/>
         <source>Win Rate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -552,7 +723,7 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
 <context>
     <name>IndicatorsViewWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/indicators_view_widget.py" line="142"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/indicators_view_widget.py" line="144"/>
         <source>1D</source>
         <translation type="unfinished"></translation>
     </message>
@@ -726,7 +897,7 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="604"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="610"/>
         <source>2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -746,63 +917,63 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="377"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="380"/>
         <source>20</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="416"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="419"/>
         <source>MA4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="432"/>
-        <source>24</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="471"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="474"/>
         <source>MA5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="484"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="435"/>
         <source>30</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="523"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="529"/>
         <source>MA6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="539"/>
-        <source>54</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="578"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="584"/>
         <source>MA7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="591"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="490"/>
         <source>60</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="630"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="636"/>
         <source>Enable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="697"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="703"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="723"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="729"/>
         <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="545"/>
+        <source>120</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="597"/>
+        <source>250</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1269,27 +1440,27 @@ Trading Principles:
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="101"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="88"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="102"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="89"/>
         <source>Review</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="110"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="92"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="173"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="153"/>
         <source>Prompt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="174"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="154"/>
         <source>Are you sure you want to exit?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1303,9 +1474,47 @@ Trading Principles:
     </message>
 </context>
 <context>
+    <name>ReviewSettingInterface</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="47"/>
+        <source>Operation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="49"/>
+        <source>Complete the forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="49"/>
+        <source>Complete the current unfinished candlestick; turn on to also move on to the next one</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <source>Regret mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <source>Allow k-line backward operation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="65"/>
+        <source>Fast forward step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="65"/>
+        <source>From {0} to {1}</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ReviewWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/review_widget.py" line="92"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/review_widget.py" line="73"/>
         <source>Search stock code</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1593,168 +1802,13 @@ Trading Rules:
 <context>
     <name>SettingInterface</name>
     <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="27"/>
-        <source>Settings</source>
+        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="43"/>
+        <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="30"/>
-        <source>Personalization</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="32"/>
-        <source>Mica effect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="32"/>
-        <source>Apply semi transparent to windows and surfaces</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="39"/>
-        <source>Application theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="39"/>
-        <source>Change the appearance of your application</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="39"/>
-        <source>Light</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="39"/>
-        <source>Dark</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="68"/>
-        <source>Use system setting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="50"/>
-        <source>Theme color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="50"/>
-        <source>Change the theme color of you application</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="57"/>
-        <source>Interface zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="57"/>
-        <source>Change the size of widgets and fonts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="68"/>
-        <source>Language</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="68"/>
-        <source>Set your preferred language for UI</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="78"/>
-        <source>Material</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="80"/>
-        <source>Acrylic blur radius</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="80"/>
-        <source>The greater the radius, the more blurred the image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="89"/>
-        <source>Software update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="91"/>
-        <source>Check for updates when the application starts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="91"/>
-        <source>The new version will be more stable and have more features</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="117"/>
-        <source>About</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="101"/>
-        <source>Open help page</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="101"/>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="110"/>
-        <source>Provide feedback</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="117"/>
-        <source>Check update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="117"/>
-        <source>Copyright</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="117"/>
-        <source>Version</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="175"/>
-        <source>Updated successfully</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="175"/>
-        <source>Configuration takes effect after restart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="184"/>
-        <source>Choose folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="101"/>
-        <source>Discover new features and learn useful tips about KLineReview</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="110"/>
-        <source>Help us improve KLineReview by providing feedback</source>
+        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="44"/>
+        <source>Review</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1791,6 +1845,64 @@ Trading Rules:
     <message>
         <location filename="../../common/translator.py" line="10"/>
         <source>Review</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TuShareSettingWidget</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="34"/>
+        <source>API Key: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="69"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="117"/>
+        <source>Interface Testing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="137"/>
+        <source>Interface: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="171"/>
+        <source>Code: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="221"/>
+        <source>Date: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="253"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="289"/>
+        <source>Adjustment: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="321"/>
+        <source>Peiiod: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="361"/>
+        <source>Test</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

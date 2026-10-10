@@ -24,7 +24,7 @@ class ReviewSettingInterface(ScrollArea):
         self.expandLayout = ExpandLayout(self.scrollWidget)
 
         # setting label
-        self.settingLabel = QLabel(self.tr("ReviewSettings"), self)
+        # self.settingLabel = QLabel(self.tr("ReviewSettings"), self)
 
         self.__initWidget()
 
@@ -32,14 +32,14 @@ class ReviewSettingInterface(ScrollArea):
     def __initWidget(self):
         self.resize(1000, 800)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setViewportMargins(0, 80, 0, 20)
+        self.setViewportMargins(0, 0, 0, 20)
         self.setWidget(self.scrollWidget)
         self.setWidgetResizable(True)
         self.setObjectName('reviewSettingInterface')
 
         # initialize style sheet
         self.scrollWidget.setObjectName('scrollWidget')
-        self.settingLabel.setObjectName('settingLabel')
+        # self.settingLabel.setObjectName('settingLabel')
         # StyleSheet.SETTING_INTERFACE.apply(self)
 
         
@@ -55,12 +55,12 @@ class ReviewSettingInterface(ScrollArea):
         )
 
         self.regretModeCard = SwitchSettingCard(
-                    '',
-                    self.tr('Regret mode'),
-                    self.tr('Allow k-line backward operation'),
-                    cfg.regretMode,
-                    self.operationGroup
-                )
+            '',
+            self.tr('Regret mode'),
+            self.tr('Allow k-line backward operation'),
+            cfg.regretMode,
+            self.operationGroup
+        )
 
         self.stepCard = StepSettingCard(
             cfg.fastForwardStep,
@@ -74,7 +74,7 @@ class ReviewSettingInterface(ScrollArea):
         self.__initLayout()
     
     def __initLayout(self):
-        self.settingLabel.move(36, 30)
+        # self.settingLabel.move(36, 30)
 
         # add cards to group
         self.operationGroup.addSettingCard(self.ctfCard)

@@ -24,7 +24,7 @@ class BaostockSettingInterface(ScrollArea):
         self.expandLayout = ExpandLayout(self.scrollWidget)
 
         # setting label
-        self.settingLabel = QLabel(self.tr("BaostockSettings"), self)
+        # self.settingLabel = QLabel(self.tr("BaostockSettings"), self)
 
         self.__initWidget()
 
@@ -39,11 +39,12 @@ class BaostockSettingInterface(ScrollArea):
 
         # initialize style sheet
         self.scrollWidget.setObjectName('scrollWidget')
-        self.settingLabel.setObjectName('settingLabel')
+        # self.settingLabel.setObjectName('settingLabel')
         # StyleSheet.SETTING_INTERFACE.apply(self)
 
         # initialize layout
         self.__initLayout()
     
     def __initLayout(self):
-        self.settingLabel.move(36, 30)
+        # self.settingLabel.move(36, 30)
+        pass

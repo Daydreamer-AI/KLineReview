@@ -24,7 +24,7 @@ class GeneralSettingInterface(ScrollArea):
         self.expandLayout = ExpandLayout(self.scrollWidget)
 
         # setting label
-        self.settingLabel = QLabel(self.tr("GeneralSettings"), self)
+        # self.settingLabel = QLabel(self.tr("GeneralSettings"), self)
 
         # personalization
         self.personalGroup = SettingCardGroup(
@@ -128,14 +128,14 @@ class GeneralSettingInterface(ScrollArea):
     def __initWidget(self):
         self.resize(1000, 800)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setViewportMargins(0, 80, 0, 20)
+        self.setViewportMargins(0, 0, 0, 20)
         self.setWidget(self.scrollWidget)
         self.setWidgetResizable(True)
         self.setObjectName('generalSettingInterface')
 
         # initialize style sheet
         self.scrollWidget.setObjectName('scrollWidget')
-        self.settingLabel.setObjectName('settingLabel')
+        # self.settingLabel.setObjectName('settingLabel')
         StyleSheet.SETTING_INTERFACE.apply(self)
 
         self.micaCard.setEnabled(isWin11())
@@ -145,7 +145,7 @@ class GeneralSettingInterface(ScrollArea):
         self.__connectSignalToSlot()
 
     def __initLayout(self):
-        self.settingLabel.move(36, 30)
+        # self.settingLabel.move(36, 30)
 
         # add cards to group
         self.personalGroup.addSettingCard(self.micaCard)
