@@ -109,4 +109,19 @@ Baostock 项目地址：https://pypi.org/project/baostock/
 
 ### qfluentwidgets
 
-qfluentwidgets 项目地址：https://github.com/zhiyiYo/PyQt-Fluent-Widgets（本项目已将其控件源码内置至 `src/gui/qt_widgets/MComponents/qfluentwidgets`）
+qfluentwidgets 项目地址：https://github.com/zhiyiYo/PyQt-Fluent-Widgets
+（本项目已将其控件源码内置至 `src/gui/qt_widgets/MComponents/qfluentwidgets`）
+
+## 捐赠
+
+**如果你觉得这个项目不错，请作者喝杯咖啡。**
+
+<div align="center">
+  <img src="src/resources/images/donate/WeChat.jpg" width="300" alt="WeChat" style="margin-right: 60px;">
+  <img src="src/resources/images/donate/Airplay.jpg" width="300" alt="Airplay" style="margin-right: 60px;">
+  <img src="src/resources/images/donate/binance.jpg" width="300" alt="binance" style="margin-right: 60px;">
+  <img src="src/resources/images/donate/OKX.jpg" width="300" alt="OKX" style="margin-right: 60px;">
+</div>
+
+**链上钱包：**
+[链上钱包地址.md](docs/其他/捐赠/链上/链上钱包地址.md)

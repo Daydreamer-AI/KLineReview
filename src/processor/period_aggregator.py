@@ -145,6 +145,10 @@ def _get_base_timestamps(base_df):
     return pd.to_datetime(time_str, errors='coerce')
 
 
+# 公开别名：复盘“前进补全未走完 bar”需按同一规则解析基周期时间戳，避免重复实现
+get_base_timestamps = _get_base_timestamps
+
+
 def _aggregate_group(grp, label_t, complete, period):
     """将同一周期内的基周期 bar 聚合为一行上级周期 bar。"""
     row = {

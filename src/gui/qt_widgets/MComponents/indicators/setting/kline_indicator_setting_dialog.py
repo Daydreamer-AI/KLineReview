@@ -76,7 +76,7 @@ class KLineIndicatorSettingDialog(QDialog):
 
         # 遍历MA配置并设置UI
         for id, ma_setting in self.dict_ma_setting_user.items():
-            # self.logger.info(f"ma_setting--id: {ma_setting.id}, period: {ma_setting.period}, name: {ma_setting.name}, visible: {ma_setting.visible}, line_width: {ma_setting.line_width}, color: {ma_setting.color}, color_hex: {ma_setting.color_hex}")
+            self.logger.info(f"ma_setting--id: {ma_setting.id}, period: {ma_setting.period}, name: {ma_setting.name}, visible: {ma_setting.visible}, line_width: {ma_setting.line_width}, color: {ma_setting.color}, color_hex: {ma_setting.color_hex}")
             if id in self.dict_ma_setting_object.keys():
                 ma_setting_object = self.dict_ma_setting_object[id]
                 ma_setting_object.period_lineedit_obj.setText(str(ma_setting.period))

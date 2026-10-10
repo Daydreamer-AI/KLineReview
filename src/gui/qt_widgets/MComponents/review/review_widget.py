@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, uic, QtGui
 from PyQt5.QtWidgets import QWidget, QCompleter, QMessageBox, QListWidget, QListWidgetItem, QButtonGroup
-from PyQt5.QtCore import QDate, QFile, Qt, pyqtSignal
+from PyQt5.QtCore import QDate, QFile, Qt, pyqtSignal, QEvent
 
 import random
 import sys
@@ -14,8 +14,8 @@ from gui.qt_widgets.MComponents.review.demo_trading_record_widget import DemoTra
 from processor.baostock_processor import BaoStockProcessor
 from processor.period_aggregator import aggregate_period
 from manager.bao_stock_data_manager import BaostockDataManager
-from manager.period_manager import TimePeriod
-from manager.review_demo_trading_manager import ReviewDemoTradingManager
+from manager.period_manager import TimePeriod, _DEFAULT_LOAD_PERIODS, _BASE_LOAD_PERIODS
+from manager.review_demo_trading_manager import review_demo_trading_manager
 
 from common.common_api import *
 from gui.qt_widgets.MComponents.review import income_chart_widget as _income_chart_widget_module
@@ -34,27 +34,6 @@ ensure_promoted_widgets()
 class ReviewWidget(QWidget):
 
     random_data_generated = pyqtSignal(object)
-
-    # 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
-    _DEFAULT_LOAD_PERIODS = [
-        # TimePeriod.MINUTE_5,
-        # TimePeriod.MINUTE_10,
-        # TimePeriod.MINUTE_15,
-        # TimePeriod.MINUTE_30,
-        # TimePeriod.MINUTE_45,
-        # TimePeriod.MINUTE_60,
-        # TimePeriod.MINUTE_90,
-        # TimePeriod.MINUTE_120,
-        TimePeriod.DAY,
-        TimePeriod.WEEK,
-        TimePeriod.MONTH,
-    ]
-
-    # 基周期：远程只拉取基周期，周线等上级周期由基周期本地聚合生成（不依赖远程上级周期接口）
-    _BASE_LOAD_PERIODS = [
-        TimePeriod.DAY
-        # , TimePeriod.MINUTE_5,
-    ]
 
     def __init__(self, parent=None):
         super(ReviewWidget, self).__init__(parent) 
@@ -75,13 +54,13 @@ class ReviewWidget(QWidget):
         self.current_load_code = ""
         self.current_load_period = None
         self._is_loading = False
-        self._load_periods = list(self._DEFAULT_LOAD_PERIODS)
-        self._base_load_periods = list(self._BASE_LOAD_PERIODS)
+        self._load_periods = list(_DEFAULT_LOAD_PERIODS)
+        self._base_load_periods = list(_BASE_LOAD_PERIODS)
         self._fetch_pending_periods = []
         self._fetch_failed_periods = []
         self._fetched_period_data = {}
 
-        self.demo_trading_manager = ReviewDemoTradingManager()
+        self.demo_trading_manager = review_demo_trading_manager
 
     def init_ui(self):
         from gui.qt_widgets.MComponents.indicators.indicators_view_widget import IndicatorsViewWidget
@@ -177,6 +156,8 @@ class ReviewWidget(QWidget):
         self.demo_trading_manager.sig_trading_status_changed.connect(self.slot_demo_trading_manager_sig_trading_status_changed)
         self.demo_trading_record_widget.sig_btn_return_clicked.connect(self.slot_demo_trading_record_widget_sig_btn_return_clicked)
 
+        cfg.regretMode.valueChanged.connect(self.slot_regretModeChanged)
+
     def load_qss(self, theme="default"):
         qss_file_name = f":/theme/{theme}/mcomponents/review_widget.qss"
         self.logger.info(f"回放模块样式表文件路径：{qss_file_name}")
@@ -189,6 +170,14 @@ class ReviewWidget(QWidget):
             self.logger.warning("无法打开回放模块样式表文件")
         qssFile.close()
 
+    def hideEvent(self, event):
+        self.logger.info("ReviewWidget控件隐藏")
+
+        if self.btn_play.property("is_play"):
+            self.logger.info("回放模块离开事件，暂停播放")
+            self.slot_btn_play_clicked()
+
+        super().hideEvent(event)
 
     def preload_data(self, df_row):
         self.logger.info(f"回放预加载数据: {df_row}")
@@ -240,9 +229,9 @@ class ReviewWidget(QWidget):
         self.btn_date_select.setEnabled(True if b_init else not is_playing)
         self.btn_period_select.setEnabled(True if b_init else not is_playing)
 
-        self.btn_back_to_front.setEnabled(not is_playing)
-        self.btn_back_ten.setEnabled(not is_playing)
-        self.btn_back.setEnabled(not is_playing)
+        self.btn_back_to_front.setEnabled(not is_playing and cfg.regretMode.value)
+        self.btn_back_ten.setEnabled(not is_playing and cfg.regretMode.value)
+        self.btn_back.setEnabled(not is_playing and cfg.regretMode.value)
         self.btn_move_on.setEnabled(not is_playing)
         self.btn_move_on_10.setEnabled(not is_playing)
         self.btn_move_to_last.setEnabled(not is_playing)
@@ -433,6 +422,7 @@ class ReviewWidget(QWidget):
         period = self._fetch_pending_periods.pop(0)
         fetch_start_date = self._get_fetch_start_date(date, period)
 
+        # TODO: 添加其他数据来源，如：AKShare、TuShare等
         from thread.baostock_data_fetch_task import BaostockDataFetchTask
         from thread.task_pool import get_default_task_pool
 
@@ -792,27 +782,33 @@ class ReviewWidget(QWidget):
 
     def slot_btn_play_clicked(self):
         if self.btn_play.property("is_play"):
-            self.logger.info("暂停播放")
-            self.indicators_view_widget.pause_animation()
+            self.pause_kline_review()
             self.btn_play.setProperty("is_play", False)
-            self.btn_play.setIcon(Icon.PLAY)
-            self.playing_enabled(False)
         else:
-            self.logger.info("开始播放")
-            self.indicators_view_widget.start_animation()
+            self.play_kline_review()
             self.btn_play.setProperty("is_play", True)
-            self.btn_play.setIcon(Icon.PAUSE)
-            self.playing_enabled(True)
 
         self.btn_play.style().unpolish(self.btn_play)
         self.btn_play.style().polish(self.btn_play)
         self.btn_play.update()
 
+    def play_kline_review(self):
+        self.logger.info("开始播放")
+        self.indicators_view_widget.start_animation()
+        self.btn_play.setIcon(Icon.PAUSE)
+        self.playing_enabled(True)
+
+    def pause_kline_review(self):
+        self.logger.info("暂停播放")
+        self.indicators_view_widget.pause_animation()
+        self.btn_play.setIcon(Icon.PLAY)
+        self.playing_enabled(False)
+
     def slot_btn_back_to_front_clicked(self):
         self.indicators_view_widget.back_to_front()
 
     def slot_btn_back_ten_clicked(self):
-        self.indicators_view_widget.step_backward(10)
+        self.indicators_view_widget.step_backward(cfg.fastForwardStep.value) 
 
     def slot_btn_back_clicked(self):
         self.indicators_view_widget.step_backward()
@@ -821,7 +817,7 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.step_forward()
 
     def slot_btn_move_on_10_clicked(self):
-        self.indicators_view_widget.step_forward(10)
+        self.indicators_view_widget.step_forward(cfg.fastForwardStep.value)
 
     def slot_btn_move_to_last_clicked(self):
         self.indicators_view_widget.back_to_end()
@@ -970,6 +966,13 @@ class ReviewWidget(QWidget):
 
     def slot_theme_changed_finished(self):
         self.logger.info(f"主题已切换为: {cfg.theme}")
+
+    def slot_regretModeChanged(self):
+        self.logger.info(f"回退模式已切换为: {cfg.regretMode.value}")
+        is_playing = self.btn_play.property("is_play")
+        self.btn_back_to_front.setEnabled(not is_playing and cfg.regretMode.value)
+        self.btn_back_ten.setEnabled(not is_playing and cfg.regretMode.value)
+        self.btn_back.setEnabled(not is_playing and cfg.regretMode.value)
 
 
 # uic 按 .ui 的 <header> 裸模块名导入提升控件；

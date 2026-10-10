@@ -98,7 +98,6 @@ class TimePeriod(Enum):
     def get_table_name(self):
         """获取对应级别的数据库表名"""
         return f"stock_data_{self.value}"
-    
 
     # ================= 比较运算符 =================
 
@@ -148,3 +147,23 @@ class ReviewPeriodProcessData(object):
         self.current_min_index = None
         self.current_max_index = None
 
+# 复盘默认后台加载周期（预留调整接口，后续可改为用户配置）
+_DEFAULT_LOAD_PERIODS = [
+    # TimePeriod.MINUTE_5,
+    # TimePeriod.MINUTE_10,
+    # TimePeriod.MINUTE_15,
+    # TimePeriod.MINUTE_30,
+    # TimePeriod.MINUTE_45,
+    # TimePeriod.MINUTE_60,
+    # TimePeriod.MINUTE_90,
+    # TimePeriod.MINUTE_120,
+    TimePeriod.DAY,
+    TimePeriod.WEEK,
+    TimePeriod.MONTH,
+]
+
+# 基周期：远程只拉取基周期，周线等上级周期由基周期本地聚合生成（不依赖远程上级周期接口）
+_BASE_LOAD_PERIODS = [
+    TimePeriod.DAY
+    # , TimePeriod.MINUTE_5,
+]

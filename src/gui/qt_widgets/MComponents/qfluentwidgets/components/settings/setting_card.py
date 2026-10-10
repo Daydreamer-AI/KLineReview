@@ -10,6 +10,7 @@ from ..dialog_box.color_dialog import ColorDialog
 from ..widgets.combo_box import ComboBox
 from ..widgets.switch_button import SwitchButton, IndicatorPosition
 from ..widgets.slider import Slider
+from ..widgets.spin_box import SpinBox
 from ..widgets.icon_widget import IconWidget
 from ..widgets.button import HyperlinkButton
 from ...common.style_sheet import FluentStyleSheet
@@ -447,3 +448,49 @@ class ComboBoxSettingCard(SettingCard):
 
         self.comboBox.setCurrentText(self.optionToText[value])
         qconfig.set(self.configItem, value)
+
+class StepSettingCard(SettingCard):
+    """ Setting card with a step lineedit """
+
+    valueChanged = pyqtSignal(int)
+
+    def __init__(self, configItem, icon: Union[str, QIcon, FluentIconBase], title, content=None, parent=None):
+        """
+        Parameters
+        ----------
+        configItem: RangeConfigItem
+            configuration item operated by the card
+
+        icon: str | QIcon | FluentIconBase
+            the icon to be drawn
+
+        title: str
+            the title of card
+
+        content: str
+            the content of card
+
+        parent: QWidget
+            parent widget
+        """
+        super().__init__(icon, title, content, parent)
+        self.configItem = configItem
+
+        self.spin_box = SpinBox(self)
+        self.spin_box.setRange(*configItem.range)
+        self.spin_box.setValue(configItem.value)
+
+        self.hBoxLayout.addStretch(1)
+        self.hBoxLayout.addWidget(self.spin_box, 0, Qt.AlignRight)
+
+        configItem.valueChanged.connect(self.setValue)
+        self.spin_box.valueChanged.connect(self.__onValueChanged)
+        
+    def __onValueChanged(self, value: int):
+        """ slider value changed slot """
+        self.setValue(value)
+        self.valueChanged.emit(value)
+
+    def setValue(self, value):
+        qconfig.set(self.configItem, value)
+        self.spin_box.setValue(value)

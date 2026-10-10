@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>AKShareSettingInterface</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/akshare_setting_interface.py" line="27"/>
+        <source>AKShareSettings</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>AmountSettingDialog</name>
     <message>
         <location filename="../../gui/qt_widgets/MComponents/indicators/setting/amount_setting_dialog.py" line="109"/>
@@ -320,37 +328,37 @@ MA1、MA2分别为成交额的5日、10日均线；
 <context>
     <name>DemoTradingRecord</name>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="39"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="40"/>
         <source>No Trade</source>
         <translation>未交易</translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="41"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="42"/>
         <source>Buy Pending</source>
         <translation>买入挂单</translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="43"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="44"/>
         <source>Buy Canceled</source>
         <translation>买入撤单</translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="45"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="46"/>
         <source>Sell Pending</source>
         <translation>卖出挂单</translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="47"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="48"/>
         <source>Sell Canceled</source>
         <translation>卖出撤单</translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="49"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="50"/>
         <source>Holding</source>
         <translation>持有中</translation>
     </message>
     <message>
-        <location filename="../../manager/review_demo_trading_manager.py" line="51"/>
+        <location filename="../../manager/review_demo_trading_manager.py" line="52"/>
         <source>Closed</source>
         <translation>交易完成</translation>
     </message>
@@ -499,14 +507,205 @@ MA1、MA2分别为成交额的5日、10日均线；
     </message>
 </context>
 <context>
+    <name>DonateDialog</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/donate_dialog.py" line="40"/>
+        <source>General</source>
+        <translation>通用</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/donate_dialog.py" line="41"/>
+        <source>OnChain</source>
+        <translation>链上</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/DonateDialog.ui" line="14"/>
+        <source>Donate</source>
+        <translation>捐赠</translation>
+    </message>
+</context>
+<context>
+    <name>GeneralSettingInterface</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
+        <source>Personalization</source>
+        <translation>个性化</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="34"/>
+        <source>Mica effect</source>
+        <translation>云母效果</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="34"/>
+        <source>Apply semi transparent to windows and surfaces</source>
+        <translation>窗口和表面显示半透明</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
+        <source>Application theme</source>
+        <translation>应用主题</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
+        <source>Change the appearance of your application</source>
+        <translation>调整应用的外观</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
+        <source>Light</source>
+        <translation>浅色</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
+        <source>Dark</source>
+        <translation>深色</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
+        <source>Use system setting</source>
+        <translation>跟随系统设置</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="52"/>
+        <source>Theme color</source>
+        <translation>主题色</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="52"/>
+        <source>Change the theme color of you application</source>
+        <translation>调整应用主题色</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="59"/>
+        <source>Interface zoom</source>
+        <translation>界面缩放</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="59"/>
+        <source>Change the size of widgets and fonts</source>
+        <translation>调整小部件和字体的大小</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
+        <source>Language</source>
+        <translation>语言</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
+        <source>Set your preferred language for UI</source>
+        <translation>选择界面所使用的语言</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
+        <source>Material</source>
+        <translation>材料</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="82"/>
+        <source>Acrylic blur radius</source>
+        <translation>亚克力磨砂半径</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="82"/>
+        <source>The greater the radius, the more blurred the image</source>
+        <translation>磨砂半径越大，图像越模糊</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
+        <source>Software update</source>
+        <translation>软件更新</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="93"/>
+        <source>Check for updates when the application starts</source>
+        <translation>在应用程序启动时检查更新</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="93"/>
+        <source>The new version will be more stable and have more features</source>
+        <translation>新版本将更加稳定并且拥有更多功能（建议启用）</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
+        <source>About</source>
+        <translation>关于</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
+        <source>Open help page</source>
+        <translation>打开帮助页面</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
+        <source>Help</source>
+        <translation>帮助</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
+        <source>Discover new features and learn useful tips about KLineReview</source>
+        <translation>发现新功能并了解有关软件的使用技巧</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="112"/>
+        <source>Provide feedback</source>
+        <translation>提供反馈</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="112"/>
+        <source>Help us improve KLineReview by providing feedback</source>
+        <translation>通过提供反馈帮助我们改进软件</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
+        <source>Check update</source>
+        <translation>检查更新</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
+        <source>Copyright</source>
+        <translation>版权所有</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
+        <source>Version</source>
+        <translation>当前版本 </translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="186"/>
+        <source>Updated successfully</source>
+        <translation>更新成功</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="186"/>
+        <source>Configuration takes effect after restart</source>
+        <translation>配置重启后生效</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="195"/>
+        <source>Choose folder</source>
+        <translation>选择目录</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="128"/>
+        <source>Donate</source>
+        <translation>捐赠</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="128"/>
+        <source>Donate to KLineReview</source>
+        <translation>向KLineReview捐赠</translation>
+    </message>
+</context>
+<context>
     <name>IncomeChartWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="230"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="235"/>
         <source>Return</source>
         <translation>收益率</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="234"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="239"/>
         <source>Yield Curve</source>
         <translation>收益率曲线</translation>
     </message>
@@ -531,27 +730,27 @@ MA1、MA2分别为成交额的5日、10日均线；
         <translation>胜率</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="316"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="321"/>
         <source>Start</source>
         <translation>起始点</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="317"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="322"/>
         <source>Trade No.</source>
         <translation>交易序号：</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="318"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="323"/>
         <source>Single Return</source>
         <translation>单次收益率：</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="319"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="324"/>
         <source>Cumulative Return</source>
         <translation>累计总收益率：</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="320"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="325"/>
         <source>Win Rate</source>
         <translation>当前胜率：</translation>
     </message>
@@ -559,7 +758,7 @@ MA1、MA2分别为成交额的5日、10日均线；
 <context>
     <name>IndicatorsViewWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/indicators_view_widget.py" line="142"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/indicators_view_widget.py" line="147"/>
         <source>1D</source>
         <translation>日线</translation>
     </message>
@@ -734,7 +933,7 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="604"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="610"/>
         <source>2</source>
         <translation></translation>
     </message>
@@ -754,64 +953,64 @@ The MA (Moving Average) indicator tracks price trends. Trends tend to persist; t
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="377"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="380"/>
         <source>20</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="416"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="419"/>
         <source>MA4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="432"/>
-        <source>24</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="471"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="474"/>
         <source>MA5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="484"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="435"/>
         <source>30</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="523"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="529"/>
         <source>MA6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="539"/>
-        <source>54</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="578"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="584"/>
         <source>MA7</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="591"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="490"/>
         <source>60</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="630"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="636"/>
         <source>Enable</source>
         <translation>启用</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="697"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="703"/>
         <source>Reset</source>
         <translation>重置</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="723"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="729"/>
         <source>Apply</source>
         <translation>应用</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="545"/>
+        <source>120</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/setting/KLineIndicatorSettingDialog.ui" line="597"/>
+        <source>250</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1290,27 +1489,27 @@ MACD指数平滑异同移动平均线为两条长、短的平滑平均线。
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="101"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="88"/>
         <source>Home</source>
         <translation>主页</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="102"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="89"/>
         <source>Review</source>
         <translation>回放</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="110"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="92"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="173"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="153"/>
         <source>Prompt</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/main/main_window.py" line="174"/>
+        <location filename="../../gui/qt_widgets/main/main_window.py" line="154"/>
         <source>Are you sure you want to exit?</source>
         <translation>确定要退出软件吗？</translation>
     </message>
@@ -1324,9 +1523,57 @@ MACD指数平滑异同移动平均线为两条长、短的平滑平均线。
     </message>
 </context>
 <context>
+    <name>ReviewSettingInterface</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="47"/>
+        <source>Operation</source>
+        <translation>操作</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="49"/>
+        <source>Complete the forward</source>
+        <translation>补全前进</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="49"/>
+        <source>Complete the current unfinished candlestick; turn on to also move on to the next one</source>
+        <translation>补全当前未走完K线后自动前进到下一根K线</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="66"/>
+        <source>Regret mode</source>
+        <translation>后悔模式</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="66"/>
+        <source>Allow k-line backward operation</source>
+        <translation>允许K线后退操作</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="74"/>
+        <source>Fast forward step</source>
+        <translation>快进步数</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="74"/>
+        <source>From {0} to {1}</source>
+        <translation>从 {0} 到 {1}</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <source>Open first</source>
+        <translation>展示开盘态</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <source>Single-step forward shows the open price first (unfinished), click again to complete it; when on, &quot;Complete the forward&quot; is ignored</source>
+        <translation>手动单步前进时先展示开盘价</translation>
+    </message>
+</context>
+<context>
     <name>ReviewWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/review_widget.py" line="92"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/review_widget.py" line="73"/>
         <source>Search stock code</source>
         <translation>在此搜索代码</translation>
     </message>
@@ -1617,169 +1864,14 @@ RSI的基本原理是在一个正常的股市中，多空买卖双方的力道�
 <context>
     <name>SettingInterface</name>
     <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="27"/>
-        <source>Settings</source>
-        <translation>设置</translation>
+        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="43"/>
+        <source>General</source>
+        <translation>通用</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="30"/>
-        <source>Personalization</source>
-        <translation>个性化</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="32"/>
-        <source>Mica effect</source>
-        <translation>云母效果</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="32"/>
-        <source>Apply semi transparent to windows and surfaces</source>
-        <translation>窗口和表面显示半透明</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="39"/>
-        <source>Application theme</source>
-        <translation>应用主题</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="39"/>
-        <source>Change the appearance of your application</source>
-        <translation>调整应用的外观</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="39"/>
-        <source>Light</source>
-        <translation>浅色</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="39"/>
-        <source>Dark</source>
-        <translation>深色</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="68"/>
-        <source>Use system setting</source>
-        <translation>跟随系统设置</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="50"/>
-        <source>Theme color</source>
-        <translation>主题色</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="50"/>
-        <source>Change the theme color of you application</source>
-        <translation>调整应用主题色</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="57"/>
-        <source>Interface zoom</source>
-        <translation>界面缩放</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="57"/>
-        <source>Change the size of widgets and fonts</source>
-        <translation>调整小部件和字体的大小</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="68"/>
-        <source>Language</source>
-        <translation>语言</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="68"/>
-        <source>Set your preferred language for UI</source>
-        <translation>选择界面所使用的语言</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="78"/>
-        <source>Material</source>
-        <translation>材料</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="80"/>
-        <source>Acrylic blur radius</source>
-        <translation>亚克力磨砂半径</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="80"/>
-        <source>The greater the radius, the more blurred the image</source>
-        <translation>磨砂半径越大，图像越模糊</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="89"/>
-        <source>Software update</source>
-        <translation>软件更新</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="91"/>
-        <source>Check for updates when the application starts</source>
-        <translation>在应用程序启动时检查更新</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="91"/>
-        <source>The new version will be more stable and have more features</source>
-        <translation>新版本将更加稳定并且拥有更多功能（建议启用）</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="117"/>
-        <source>About</source>
-        <translation>关于</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="101"/>
-        <source>Open help page</source>
-        <translation>打开帮助页面</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="101"/>
-        <source>Help</source>
-        <translation>帮助</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="110"/>
-        <source>Provide feedback</source>
-        <translation>提供反馈</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="117"/>
-        <source>Check update</source>
-        <translation>检查更新</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="117"/>
-        <source>Copyright</source>
-        <translation>版权所有</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="117"/>
-        <source>Version</source>
-        <translation>当前版本 </translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="175"/>
-        <source>Updated successfully</source>
-        <translation>更新成功</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="175"/>
-        <source>Configuration takes effect after restart</source>
-        <translation>配置重启后生效</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="184"/>
-        <source>Choose folder</source>
-        <translation>选择目录</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="101"/>
-        <source>Discover new features and learn useful tips about KLineReview</source>
-        <translation>发现新功能并了解有关软件的使用技巧</translation>
-    </message>
-    <message>
-        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="110"/>
-        <source>Help us improve KLineReview by providing feedback</source>
-        <translation>通过提供反馈帮助我们改进软件</translation>
+        <location filename="../../gui/qt_widgets/setting/setting_interface.py" line="44"/>
+        <source>Review</source>
+        <translation>回放</translation>
     </message>
 </context>
 <context>
@@ -1816,6 +1908,64 @@ RSI的基本原理是在一个正常的股市中，多空买卖双方的力道�
         <location filename="../../common/translator.py" line="10"/>
         <source>Review</source>
         <translation>回放</translation>
+    </message>
+</context>
+<context>
+    <name>TuShareSettingWidget</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="14"/>
+        <source>Form</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="34"/>
+        <source>API Key: </source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="69"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="117"/>
+        <source>Interface Testing</source>
+        <translation>接口测试</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="137"/>
+        <source>Interface: </source>
+        <translation>接口：</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="171"/>
+        <source>Code: </source>
+        <translation>代码：</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="221"/>
+        <source>Date: </source>
+        <translation>日期：</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="253"/>
+        <source>-</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="289"/>
+        <source>Adjustment: </source>
+        <translation>复权方式：</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="321"/>
+        <source>Peiiod: </source>
+        <translation>周期：</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/tushare_setting/TuShareSettingWidget.ui" line="361"/>
+        <source>Test</source>
+        <translation>测试</translation>
     </message>
 </context>
 <context>

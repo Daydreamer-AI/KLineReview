@@ -1,5 +1,6 @@
 akshare
 baostock
+tushare
 PyQt5
 PyQt5-Frameless-Window
 PyQtGraph
@@ -10,3 +11,4 @@ darkdetect
 colorthief
 scipy
 pillow
+dotenv
