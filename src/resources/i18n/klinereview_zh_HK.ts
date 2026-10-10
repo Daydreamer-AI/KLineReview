@@ -500,165 +500,193 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
     </message>
 </context>
 <context>
+    <name>DonateDialog</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/donate_dialog.py" line="40"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/donate_dialog.py" line="41"/>
+        <source>OnChain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/DonateDialog.ui" line="14"/>
+        <source>Donate</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GeneralSettingInterface</name>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="30"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
         <source>Personalization</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="34"/>
         <source>Mica effect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="34"/>
         <source>Apply semi transparent to windows and surfaces</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
         <source>Application theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
         <source>Change the appearance of your application</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
         <source>Light</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
         <source>Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
         <source>Use system setting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="50"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="52"/>
         <source>Theme color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="50"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="52"/>
         <source>Change the theme color of you application</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="57"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="59"/>
         <source>Interface zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="57"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="59"/>
         <source>Change the size of widgets and fonts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
         <source>Set your preferred language for UI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="78"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
         <source>Material</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="82"/>
         <source>Acrylic blur radius</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="82"/>
         <source>The greater the radius, the more blurred the image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="89"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
         <source>Software update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="93"/>
         <source>Check for updates when the application starts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="93"/>
         <source>The new version will be more stable and have more features</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
         <source>Open help page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
         <source>Discover new features and learn useful tips about KLineReview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="110"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="112"/>
         <source>Provide feedback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="110"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="112"/>
         <source>Help us improve KLineReview by providing feedback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
         <source>Check update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
         <source>Copyright</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
         <source>Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="175"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="186"/>
         <source>Updated successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="175"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="186"/>
         <source>Configuration takes effect after restart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="184"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="195"/>
         <source>Choose folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="128"/>
+        <source>Donate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="128"/>
+        <source>Donate to KLineReview</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

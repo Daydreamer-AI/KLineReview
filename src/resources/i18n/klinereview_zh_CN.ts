@@ -507,166 +507,194 @@ MA1、MA2分别为成交额的5日、10日均线；
     </message>
 </context>
 <context>
+    <name>DonateDialog</name>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/donate_dialog.py" line="40"/>
+        <source>General</source>
+        <translation>通用</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/donate_dialog.py" line="41"/>
+        <source>OnChain</source>
+        <translation>链上</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/donate/DonateDialog.ui" line="14"/>
+        <source>Donate</source>
+        <translation>捐赠</translation>
+    </message>
+</context>
+<context>
     <name>GeneralSettingInterface</name>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="30"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
         <source>Personalization</source>
         <translation>个性化</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="34"/>
         <source>Mica effect</source>
         <translation>云母效果</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="32"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="34"/>
         <source>Apply semi transparent to windows and surfaces</source>
         <translation>窗口和表面显示半透明</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
         <source>Application theme</source>
         <translation>应用主题</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
         <source>Change the appearance of your application</source>
         <translation>调整应用的外观</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
         <source>Light</source>
         <translation>浅色</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="39"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="41"/>
         <source>Dark</source>
         <translation>深色</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
         <source>Use system setting</source>
         <translation>跟随系统设置</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="50"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="52"/>
         <source>Theme color</source>
         <translation>主题色</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="50"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="52"/>
         <source>Change the theme color of you application</source>
         <translation>调整应用主题色</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="57"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="59"/>
         <source>Interface zoom</source>
         <translation>界面缩放</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="57"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="59"/>
         <source>Change the size of widgets and fonts</source>
         <translation>调整小部件和字体的大小</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="68"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="70"/>
         <source>Set your preferred language for UI</source>
         <translation>选择界面所使用的语言</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="78"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
         <source>Material</source>
         <translation>材料</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="82"/>
         <source>Acrylic blur radius</source>
         <translation>亚克力磨砂半径</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="80"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="82"/>
         <source>The greater the radius, the more blurred the image</source>
         <translation>磨砂半径越大，图像越模糊</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="89"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
         <source>Software update</source>
         <translation>软件更新</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="93"/>
         <source>Check for updates when the application starts</source>
         <translation>在应用程序启动时检查更新</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="91"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="93"/>
         <source>The new version will be more stable and have more features</source>
         <translation>新版本将更加稳定并且拥有更多功能（建议启用）</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
         <source>Open help page</source>
         <translation>打开帮助页面</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="101"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="103"/>
         <source>Discover new features and learn useful tips about KLineReview</source>
         <translation>发现新功能并了解有关软件的使用技巧</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="110"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="112"/>
         <source>Provide feedback</source>
         <translation>提供反馈</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="110"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="112"/>
         <source>Help us improve KLineReview by providing feedback</source>
         <translation>通过提供反馈帮助我们改进软件</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
         <source>Check update</source>
         <translation>检查更新</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
         <source>Copyright</source>
         <translation>版权所有</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="117"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="119"/>
         <source>Version</source>
         <translation>当前版本 </translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="175"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="186"/>
         <source>Updated successfully</source>
         <translation>更新成功</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="175"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="186"/>
         <source>Configuration takes effect after restart</source>
         <translation>配置重启后生效</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="184"/>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="195"/>
         <source>Choose folder</source>
         <translation>选择目录</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="128"/>
+        <source>Donate</source>
+        <translation>捐赠</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/general_setting_interface.py" line="128"/>
+        <source>Donate to KLineReview</source>
+        <translation>向KLineReview捐赠</translation>
     </message>
 </context>
 <context>
