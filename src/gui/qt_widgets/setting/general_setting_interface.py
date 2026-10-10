@@ -14,6 +14,8 @@ from common.config import cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, is
 from common.signal_bus import signalBus
 from common.style_sheet import StyleSheet
 
+from .donate.donate_dialog import DonateDialog
+
 
 class GeneralSettingInterface(ScrollArea):
     """ Setting interface """
@@ -123,6 +125,14 @@ class GeneralSettingInterface(ScrollArea):
             self.aboutGroup
         )
 
+        self.donateCard = PrimaryPushSettingCard(
+            self.tr('Donate'),
+            FIF.CAFE,
+            self.tr('Donate'),
+            self.tr('Donate to KLineReview'),
+            self.aboutGroup
+        )
+
         self.__initWidget()
 
     def __initWidget(self):
@@ -161,6 +171,7 @@ class GeneralSettingInterface(ScrollArea):
         self.aboutGroup.addSettingCard(self.helpCard)
         self.aboutGroup.addSettingCard(self.feedbackCard)
         self.aboutGroup.addSettingCard(self.aboutCard)
+        self.aboutGroup.addSettingCard(self.donateCard)
 
         # add setting card group to layout
         self.expandLayout.setSpacing(28)
@@ -201,3 +212,6 @@ class GeneralSettingInterface(ScrollArea):
         # about
         self.feedbackCard.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl(FEEDBACK_URL)))
+
+        self.donateCard.clicked.connect(
+            lambda: DonateDialog().exec())

@@ -219,5 +219,21 @@
         <file>images/icons/close_white.svg</file>
         <file>images/icons/return_white.svg</file>
         <file>images/icons/return_black.svg</file>
+        <file>images/donate/Airplay.jpg</file>
+        <file>images/donate/binance.jpg</file>
+        <file>images/donate/OKX.jpg</file>
+        <file>images/donate/WeChat.jpg</file>
+        <file>images/donate/on_chain/Arbitrum.png</file>
+        <file>images/donate/on_chain/Arc.png</file>
+        <file>images/donate/on_chain/Base.png</file>
+        <file>images/donate/on_chain/Bitcoin.png</file>
+        <file>images/donate/on_chain/BNBChain.png</file>
+        <file>images/donate/on_chain/Ethereum.png</file>
+        <file>images/donate/on_chain/Linea.png</file>
+        <file>images/donate/on_chain/OP.png</file>
+        <file>images/donate/on_chain/Polygon.png</file>
+        <file>images/donate/on_chain/Sei.png</file>
+        <file>images/donate/on_chain/Solana.png</file>
+        <file>images/donate/on_chain/Tron.png</file>
     </qresource>
 </RCC>
