@@ -64,7 +64,7 @@ class Config(QConfig):
 
     # Review
     ctfEnabled = ConfigItem("Review", "ctfEnabled", False, BoolValidator())
-    openFirst = ConfigItem("Review", "openFirst", False, BoolValidator())
+    openFirst = ConfigItem("Review", "openFirst", True, BoolValidator())
     regretMode = ConfigItem("Review", "regretMode", False, BoolValidator())
     fastForwardStep = RangeConfigItem("Review", "fastForwardStep", 3, RangeValidator(3, 10))
 
@@ -72,7 +72,7 @@ class Config(QConfig):
 
 YEAR = 2026
 AUTHOR = "牛马不是马"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 HELP_URL = "https://github.com/Daydreamer-AI/KLineReview"
 REPO_URL = "https://github.com/Daydreamer-AI/KLineReview"
 EXAMPLE_URL = "https://github.com/Daydreamer-AI/KLineReview"
