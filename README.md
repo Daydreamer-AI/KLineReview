@@ -117,10 +117,10 @@ qfluentwidgets 项目地址：https://github.com/zhiyiYo/PyQt-Fluent-Widgets
 **如果你觉得这个项目不错，请作者喝杯咖啡。**
 
 <div align="center">
-  <img src="docs/其他/捐赠/微信.jpg" width="300" alt="微信" style="margin-right: 60px;">
-  <img src="docs/其他/捐赠/支付宝.jpg" width="300" alt="支付宝" style="margin-right: 60px;">
-  <img src="docs/其他/捐赠/币安.jpg" width="300" alt="币安" style="margin-right: 60px;">
-  <img src="docs/其他/捐赠/欧易.jpg" width="300" alt="欧易" style="margin-right: 60px;">
+  <img src="src/resources/images/donate/WeChat.jpg" width="300" alt="WeChat" style="margin-right: 60px;">
+  <img src="src/resources/images/donate/Airplay.jpg" width="300" alt="Airplay" style="margin-right: 60px;">
+  <img src="src/resources/images/donate/binance.jpg" width="300" alt="binance" style="margin-right: 60px;">
+  <img src="src/resources/images/donate/OKX.jpg" width="300" alt="OKX" style="margin-right: 60px;">
 </div>
 
 **链上钱包：**
