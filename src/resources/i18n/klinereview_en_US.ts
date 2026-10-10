@@ -665,12 +665,12 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
 <context>
     <name>IncomeChartWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="231"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="235"/>
         <source>Return</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="235"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="239"/>
         <source>Yield Curve</source>
         <translation type="unfinished"></translation>
     </message>
@@ -695,27 +695,27 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="317"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="321"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="318"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="322"/>
         <source>Trade No.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="319"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="323"/>
         <source>Single Return</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="320"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="324"/>
         <source>Cumulative Return</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="321"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="325"/>
         <source>Win Rate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -723,7 +723,7 @@ MA1 and MA2 are the 5-day and 10-day moving averages of turnover, respectively.
 <context>
     <name>IndicatorsViewWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/indicators_view_widget.py" line="144"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/indicators_view_widget.py" line="147"/>
         <source>1D</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1491,23 +1491,33 @@ Trading Principles:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="66"/>
         <source>Regret mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="66"/>
         <source>Allow k-line backward operation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="65"/>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="74"/>
         <source>Fast forward step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="65"/>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="74"/>
         <source>From {0} to {1}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <source>Open first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <source>Single-step forward shows the open price first (unfinished), click again to complete it; when on, &quot;Complete the forward&quot; is ignored</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -672,12 +672,12 @@ MA1、MA2分别为成交额的5日、10日均线；
 <context>
     <name>IncomeChartWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="231"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="235"/>
         <source>Return</source>
         <translation>收益率</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="235"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="239"/>
         <source>Yield Curve</source>
         <translation>收益率曲线</translation>
     </message>
@@ -702,27 +702,27 @@ MA1、MA2分别为成交额的5日、10日均线；
         <translation>胜率</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="317"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="321"/>
         <source>Start</source>
         <translation>起始点</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="318"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="322"/>
         <source>Trade No.</source>
         <translation>交易序号：</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="319"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="323"/>
         <source>Single Return</source>
         <translation>单次收益率：</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="320"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="324"/>
         <source>Cumulative Return</source>
         <translation>累计总收益率：</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="321"/>
+        <location filename="../../gui/qt_widgets/MComponents/review/income_chart_widget.py" line="325"/>
         <source>Win Rate</source>
         <translation>当前胜率：</translation>
     </message>
@@ -730,7 +730,7 @@ MA1、MA2分别为成交额的5日、10日均线；
 <context>
     <name>IndicatorsViewWidget</name>
     <message>
-        <location filename="../../gui/qt_widgets/MComponents/indicators/indicators_view_widget.py" line="144"/>
+        <location filename="../../gui/qt_widgets/MComponents/indicators/indicators_view_widget.py" line="147"/>
         <source>1D</source>
         <translation>日线</translation>
     </message>
@@ -1512,24 +1512,34 @@ MACD指数平滑异同移动平均线为两条长、短的平滑平均线。
         <translation>补全当前未走完K线后自动前进到下一根K线</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="66"/>
         <source>Regret mode</source>
         <translation>后悔模式</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="66"/>
         <source>Allow k-line backward operation</source>
         <translation>允许K线后退操作</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="65"/>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="74"/>
         <source>Fast forward step</source>
         <translation>快进步数</translation>
     </message>
     <message>
-        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="65"/>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="74"/>
         <source>From {0} to {1}</source>
         <translation>从 {0} 到 {1}</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <source>Open first</source>
+        <translation>展示开盘态</translation>
+    </message>
+    <message>
+        <location filename="../../gui/qt_widgets/setting/review_setting_interface.py" line="57"/>
+        <source>Single-step forward shows the open price first (unfinished), click again to complete it; when on, &quot;Complete the forward&quot; is ignored</source>
+        <translation>手动单步前进时先展示开盘价</translation>
     </message>
 </context>
 <context>
