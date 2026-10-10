@@ -109,4 +109,35 @@ Baostock 项目地址：https://pypi.org/project/baostock/
 
 ### qfluentwidgets
 
-qfluentwidgets 项目地址：https://github.com/zhiyiYo/PyQt-Fluent-Widgets（本项目已将其控件源码内置至 `src/gui/qt_widgets/MComponents/qfluentwidgets`）
+qfluentwidgets 项目地址：https://github.com/zhiyiYo/PyQt-Fluent-Widgets
+（本项目已将其控件源码内置至 `src/gui/qt_widgets/MComponents/qfluentwidgets`）
+
+## 捐赠
+
+**如果你觉得这个项目不错，请作者喝杯咖啡。**
+
+<div align="center">
+  <img src="docs/其他/捐赠/微信.jpg" width="300" alt="微信" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/支付宝.jpg" width="300" alt="支付宝" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/币安.jpg" width="300" alt="币安" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/欧易.jpg" width="300" alt="欧易" style="margin-right: 60px;">
+</div>
+
+**链上钱包：**
+
+<div align="center">
+  <img src="docs/其他/捐赠/链上/链上-以太坊.png" width="300" alt="以太坊" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-Bitcoin.png" width="300" alt="Bitcoin" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-Solana.png" width="300" alt="Solana" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-Linea.png" width="300" alt="Linea" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-Base.png" width="300" alt="Base" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-BNBChain.png" width="300" alt="BNBChain" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-Sei.png" width="300" alt="Sei" style="margin-right: 60px;">
+
+  <img src="docs/其他/捐赠/链上/链上-Polygon.png" width="300" alt="Polygon" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-OP.png" width="300" alt="OP" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-Arbitrum.png" width="300" alt="Arbitrum" style="margin-right: 60px;">
+
+  <img src="docs/其他/捐赠/链上/链上-Arc.png" width="300" alt="Arc" style="margin-right: 60px;">
+  <img src="docs/其他/捐赠/链上/链上-Tron.png" width="300" alt="Tron" style="margin-right: 60px;">
+</div>
