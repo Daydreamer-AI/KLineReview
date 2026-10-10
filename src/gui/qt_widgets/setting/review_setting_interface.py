@@ -1,5 +1,5 @@
 # coding:utf-8
-from gui.qt_widgets.MComponents.qfluentwidgets import (SettingCardGroup, SwitchSettingCard, FolderListSettingCard,
+from gui.qt_widgets.MComponents.qfluentwidgets import (SettingCardGroup, SwitchSettingCard, StepSettingCard,
                             OptionsSettingCard, PushSettingCard,
                             HyperlinkCard, PrimaryPushSettingCard, ScrollArea,
                             ComboBoxSettingCard, ExpandLayout, Theme, CustomColorSettingCard,
@@ -62,6 +62,14 @@ class ReviewSettingInterface(ScrollArea):
                     self.operationGroup
                 )
 
+        self.stepCard = StepSettingCard(
+            cfg.fastForwardStep,
+            '',
+            self.tr('Fast forward step'),
+            self.tr("From {0} to {1}").format(cfg.fastForwardStep.range[0], cfg.fastForwardStep.range[1]),
+            self.operationGroup
+        )
+
         # initialize layout
         self.__initLayout()
     
@@ -71,6 +79,7 @@ class ReviewSettingInterface(ScrollArea):
         # add cards to group
         self.operationGroup.addSettingCard(self.ctfCard)
         self.operationGroup.addSettingCard(self.regretModeCard)
+        self.operationGroup.addSettingCard(self.stepCard)
 
         # add setting card group to layout
         self.expandLayout.setSpacing(28)

@@ -808,7 +808,7 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.back_to_front()
 
     def slot_btn_back_ten_clicked(self):
-        self.indicators_view_widget.step_backward(10)   # TODO：可自定义步数
+        self.indicators_view_widget.step_backward(cfg.fastForwardStep.value) 
 
     def slot_btn_back_clicked(self):
         self.indicators_view_widget.step_backward()
@@ -817,7 +817,7 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.step_forward()
 
     def slot_btn_move_on_10_clicked(self):
-        self.indicators_view_widget.step_forward(10)
+        self.indicators_view_widget.step_forward(cfg.fastForwardStep.value)
 
     def slot_btn_move_to_last_clicked(self):
         self.indicators_view_widget.back_to_end()
