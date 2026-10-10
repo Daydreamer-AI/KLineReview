@@ -49,7 +49,7 @@ class ReviewSettingInterface(ScrollArea):
         self.ctfCard = SwitchSettingCard(
             '',
             self.tr('Complete the forward'),
-            self.tr('Complete the current unfinished candlestick and move on to the next one'),
+            self.tr('Complete the current unfinished candlestick; turn on to also move on to the next one'),
             cfg.ctfEnabled,
             self.operationGroup
         )

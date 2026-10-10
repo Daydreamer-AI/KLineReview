@@ -808,7 +808,7 @@ class ReviewWidget(QWidget):
         self.indicators_view_widget.back_to_front()
 
     def slot_btn_back_ten_clicked(self):
-        self.indicators_view_widget.step_backward(10)
+        self.indicators_view_widget.step_backward(10)   # TODO：可自定义步数
 
     def slot_btn_back_clicked(self):
         self.indicators_view_widget.step_backward()

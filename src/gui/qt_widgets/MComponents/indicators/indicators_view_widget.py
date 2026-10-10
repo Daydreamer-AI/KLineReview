@@ -22,7 +22,9 @@ from gui.qt_widgets.MComponents.review.mloading_widget import LoadingWidget
 from indicators import stock_data_indicators as sdi
 
 from manager.period_manager import TimePeriod, ReviewPeriodProcessData
-from processor.period_aggregator import period_start_key, aggregate_period
+from processor.period_aggregator import period_start_key, aggregate_period, get_base_timestamps
+
+from common.config import cfg
 
 from manager.indicators_config_manager import get_indicator_config_manager, IndicatrosEnum
 
@@ -473,6 +475,91 @@ class IndicatorsViewWidget(QWidget):
         else:
             as_of = df['date'].iloc[index]
         self._refresh_derived_period_data(period, as_of)
+
+    def _get_period_base_data(self, period):
+        """返回重建目标周期数据所用的基周期 DataFrame（未按复盘位置截断）。"""
+        if TimePeriod.is_minute_level(period):
+            minute_bases = [
+                p for p in self.dict_stock_data
+                if TimePeriod.is_minute_level(p) and p < period
+            ]
+            if not minute_bases:
+                return None
+            base_period = min(minute_bases)
+        else:
+            # 日线及以上：上级周期统一由日线基周期聚合
+            base_period = TimePeriod.DAY
+        base_df = self._base_stock_data.get(base_period)
+        if base_df is None or base_df.empty:
+            base_df = self.dict_stock_data.get(base_period)
+        return base_df
+
+    def _get_unfinished_bar_complete_as_of(self, period, df, index):
+        """计算把 index 处未走完 bar 补全为完整 K 线所需的 as_of 时刻。
+
+        取该 bar 所属周期内最后一根基周期 bar 的时刻：聚合时 as_of 落在该周期内，
+        该周期即按完整周期处理（is_complete=True），且不会截断后续周期。
+        """
+        date_time_col = 'time' if 'time' in df.columns else 'date'
+        try:
+            bar_time = pd.Timestamp(df[date_time_col].iloc[index])
+        except (ValueError, TypeError, IndexError):
+            return None
+        if pd.isna(bar_time):
+            return None
+
+        base_df = self._get_period_base_data(period)
+        if base_df is None or base_df.empty:
+            return None
+
+        target_period_start = period_start_key(period, bar_time)
+        matched_times = [
+            base_time for base_time in get_base_timestamps(base_df)
+            if pd.notna(base_time) and period_start_key(period, base_time) == target_period_start
+        ]
+        if not matched_times:
+            return None
+        return max(matched_times)
+
+    def _complete_unfinished_current_bar(self):
+        """当前 bar 未走完时先补全为完整 K 线（不移动复盘索引），返回是否完成补全。
+
+        补全按当前 bar 所属周期的结束时刻重建本周期数据，是否补全后继续前进
+        由调用方结合 cfg.ctfEnabled 决定。
+        """
+        if self.property("review") is None:
+            return False
+        period = self.get_current_period()
+        index = self.current_animation_index
+        if period is None or index < 0:
+            return False
+
+        df = self.get_stock_data()
+        if df is None or df.empty or 'is_complete' not in df.columns:
+            return False
+        if index >= len(df) or bool(df['is_complete'].iloc[index]):
+            return False
+
+        as_of = self._get_unfinished_bar_complete_as_of(period, df, index)
+        if as_of is None:
+            return False
+        self.logger.info(
+            f"补全未走完的{TimePeriod.get_chinese_label(period)}K线：索引={index}，as_of={as_of}")
+        self._refresh_derived_period_data(period, as_of)
+
+        completed_df = self.get_stock_data()
+        if (completed_df is None or completed_df.empty
+                or 'is_complete' not in completed_df.columns
+                or index >= len(completed_df)
+                or not bool(completed_df['is_complete'].iloc[index])):
+            # 基周期数据本身不足（如进行中当日分钟数据未走完），交由调用方按普通前进处理
+            self.logger.warning(f"当前K线（索引={index}）数据不足，无法补全，按普通前进处理")
+            return False
+        if self.df_data is None or self.df_data.empty:
+            return False
+
+        self.update_chart(self.df_data.iloc[0], index)
+        return True
 
     def update_indicator_chart(self, df_data):
         is_volume_checked = self.btn_indicator_volume.isChecked()
@@ -1187,7 +1274,13 @@ class IndicatorsViewWidget(QWidget):
             self.animation_timer.start(self.animation_speed)
 
     def step_forward(self, steps=1):
-        """向前播放指定步数"""
+        """向前播放指定步数。
+
+        K 线未走完（进行中 bar）时按 cfg.ctfEnabled 区分处理：
+        - False（默认）：本次前进只把当前未走完 K 线补全为完整 K 线，复盘位置不动，
+          用户再次点击前进才显示下一根完整 K 线；
+        - True：沿用原前进逻辑，补全当前未走完 K 线并自动显示下一根完整 K 线。
+        """
         if self.df_data is None or self.df_data.empty:
             return
         
@@ -1197,7 +1290,12 @@ class IndicatorsViewWidget(QWidget):
             QMessageBox.warning(self, "提示", "已到达最前")
             self.sig_animation_play_finished.emit()
             return
-        
+
+        # 未开启“补全并前进”时，本次前进只补全当前未走完的 K 线，位置不动；
+        # 开启时沿用原前进逻辑（移动到下一根时上一根已按完整周期重算，即补全并前进）
+        if not cfg.ctfEnabled.value and self._complete_unfinished_current_bar():
+            return
+
         if new_index > self.max_animation_index:
             QMessageBox.warning(self, "提示", "已到达最后")
             return

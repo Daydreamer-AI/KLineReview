@@ -29,6 +29,7 @@ import pandas as pd
 
 from manager.period_manager import TimePeriod
 from indicators import stock_data_indicators as sdi
+from common.config import cfg
 from gui.qt_widgets.MComponents.review.review_widget import ReviewWidget
 
 
@@ -156,6 +157,89 @@ class TestPartialPeriods(ReviewSwitchTestBase):
         view_load = self.make_view(review_date='2026-06-03', display=TimePeriod.WEEK)
         self.assertEqual(self._cur(view_switch), self._cur(view_load))
         self.assertFalse(self._current_row(view_load)['is_complete'])
+
+
+class TestForwardOnUnfinishedBar(ReviewSwitchTestBase):
+    """未走完 K 线的前进处理：由 cfg.ctfEnabled 决定补全后是否自动前进。"""
+
+    def setUp(self):
+        self._ctf_enabled = cfg.ctfEnabled.value
+
+    def tearDown(self):
+        cfg.ctfEnabled.value = self._ctf_enabled
+
+    def _day_close(self, date):
+        return self.day_df.loc[self.day_df['date'] == date, 'close'].iloc[0]
+
+    def test_forward_only_completes_when_ctf_disabled(self):
+        """ctfEnabled=False（默认）：前进只补全当前未走完 K 线，位置不动。"""
+        cfg.ctfEnabled.value = False
+        view = self.make_view(review_date='2026-06-03', display=TimePeriod.WEEK)
+
+        start_index = view.current_animation_index
+        self.assertEqual(self._cur(view), '2026-06-03 15:00:00')
+        self.assertFalse(self._current_row(view)['is_complete'])
+        self.assertAlmostEqual(self._current_row(view)['close'], self._day_close('2026-06-03'))
+
+        view.step_forward()
+
+        # 复盘位置不变，当前 K 线补全为完整周（周一~周五）
+        self.assertEqual(view.current_animation_index, start_index)
+        self.assertEqual(self._cur(view), '2026-06-05 15:00:00')
+        self.assertTrue(self._current_row(view)['is_complete'])
+        self.assertAlmostEqual(self._current_row(view)['close'], self._day_close('2026-06-05'))
+
+        # 用户再次点击前进，才显示下一根完整 K 线
+        view.step_forward()
+
+        self.assertEqual(view.current_animation_index, start_index + 1)
+        self.assertEqual(self._cur(view), '2026-06-12 15:00:00')
+        self.assertTrue(self._current_row(view)['is_complete'])
+
+    def test_forward_completes_and_moves_on_when_ctf_enabled(self):
+        """ctfEnabled=True：补全当前未走完 K 线并自动前进到下一根完整 K 线。"""
+        cfg.ctfEnabled.value = True
+        view = self.make_view(review_date='2026-06-03', display=TimePeriod.WEEK)
+
+        start_index = view.current_animation_index
+        self.assertFalse(self._current_row(view)['is_complete'])
+
+        view.step_forward()
+
+        self.assertEqual(view.current_animation_index, start_index + 1)
+        self.assertEqual(self._cur(view), '2026-06-12 15:00:00')
+        self.assertTrue(self._current_row(view)['is_complete'])
+        # 原来的进行中周已补全为完整周
+        self.assertTrue(view.df_data.iloc[start_index]['is_complete'])
+        self.assertAlmostEqual(view.df_data.iloc[start_index]['close'], self._day_close('2026-06-05'))
+
+    def test_forward_completes_partial_month(self):
+        """月线未走完时同样按 ctfEnabled=False 只补全当月。"""
+        cfg.ctfEnabled.value = False
+        view = self.make_view(review_date='2026-06-03', display=TimePeriod.MONTH)
+
+        start_index = view.current_animation_index
+        self.assertEqual(self._cur(view), '2026-06-03 15:00:00')
+        self.assertFalse(self._current_row(view)['is_complete'])
+
+        view.step_forward()
+
+        self.assertEqual(view.current_animation_index, start_index)
+        self.assertEqual(self._cur(view), '2026-06-30 15:00:00')
+        self.assertTrue(self._current_row(view)['is_complete'])
+
+    def test_forward_moves_on_when_bar_already_complete(self):
+        """当前 K 线已走完时，前进行为不受 ctfEnabled 影响。"""
+        cfg.ctfEnabled.value = False
+        view = self.make_view(review_date='2026-06-05', display=TimePeriod.WEEK)
+
+        start_index = view.current_animation_index
+        self.assertTrue(self._current_row(view)['is_complete'])
+
+        view.step_forward()
+
+        self.assertEqual(view.current_animation_index, start_index + 1)
+        self.assertTrue(self._current_row(view)['is_complete'])
 
 
 if __name__ == '__main__':
