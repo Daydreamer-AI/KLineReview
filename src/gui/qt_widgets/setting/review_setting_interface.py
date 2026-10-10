@@ -54,6 +54,15 @@ class ReviewSettingInterface(ScrollArea):
             self.operationGroup
         )
 
+        self.openCard = SwitchSettingCard(
+            '',
+            self.tr('Open first'),
+            self.tr('Single-step forward shows the open price first (unfinished), click again to complete it; '
+                    'when on, "Complete the forward" is ignored'),
+            cfg.openFirst,
+            self.operationGroup
+        )
+
         self.regretModeCard = SwitchSettingCard(
             '',
             self.tr('Regret mode'),
@@ -70,14 +79,23 @@ class ReviewSettingInterface(ScrollArea):
             self.operationGroup
         )
 
+        # openFirst 优先：开启时“补全并前进”不生效，置灰对应卡片
+        cfg.openFirst.valueChanged.connect(self.__openFirstChanged)
+        self.__openFirstChanged(cfg.openFirst.value)
+
         # initialize layout
         self.__initLayout()
+
+    def __openFirstChanged(self, b_open_first):
+        """openFirst 开启时抑制 ctfEnabled 的自动前进，置灰“补全并前进”卡片。"""
+        self.ctfCard.setEnabled(not b_open_first)
     
     def __initLayout(self):
         # self.settingLabel.move(36, 30)
 
         # add cards to group
         self.operationGroup.addSettingCard(self.ctfCard)
+        self.operationGroup.addSettingCard(self.openCard)
         self.operationGroup.addSettingCard(self.regretModeCard)
         self.operationGroup.addSettingCard(self.stepCard)
 

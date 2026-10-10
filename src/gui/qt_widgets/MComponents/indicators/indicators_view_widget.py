@@ -87,6 +87,9 @@ class IndicatorsViewWidget(QWidget):
         self.min_period = TimePeriod.DAY    # 已切换成功的最小周期
         self.index_changed = False
 
+        # 开盘态（cfg.openFirst）：手动单步前进落地时先显示开盘价的 bar 索引，-1 表示无
+        self._open_first_index = -1
+
     def init_ui(self):
         self.period_button_group = QtWidgets.QButtonGroup(self)
         self.period_button_group.addButton(self.btn_time)
@@ -285,12 +288,17 @@ class IndicatorsViewWidget(QWidget):
         return dict_return
 
     def get_current_kline_data(self):
-        """返回最后一条K线数据"""
+        """返回当前复盘位置的K线数据（含开盘态等显示层形态，与图表显示保持一致）"""
+        index = self.current_animation_index
+        if (self.df_data is not None and not self.df_data.empty
+                and 0 <= index < len(self.df_data)):
+            return self.df_data.iloc[index]
+
         df_data = self.get_stock_data()
-        if df_data.empty:
+        if df_data is None or df_data.empty:
             return pd.DataFrame()
-        
-        return df_data.iloc[self.current_animation_index]
+
+        return df_data.iloc[index]
 
     def get_stock_data(self):
         checked_btn = self.period_button_group.checkedButton()
@@ -333,6 +341,7 @@ class IndicatorsViewWidget(QWidget):
             dict_stock_data: {TimePeriod: DataFrame}，各周期K线数据（建议含指标列，
                              列结构参考 init_para 中的注释）
         """
+        self._open_first_index = -1     # 注入新数据不保留开盘态
         if code != self.current_selected_code:
             self.logger.info(f"切换股票：{self.current_selected_code} -> {code}")
             self.dict_stock_data = {}
@@ -406,6 +415,9 @@ class IndicatorsViewWidget(QWidget):
             start_index = max(0, min(start_index, len(df) - 1))
             # 获取指定索引前（包含指定索引）的数据
             self.df_data = df.iloc[:start_index+1]
+            # 开盘态（手动单步前进落地）：显示层把当前 bar 变换为刚开盘形态
+            if self._open_first_index == start_index:
+                self.df_data = self._apply_open_first_bar(self.df_data, self.get_current_period(), start_index)
             # self.logger.info(f"self.df_data的长度: {len(self.df_data)}\n{self.df_data.tail(1)}")
             
             # 设置当前动画索引为start_index
@@ -522,7 +534,8 @@ class IndicatorsViewWidget(QWidget):
         return max(matched_times)
 
     def _complete_unfinished_current_bar(self):
-        """当前 bar 未走完时先补全为完整 K 线（不移动复盘索引），返回是否完成补全。
+        """当前 bar 未走完（期中进行中／开盘态）时先补全为完整 K 线（不移动复盘索引），
+        返回是否完成补全。
 
         补全按当前 bar 所属周期的结束时刻重建本周期数据，是否补全后继续前进
         由调用方结合 cfg.ctfEnabled 决定。
@@ -537,7 +550,8 @@ class IndicatorsViewWidget(QWidget):
         df = self.get_stock_data()
         if df is None or df.empty or 'is_complete' not in df.columns:
             return False
-        if index >= len(df) or bool(df['is_complete'].iloc[index]):
+        b_open_first = self._open_first_index == index
+        if index >= len(df) or (bool(df['is_complete'].iloc[index]) and not b_open_first):
             return False
 
         as_of = self._get_unfinished_bar_complete_as_of(period, df, index)
@@ -558,8 +572,61 @@ class IndicatorsViewWidget(QWidget):
         if self.df_data is None or self.df_data.empty:
             return False
 
+        self._open_first_index = -1     # 开盘态已补全为完整 K 线
         self.update_chart(self.df_data.iloc[0], index)
         return True
+
+    def _get_bar_open_time(self, period, bar_time):
+        """返回 bar 所属周期的开始时刻（开盘态的时间标签）。
+
+        日线及以上取周期开始日（周=周一、月=1 日等）的 09:30；
+        分钟级取槽位开始时刻（自带时间）。
+        """
+        period_start = period_start_key(period, bar_time)
+        if TimePeriod.is_minute_level(period):
+            return period_start
+        return pd.Timestamp.combine(period_start.normalize(), pd.Timestamp('09:30').time())
+
+    def _apply_open_first_bar(self, df_slice, period, index):
+        """把切片数据 index 处的 bar 变换为“刚开盘”形态（显示层转换，不改基周期数据）。
+
+        - open 保留真实开盘价，high/low/close 与 open 一致（刚开盘，尚无涨跌区间）；
+        - volume/amount/turnover_rate 置 0，is_complete=False（属于未走完状态，可被补全）；
+        - date/time 标签取该 bar 所属周期的开始时刻（见 _get_bar_open_time）；
+        - 按变换后的数据重算指标：指标只依赖历史与当前 bar，不会引入未来数据。
+        """
+        if df_slice is None or df_slice.empty or 'open' not in df_slice.columns:
+            return df_slice
+        if period is None or index < 0 or index >= len(df_slice):
+            return df_slice
+
+        row_pos = df_slice.index[index]
+        date_time_col = 'time' if 'time' in df_slice.columns else 'date'
+        try:
+            bar_time = pd.Timestamp(df_slice[date_time_col].loc[row_pos])
+        except (ValueError, TypeError):
+            return df_slice
+        if pd.isna(bar_time):
+            return df_slice
+
+        open_price = df_slice['open'].loc[row_pos]
+        open_time = self._get_bar_open_time(period, bar_time)
+
+        df_open = df_slice.copy()
+        df_open.loc[row_pos, 'high'] = open_price
+        df_open.loc[row_pos, 'low'] = open_price
+        df_open.loc[row_pos, 'close'] = open_price
+        for col in ('volume', 'amount', 'turnover_rate'):
+            if col in df_open.columns:
+                df_open.loc[row_pos, col] = 0
+        df_open.loc[row_pos, 'is_complete'] = False
+        if 'date' in df_open.columns:
+            df_open.loc[row_pos, 'date'] = open_time.strftime('%Y-%m-%d')
+        if 'time' in df_open.columns:
+            df_open.loc[row_pos, 'time'] = open_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        sdi.default_indicators_auto_calculate(df_open)
+        return df_open
 
     def update_indicator_chart(self, df_data):
         is_volume_checked = self.btn_indicator_volume.isChecked()
@@ -1086,6 +1153,8 @@ class IndicatorsViewWidget(QWidget):
     # -----------------------复盘回放相关接口----------------------
     def init_animation(self, data, start_date, b_init=True):
         dict_return = {}
+        # 加载/切换周期重新初始化：不保留开盘态
+        self._open_first_index = -1
         code = data['code']
         self.logger.info(f"初始化动画：{code}, 日期：{start_date}")
         if code != self.current_selected_code or not self.dict_stock_data:
@@ -1273,13 +1342,16 @@ class IndicatorsViewWidget(QWidget):
             self.animation_timer.stop()
             self.animation_timer.start(self.animation_speed)
 
-    def step_forward(self, steps=1):
+    def step_forward(self, steps=1, open_first=True):
         """向前播放指定步数。
 
-        K 线未走完（进行中 bar）时按 cfg.ctfEnabled 区分处理：
-        - False（默认）：本次前进只把当前未走完 K 线补全为完整 K 线，复盘位置不动，
-          用户再次点击前进才显示下一根完整 K 线；
-        - True：沿用原前进逻辑，补全当前未走完 K 线并自动显示下一根完整 K 线。
+        K 线未走完（进行中／开盘态）时先补全当前 K 线：
+        - cfg.ctfEnabled=False（默认）：本次前进只补全，复盘位置不动，再次点击前进才显示下一根；
+        - cfg.ctfEnabled=True：补全并自动前进；cfg.openFirst=True 时该自动前进被抑制（openFirst 优先）。
+
+        cfg.openFirst=True 且当前 K 线已走完：手动单步前进落地时先显示下一根的开盘态（属于未走完），
+        再次点击前进才补全为完整 K 线；多步前进（“前进 N 步”）与自动播放传 open_first=False，
+        直接显示完整 K 线，不引入开盘态。
         """
         if self.df_data is None or self.df_data.empty:
             return
@@ -1291,14 +1363,20 @@ class IndicatorsViewWidget(QWidget):
             self.sig_animation_play_finished.emit()
             return
 
-        # 未开启“补全并前进”时，本次前进只补全当前未走完的 K 线，位置不动；
-        # 开启时沿用原前进逻辑（移动到下一根时上一根已按完整周期重算，即补全并前进）
-        if not cfg.ctfEnabled.value and self._complete_unfinished_current_bar():
-            return
+        # 未走完的当前 K 线：补全；是否补全后继续前进由 ctfEnabled 决定（openFirst 开启时抑制自动前进）
+        if self._complete_unfinished_current_bar():
+            if not (cfg.ctfEnabled.value and not cfg.openFirst.value):
+                return
 
         if new_index > self.max_animation_index:
             QMessageBox.warning(self, "提示", "已到达最后")
             return
+
+        # 手动单步前进 + cfg.openFirst：落地先显示开盘态；其它前进方式直接显示完整 K 线
+        if open_first and steps == 1 and cfg.openFirst.value:
+            self._open_first_index = new_index
+        else:
+            self._open_first_index = -1
 
         data = self.df_data.iloc[0]
         self.update_chart(data, new_index)
@@ -1314,6 +1392,7 @@ class IndicatorsViewWidget(QWidget):
             QMessageBox.warning(self, "提示", "已到达最前")
             return
 
+        self._open_first_index = -1     # 回退后不再保留开盘态
         data = self.df_data.iloc[0]
         self.update_chart(data, new_index)
 
@@ -1322,6 +1401,7 @@ class IndicatorsViewWidget(QWidget):
         if self.df_data is None or self.df_data.empty:
             return
         
+        self._open_first_index = -1
         data = self.df_data.iloc[0]
         self.update_chart(data, 0)
 
@@ -1330,6 +1410,7 @@ class IndicatorsViewWidget(QWidget):
         if self.df_data is None or self.df_data.empty:
             return
         
+        self._open_first_index = -1
         data = self.df_data.iloc[0]
         self.update_chart(data, self.max_animation_index)
 
@@ -1341,6 +1422,7 @@ class IndicatorsViewWidget(QWidget):
         if index == self.current_animation_index:
             return
 
+        self._open_first_index = -1     # 滑块跳转不保留开盘态
         data = self.df_data.iloc[0]
         self.update_chart(data, index)
 
@@ -1500,6 +1582,7 @@ class IndicatorsViewWidget(QWidget):
             self.stop_animation()
             self.sig_animation_play_finished.emit()
             return
-        
-        self.step_forward()
+
+        # 自动播放不引入开盘态（仅手动单步前进有开盘态）
+        self.step_forward(open_first=False)
 

@@ -64,6 +64,7 @@ class Config(QConfig):
 
     # Review
     ctfEnabled = ConfigItem("Review", "ctfEnabled", False, BoolValidator())
+    openFirst = ConfigItem("Review", "openFirst", False, BoolValidator())
     regretMode = ConfigItem("Review", "regretMode", False, BoolValidator())
     fastForwardStep = RangeConfigItem("Review", "fastForwardStep", 3, RangeValidator(3, 10))
 

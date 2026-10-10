@@ -164,9 +164,12 @@ class TestForwardOnUnfinishedBar(ReviewSwitchTestBase):
 
     def setUp(self):
         self._ctf_enabled = cfg.ctfEnabled.value
+        self._open_first = cfg.openFirst.value
+        cfg.openFirst.value = False     # 与 openFirst 解耦，单独验证 ctfEnabled 语义
 
     def tearDown(self):
         cfg.ctfEnabled.value = self._ctf_enabled
+        cfg.openFirst.value = self._open_first
 
     def _day_close(self, date):
         return self.day_df.loc[self.day_df['date'] == date, 'close'].iloc[0]
@@ -239,6 +242,125 @@ class TestForwardOnUnfinishedBar(ReviewSwitchTestBase):
         view.step_forward()
 
         self.assertEqual(view.current_animation_index, start_index + 1)
+        self.assertTrue(self._current_row(view)['is_complete'])
+
+
+class TestForwardOpenFirst(ReviewSwitchTestBase):
+    """开盘态前进（cfg.openFirst）：手动单步前进先显示开盘价，再次前进补全为完整 K 线。"""
+
+    def setUp(self):
+        self._open_first = cfg.openFirst.value
+        self._ctf_enabled = cfg.ctfEnabled.value
+
+    def tearDown(self):
+        cfg.openFirst.value = self._open_first
+        cfg.ctfEnabled.value = self._ctf_enabled
+
+    def _day_open(self, date):
+        return self.day_df.loc[self.day_df['date'] == date, 'open'].iloc[0]
+
+    def _day_close(self, date):
+        return self.day_df.loc[self.day_df['date'] == date, 'close'].iloc[0]
+
+    def _make_week_view_at_friday(self):
+        """2026-06-05（周五）复盘：当前周 K 线完整，便于验证前进落地形态。"""
+        cfg.ctfEnabled.value = False
+        cfg.openFirst.value = True
+        view = self.make_view(review_date='2026-06-05', display=TimePeriod.WEEK)
+        self.assertTrue(self._current_row(view)['is_complete'])
+        return view
+
+    def test_single_step_forward_lands_on_open_price(self):
+        """单步前进先显示下一根 K 线的开盘态（未走完），时间标签取周期开始时刻。"""
+        view = self._make_week_view_at_friday()
+        start_index = view.current_animation_index
+
+        view.step_forward()
+
+        row = self._current_row(view)
+        self.assertEqual(view.current_animation_index, start_index + 1)
+        self.assertEqual(self._cur(view), '2026-06-08 09:30:00')
+        self.assertEqual(row['date'], '2026-06-08')
+        self.assertFalse(row['is_complete'])
+        self.assertAlmostEqual(row['open'], self._day_open('2026-06-08'))
+        self.assertAlmostEqual(row['high'], row['open'])
+        self.assertAlmostEqual(row['low'], row['open'])
+        self.assertAlmostEqual(row['close'], row['open'])
+        self.assertEqual(row['volume'], 0)
+        # 开盘态属显示层变换，周期数据本身仍是完整 K 线
+        period_row = view.get_stock_data().iloc[start_index + 1]
+        self.assertTrue(period_row['is_complete'])
+        self.assertAlmostEqual(period_row['close'], self._day_close('2026-06-12'))
+
+    def test_second_forward_completes_the_open_bar(self):
+        """再次前进把开盘态补全为完整 K 线，复盘位置不动；再前进则落地下一根开盘态。"""
+        view = self._make_week_view_at_friday()
+        start_index = view.current_animation_index
+        view.step_forward()
+
+        view.step_forward()
+
+        row = self._current_row(view)
+        self.assertEqual(view.current_animation_index, start_index + 1)
+        self.assertEqual(self._cur(view), '2026-06-12 15:00:00')
+        self.assertTrue(row['is_complete'])
+        self.assertAlmostEqual(row['close'], self._day_close('2026-06-12'))
+
+        view.step_forward()
+
+        self.assertEqual(view.current_animation_index, start_index + 2)
+        self.assertEqual(self._cur(view), '2026-06-15 09:30:00')
+        self.assertFalse(self._current_row(view)['is_complete'])
+
+    def test_open_first_suppresses_ctf_auto_advance(self):
+        """openFirst 优先：开启时 ctfEnabled 的“补全并前进”被抑制，只补全。"""
+        cfg.ctfEnabled.value = True
+        cfg.openFirst.value = True
+        view = self.make_view(review_date='2026-06-03', display=TimePeriod.WEEK)
+
+        start_index = view.current_animation_index
+        self.assertFalse(self._current_row(view)['is_complete'])
+
+        view.step_forward()
+
+        self.assertEqual(view.current_animation_index, start_index)
+        self.assertEqual(self._cur(view), '2026-06-05 15:00:00')
+        self.assertTrue(self._current_row(view)['is_complete'])
+
+    def test_multi_step_forward_has_no_open_state(self):
+        """多步前进（“前进 N 步”）不引入开盘态，直接显示完整 K 线。"""
+        view = self._make_week_view_at_friday()
+        start_index = view.current_animation_index
+
+        view.step_forward(3)
+
+        self.assertEqual(view.current_animation_index, start_index + 3)
+        self.assertEqual(self._cur(view), '2026-06-26 15:00:00')
+        self.assertTrue(self._current_row(view)['is_complete'])
+        self.assertEqual(view._open_first_index, -1)
+
+    def test_auto_play_has_no_open_state(self):
+        """自动播放不引入开盘态。"""
+        view = self._make_week_view_at_friday()
+        start_index = view.current_animation_index
+
+        view.slot_animation_step()
+
+        self.assertEqual(view.current_animation_index, start_index + 1)
+        self.assertTrue(self._current_row(view)['is_complete'])
+        self.assertEqual(view._open_first_index, -1)
+
+    def test_backward_clears_open_state(self):
+        """回退不保留开盘态。"""
+        view = self._make_week_view_at_friday()
+        start_index = view.current_animation_index
+        view.step_forward()
+        self.assertEqual(view._open_first_index, start_index + 1)
+
+        view.step_backward()
+
+        self.assertEqual(view.current_animation_index, start_index)
+        self.assertEqual(view._open_first_index, -1)
         self.assertTrue(self._current_row(view)['is_complete'])
 
 
