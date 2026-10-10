@@ -33,16 +33,42 @@ jobs:
         with:
           python-version: "3.10"
 
+      # macos-15-intel 镜像剩余空间小，打 dmg 时会报
+      # "hdiutil: create failed - No space left on device"，先清掉用不到的模拟器运行时与缓存。
+      - name: Free up disk space (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          echo "== disk before cleanup =="
+          df -h / /System/Volumes/Data
+          sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/* || true
+          sudo rm -rf /Library/Developer/CoreSimulator/Volumes/* || true
+          sudo rm -rf /Library/Developer/CoreSimulator/Caches/* || true
+          sudo rm -rf "$HOME/Library/Developer/CoreSimulator" || true
+          sudo rm -rf "$HOME/Library/Developer/Xcode/DerivedData" || true
+          sudo rm -rf "$HOME/Library/Caches/pip" || true
+          echo "== disk after cleanup =="
+          df -h / /System/Volumes/Data
+
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install pyinstaller
+          pip install --no-cache-dir -r requirements.txt
+          pip install --no-cache-dir pyinstaller
 
       - name: Generate app icons
         run: python packaging/make_icons.py
 
       - name: Build with PyInstaller
         run: pyinstaller --noconfirm --clean packaging/KLineReview.spec
+
+      # PyInstaller 的 build/ 工作目录体积与 dist/ 相当，打 dmg 前先删掉腾空间
+      - name: Free up build workspace (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          rm -rf build
+          python -m pip cache purge || true
+          df -h / /System/Volumes/Data
 
       - name: Package Windows executable
         if: runner.os == 'Windows'
@@ -54,11 +80,30 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          hdiutil create \
-            -volname KLineReview \
-            -srcfolder dist/KLineReview.app \
-            -ov -format UDZO \
-            "dist/${{ matrix.artifact }}-${{ env.VERSION }}.dmg"
+          set -euo pipefail
+
+          APP="dist/KLineReview.app"
+          OUT="dist/${{ matrix.artifact }}-${{ env.VERSION }}.dmg"
+          RW="$RUNNER_TEMP/KLineReview-rw.dmg"
+          MNT="$RUNNER_TEMP/KLineReview-mnt"
+
+          # 先按 .app 实际大小建一个容量明确的读写镜像再拷贝，避免 hdiutil -srcfolder
+          # 自动估算容量偏小，导致拷贝时 ENOSPC。
+          APP_MB=$(( $(du -sk "$APP" | awk '{print $1}') / 1024 ))
+          SIZE_MB=$(( APP_MB + 300 ))
+          echo "app bundle: ${APP_MB} MB -> rw image: ${SIZE_MB} MB"
+
+          hdiutil create -size "${SIZE_MB}m" -volname KLineReview -ov "$RW"
+          mkdir -p "$MNT"
+          hdiutil attach "$RW" -nobrowse -noautoopen -mountpoint "$MNT"
+          ditto "$APP" "$MNT/KLineReview.app"
+          sync
+          hdiutil detach "$MNT"
+
+          rm -f "$OUT"
+          hdiutil convert "$RW" -format UDZO -o "$OUT"
+          rm -f "$RW"
+          ls -lh "$OUT"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
